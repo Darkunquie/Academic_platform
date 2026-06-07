@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 
@@ -28,8 +28,11 @@ export function LoginForm() {
       setError("Invalid email or password.");
       return;
     }
-    // Middleware routes to the right place based on role/status.
-    router.push("/dashboard");
+    // Route by role; middleware still guards each destination.
+    const session = await getSession();
+    const role = session?.user?.role;
+    const dest = role === "admin" || role === "super_admin" ? "/admin" : "/dashboard";
+    router.push(dest);
     router.refresh();
   }
 
