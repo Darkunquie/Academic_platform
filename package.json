@@ -1,0 +1,35 @@
+{
+  "name": "academic-platform",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "next": "^16.1.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "drizzle-orm": "^0.38.4",
+    "postgres": "^3.4.5",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.6.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "@types/node": "^22.10.7",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "drizzle-kit": "^0.30.2",
+    "dotenv": "^16.4.7",
+    "tailwindcss": "^4.0.0",
+    "@tailwindcss/postcss": "^4.0.0"
+  }
+}
