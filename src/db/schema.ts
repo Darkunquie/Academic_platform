@@ -396,9 +396,12 @@ export const interviewSessions = pgTable(
     studentId: uuid("student_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    topicId: uuid("topic_id")
-      .notNull()
-      .references(() => topics.id, { onDelete: "cascade" }),
+    // An interview spans MULTIPLE topics (across one or more chapters).
+    // The selected topics are stored in interview_session_topics.
+    // subjectId scopes the session for analytics/cache; topics imply subject.
+    subjectId: uuid("subject_id").references(() => subjects.id, {
+      onDelete: "set null",
+    }),
     mode: interviewModeEnum("mode").notNull().default("text"),
     status: interviewStatusEnum("status").notNull().default("active"),
     overallScore: numeric("overall_score"),
@@ -410,7 +413,26 @@ export const interviewSessions = pgTable(
   },
   (t) => [
     index("interview_sessions_student_idx").on(t.studentId),
-    index("interview_sessions_topic_idx").on(t.topicId),
+    index("interview_sessions_subject_idx").on(t.subjectId),
+  ]
+);
+
+// Many-to-many: a session selects multiple topics (from multiple chapters).
+export const interviewSessionTopics = pgTable(
+  "interview_session_topics",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sessionId: uuid("session_id")
+      .notNull()
+      .references(() => interviewSessions.id, { onDelete: "cascade" }),
+    topicId: uuid("topic_id")
+      .notNull()
+      .references(() => topics.id, { onDelete: "cascade" }),
+  },
+  (t) => [
+    unique("interview_session_topic_uq").on(t.sessionId, t.topicId),
+    index("interview_session_topics_session_idx").on(t.sessionId),
+    index("interview_session_topics_topic_idx").on(t.topicId),
   ]
 );
 
