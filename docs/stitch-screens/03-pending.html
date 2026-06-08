@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Scholastica | Account Pending</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@100..900&amp;family=Geist+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "surface-container": "#f0eee9",
+                "on-primary-fixed": "#002115",
+                "outline": "#707973",
+                "primary": "#004530",
+                "on-background": "#1b1c19",
+                "secondary-container": "#8a85fe",
+                "tertiary-fixed": "#ffdbd2",
+                "forest-500": "#1F8765",
+                "on-secondary-fixed": "#100069",
+                "on-surface": "#1b1c19",
+                "ink-100": "#EFEEEA",
+                "surface-variant": "#e4e2dd",
+                "surface": "#fbf9f4",
+                "error": "#ba1a1a",
+                "tertiary-container": "#982c0e",
+                "secondary": "#544dc4",
+                "indigo-700": "#3E3A8C",
+                "ink-200": "#E2E4E8",
+                "on-tertiary": "#ffffff",
+                "primary-fixed": "#abf1d0",
+                "outline-variant": "#bfc9c2",
+                "on-primary-container": "#90d5b5",
+                "paper": "#F8F6F1",
+                "on-tertiary-container": "#ffb5a2",
+                "on-primary-fixed-variant": "#005139",
+                "error-container": "#ffdad6",
+                "inverse-surface": "#30312e",
+                "surface-container-highest": "#e4e2dd",
+                "surface-dim": "#dbdad5",
+                "ink-950": "#0A0B0D",
+                "forest-950": "#062B1F",
+                "surface-container-high": "#eae8e3",
+                "surface-bright": "#fbf9f4",
+                "inverse-on-surface": "#f2f1ec",
+                "warning": "#D97A1F",
+                "on-tertiary-fixed": "#3c0800",
+                "on-secondary": "#ffffff",
+                "on-error": "#ffffff",
+                "on-error-container": "#93000a",
+                "inverse-primary": "#90d5b5",
+                "danger": "#B23A3A",
+                "tertiary": "#751900",
+                "secondary-fixed": "#e3dfff",
+                "on-secondary-fixed-variant": "#3b33ac",
+                "forest-100": "#D9EBE3",
+                "secondary-fixed-dim": "#c3c0ff",
+                "tertiary-fixed-dim": "#ffb4a1",
+                "success": "#1F8765",
+                "surface-tint": "#246a50",
+                "ink-900": "#16181C",
+                "surface-container-lowest": "#ffffff",
+                "primary-container": "#155e45",
+                "on-tertiary-fixed-variant": "#872002",
+                "on-surface-variant": "#3f4944",
+                "coral-300": "#F6A488",
+                "primary-fixed-dim": "#90d5b5",
+                "coral-700": "#C9462C",
+                "on-primary": "#ffffff",
+                "surface-container-low": "#f5f3ee",
+                "background": "#fbf9f4",
+                "on-secondary-container": "#1e0892",
+                "coral-500": "#E85D44"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "lg": "16px",
+                "md": "12px",
+                "max-width": "1280px",
+                "layout-gutter": "16px",
+                "sm": "8px",
+                "xs": "4px",
+                "base": "8px",
+                "3xl": "48px",
+                "4xl": "64px",
+                "2xl": "32px",
+                "xl": "24px",
+                "layout-margin": "24px"
+            },
+            "fontFamily": {
+                "hero": ["Instrument Serif"],
+                "display": ["Instrument Serif"],
+                "h3": ["Geist"],
+                "body": ["Geist"],
+                "small": ["Geist"],
+                "eyebrow": ["Geist Mono"],
+                "body-lg": ["Geist"],
+                "h2": ["Geist"],
+                "h1": ["Instrument Serif"]
+            },
+            "fontSize": {
+                "hero": ["72px", {"lineHeight": "76px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                "display": ["48px", {"lineHeight": "56px", "fontWeight": "400"}],
+                "h3": ["18px", {"lineHeight": "26px", "fontWeight": "600"}],
+                "body": ["15px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "small": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "eyebrow": ["11px", {"lineHeight": "16px", "letterSpacing": "0.12em", "fontWeight": "500"}],
+                "body-lg": ["17px", {"lineHeight": "28px", "fontWeight": "400"}],
+                "h2": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                "h1": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.01em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .dotted-pattern {
+            background-image: radial-gradient(circle, #E2E4E8 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+        .soft-shadow {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02), 0 12px 32px rgba(0,0,0,0.04);
+        }
+        .coral-underline {
+            position: relative;
+            display: inline-block;
+        }
+        .coral-underline::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 4px;
+            width: 100%;
+            height: 4px;
+            background-color: #F6A488;
+            z-index: -1;
+            transform-origin: left;
+            animation: underline-grow 0.8s ease-out forwards;
+        }
+        @keyframes underline-grow {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+        .glass-player {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body class="bg-ink-100 dotted-pattern min-h-screen flex flex-col font-body">
+<!-- Top Navigation (Conditional Shell) -->
+<header class="fixed top-0 w-full z-50 bg-paper border-b border-ink-200 shadow-sm h-20">
+<div class="flex justify-between items-center px-layout-margin h-full max-w-max-width mx-auto">
+<div class="font-hero text-h1 text-primary">Scholastica</div>
+<div class="flex items-center gap-xl">
+<nav class="hidden md:flex gap-xl">
+<span class="font-body text-body-lg text-on-surface-variant cursor-not-allowed opacity-50">Library</span>
+<span class="font-body text-body-lg text-on-surface-variant cursor-not-allowed opacity-50">Curriculum</span>
+<span class="font-body text-body-lg text-on-surface-variant cursor-not-allowed opacity-50">Notebook</span>
+<span class="font-body text-body-lg text-on-surface-variant cursor-not-allowed opacity-50">Community</span>
+</nav>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-forest-500 text-h2 cursor-pointer">account_circle</span>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-grow flex items-center justify-center pt-24 pb-12 px-layout-margin">
+<div class="relative w-full max-w-[640px]">
+<!-- Decorative Elements -->
+<div class="absolute -top-6 -right-6 w-12 h-12 bg-coral-300 rounded-full z-0 opacity-80 animate-pulse"></div>
+<div class="absolute top-1/2 -left-8 transform -translate-y-1/2 text-indigo-700 z-0">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'wght' 200;">add</span>
+</div>
+<!-- Main Card -->
+<div class="bg-surface-container-lowest rounded-lg soft-shadow border border-ink-200 p-4xl relative z-10 overflow-hidden">
+<!-- Status Pill -->
+<div class="mb-2xl flex justify-between items-start">
+<div class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-md py-xs rounded-full inline-flex items-center gap-xs font-eyebrow text-eyebrow">
+<span class="w-1.5 h-1.5 rounded-full bg-coral-700"></span>
+                        Pending review
+                    </div>
+<div class="font-eyebrow text-eyebrow text-on-surface-variant">ID: #SCH-29402</div>
+</div>
+<!-- Header Content -->
+<div class="space-y-md mb-3xl">
+<p class="font-eyebrow text-eyebrow text-on-surface-variant">03 — PENDING REVIEW</p>
+<h1 class="font-hero text-hero text-primary italic leading-tight">
+                        A moment in the <span class="coral-underline">waiting room</span>.
+                    </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-md">
+                        Your application is with an administrator. We send a note the moment you are approved.
+                    </p>
+</div>
+<!-- Account Summary Mini-Card -->
+<div class="bg-paper border border-ink-200 rounded-xl p-xl mb-3xl">
+<div class="grid grid-cols-2 gap-y-xl gap-x-lg">
+<div>
+<p class="font-eyebrow text-eyebrow text-on-surface-variant mb-xs">APPLICANT NAME</p>
+<p class="font-h3 text-h3 text-primary">Dr. Julian Thorne</p>
+</div>
+<div>
+<p class="font-eyebrow text-eyebrow text-on-surface-variant mb-xs">INSTITUTIONAL EMAIL</p>
+<p class="font-h3 text-h3 text-primary">j.thorne@oxford.ac.uk</p>
+</div>
+<div>
+<p class="font-eyebrow text-eyebrow text-on-surface-variant mb-xs">ACADEMIC BOARD</p>
+<p class="font-h3 text-h3 text-primary">Humanities Council</p>
+</div>
+<div>
+<p class="font-eyebrow text-eyebrow text-on-surface-variant mb-xs">CLASS DETAIL</p>
+<p class="font-h3 text-h3 text-primary">Post-Graduate Fellow</p>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col md:flex-row gap-lg pt-base border-t border-ink-100">
+<button class="group relative px-xl py-md font-body text-body-lg text-primary transition-all duration-300 hover:text-coral-700">
+                        Check status
+                        <span class="absolute bottom-0 left-0 w-0 h-[3px] bg-coral-300 transition-all duration-300 group-hover:w-full"></span>
+</button>
+<button class="group relative px-xl py-md font-body text-body-lg text-on-surface-variant transition-all duration-300 hover:text-primary">
+                        Sign out
+                        <span class="absolute bottom-0 left-0 w-0 h-[3px] bg-ink-200 transition-all duration-300 group-hover:w-full"></span>
+</button>
+</div>
+</div>
+<!-- Bottom Accent -->
+<div class="mt-xl flex justify-center">
+<div class="w-1.5 h-1.5 rounded-full bg-ink-200 mx-1"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-ink-200 mx-1"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-coral-300 mx-1"></div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-ink-950 border-t border-forest-950 w-full py-3xl">
+<div class="flex flex-col md:flex-row justify-between items-center px-layout-margin max-w-max-width mx-auto gap-xl">
+<div class="font-hero text-h2 text-ink-100">Scholastica</div>
+<div class="flex flex-wrap justify-center gap-xl">
+<a class="font-small text-small text-ink-200 hover:text-coral-300 transition-colors" href="#">Terms of Service</a>
+<a class="font-small text-small text-ink-200 hover:text-coral-300 transition-colors" href="#">Privacy Policy</a>
+<a class="font-small text-small text-ink-200 hover:text-coral-300 transition-colors" href="#">Institutional Access</a>
+<a class="font-small text-small text-ink-200 hover:text-coral-300 transition-colors" href="#">Support</a>
+</div>
+<div class="font-small text-small text-ink-100 opacity-60">
+                © 2024 Scholastica Academic Systems. All rights reserved.
+            </div>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for the card lift effect or similar
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => {
+                btn.style.transform = 'scale(0.98)';
+            });
+            btn.addEventListener('mouseup', () => {
+                btn.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

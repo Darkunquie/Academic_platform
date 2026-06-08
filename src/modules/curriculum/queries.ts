@@ -1,4 +1,4 @@
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq, isNull, or } from "drizzle-orm";
 import { db } from "@/db";
 import { sections, providers, grades } from "@/db/schema";
 
@@ -9,15 +9,25 @@ export function getSections() {
     .orderBy(asc(sections.sortOrder), asc(sections.name));
 }
 
-export function getProvidersBySection(sectionId: string) {
+export function getProvidersBySection(sectionId: string, state?: string) {
+  // National boards (state IS NULL) are always shown; state boards only when
+  // they match the student's state.
+  const where = state
+    ? and(
+        eq(providers.sectionId, sectionId),
+        or(isNull(providers.state), eq(providers.state, state))
+      )
+    : eq(providers.sectionId, sectionId);
+
   return db
     .select({
       id: providers.id,
       name: providers.name,
       kind: providers.kind,
+      state: providers.state,
     })
     .from(providers)
-    .where(eq(providers.sectionId, sectionId))
+    .where(where)
     .orderBy(asc(providers.name));
 }
 

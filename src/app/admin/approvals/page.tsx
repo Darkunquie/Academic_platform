@@ -7,52 +7,142 @@ export default async function ApprovalsPage() {
   const pending = await listPendingStudents();
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold">Pending approvals</h1>
-      <p className="mt-1 text-sm text-gray-500">
-        {pending.length} student{pending.length === 1 ? "" : "s"} awaiting review.
-      </p>
+    <div className="flex flex-col gap-10">
+      <header className="flex flex-col gap-3">
+        <p
+          className="text-[11px] uppercase text-ink-500"
+          style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+        >
+          Pending review · {pending.length} applicant
+          {pending.length === 1 ? "" : "s"}
+        </p>
+        <h1
+          className="text-primary-900"
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontSize: "52px",
+            lineHeight: "56px",
+            letterSpacing: "-0.02em",
+            fontWeight: 400,
+          }}
+        >
+          Approvals{" "}
+          <span className="hand-drawn-underline">queue.</span>
+        </h1>
+        <p
+          className="max-w-xl text-ink-700"
+          style={{ fontSize: "17px", lineHeight: "28px" }}
+        >
+          Review applicant details and confirm access. Approved students gain
+          access to their grade-scoped curriculum immediately.
+        </p>
+      </header>
 
       {pending.length === 0 ? (
-        <div className="mt-6 rounded-lg border border-dashed border-gray-300 p-8 text-center text-gray-500">
-          Nothing to review. 🎉
+        <div className="rounded-[24px] border border-dashed border-ink-300 bg-white/60 p-16 text-center">
+          <p
+            className="mb-3 text-[11px] uppercase text-ink-500"
+            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+          >
+            Inbox zero
+          </p>
+          <p
+            className="text-ink-900"
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "22px",
+              lineHeight: "30px",
+              fontWeight: 600,
+            }}
+          >
+            Nothing to review.
+          </p>
         </div>
       ) : (
-        <div className="mt-6 overflow-hidden rounded-lg border border-gray-200 bg-white">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left text-gray-500">
-              <tr>
-                <th className="px-4 py-3 font-medium">Student</th>
-                <th className="px-4 py-3 font-medium">Scope</th>
-                <th className="px-4 py-3 font-medium">Location</th>
-                <th className="px-4 py-3 font-medium text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {pending.map((s) => (
-                <tr key={s.id}>
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-gray-900">{s.name}</div>
-                    <div className="text-gray-500">{s.email}</div>
-                    <div className="text-gray-400">{s.phone}</div>
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {s.section} · {s.provider} · {s.grade}
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {s.state}, {s.country}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-end">
-                      <ApprovalActions studentId={s.id} />
+        <div className="grid gap-5 lg:grid-cols-2">
+          {pending.map((s) => {
+            const initials = s.name
+              .split(" ")
+              .map((p) => p[0])
+              .filter(Boolean)
+              .slice(0, 2)
+              .join("")
+              .toUpperCase();
+
+            return (
+              <article
+                key={s.id}
+                className="flex flex-col gap-6 rounded-[24px] border border-ink-200 bg-white p-6 soft-shadow transition-all hover:-translate-y-0.5 hover:pop-shadow"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-[14px] font-semibold text-primary-700">
+                      {initials}
+                    </span>
+                    <div className="min-w-0">
+                      <h2
+                        className="text-ink-900"
+                        style={{
+                          fontFamily: "var(--font-sans)",
+                          fontSize: "17px",
+                          lineHeight: "24px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {s.name}
+                      </h2>
+                      <p className="truncate text-[13px] text-ink-500">
+                        {s.email}
+                      </p>
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                  <span
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-coral-100 px-2.5 py-1 text-[11px] font-semibold uppercase text-coral-700"
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      letterSpacing: "0.1em",
+                    }}
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-coral-700" />
+                    Pending
+                  </span>
+                </div>
+
+                <dl className="grid grid-cols-2 gap-4 rounded-[14px] bg-paper p-4">
+                  <Detail label="Section" value={s.section} />
+                  <Detail label="Board / Univ." value={s.provider} />
+                  <Detail label="Grade" value={s.grade} />
+                  <Detail label="Phone" value={s.phone} />
+                  <Detail label="Location" value={`${s.state}, ${s.country}`} />
+                </dl>
+
+                <div className="flex items-center justify-end">
+                  <ApprovalActions studentId={s.id} />
+                </div>
+              </article>
+            );
+          })}
         </div>
       )}
+    </div>
+  );
+}
+
+function Detail({
+  label,
+  value,
+}: Readonly<{ label: string; value: string | null | undefined }>) {
+  return (
+    <div className="flex min-w-0 flex-col gap-0.5">
+      <span
+        className="text-[10px] uppercase text-ink-500"
+        style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+      >
+        {label}
+      </span>
+      <span className="truncate text-[14px] font-semibold text-ink-900">
+        {value ?? "—"}
+      </span>
     </div>
   );
 }

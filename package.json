@@ -12,12 +12,16 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "tsx src/db/seed.ts"
+    "db:seed": "tsx src/db/seed.ts",
+    "db:seed:demo": "tsx src/db/seed-demo.ts"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.38.4",
+    "katex": "^0.17.0",
+    "marked-katex-extension": "^5.1.10",
     "next": "^16.1.4",
     "next-auth": "^5.0.0-beta.25",
     "postgres": "^3.4.5",
@@ -32,6 +36,7 @@
     "@types/node": "^22.10.7",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
+    "csv-parse": "^6.2.1",
     "dotenv": "^16.4.7",
     "drizzle-kit": "^0.30.2",
     "marked": "13",

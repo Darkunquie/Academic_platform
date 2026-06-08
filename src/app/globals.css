@@ -1,1 +1,228 @@
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=block");
+@import url("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
 @import "tailwindcss";
+
+@theme {
+  /* Forest / primary */
+  --color-primary-50:  #F2F9F6;
+  --color-primary-100: #D9EBE3;
+  --color-primary-200: #A8DCC5;
+  --color-primary-500: #1F8765;
+  --color-primary-700: #155E45;
+  --color-primary-900: #0B3D2E;
+  --color-primary-950: #062B1F;
+
+  /* Coral accent */
+  --color-coral-100: #FCE3DA;
+  --color-coral-300: #F6A488;
+  --color-coral-500: #EE6A47;
+  --color-coral-700: #C9462C;
+
+  /* Indigo secondary */
+  --color-indigo-100: #E5E3F8;
+  --color-indigo-300: #A6A3E8;
+  --color-indigo-500: #5852C9;
+  --color-indigo-700: #3E3A8C;
+
+  /* Ink + paper */
+  --color-ink-100: #EFEEEA;
+  --color-ink-200: #E2E4E8;
+  --color-ink-300: #C9CCD3;
+  --color-ink-500: #6B7280;
+  --color-ink-700: #3A3F47;
+  --color-ink-900: #16181C;
+  --color-ink-950: #0A0B0D;
+  --color-paper: #F8F6F1;
+
+  /* Semantic */
+  --color-success: #1F8765;
+  --color-warning: #D97A1F;
+  --color-danger:  #B23A3A;
+  --color-info:    #5852C9;
+
+  /* Type */
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-sans:  "Geist", "Inter", system-ui, sans-serif;
+  --font-mono:  "Geist Mono", "JetBrains Mono", monospace;
+
+  /* Radii */
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+}
+
+html, body {
+  background: var(--color-paper);
+  color: var(--color-ink-900);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Decorative utilities */
+.dotted-pattern {
+  background-image: radial-gradient(circle, #707973 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.mesh-gradient {
+  background:
+    radial-gradient(circle at 20% 20%, #F6A488 0%, transparent 40%),
+    radial-gradient(circle at 80% 40%, #5852C9 0%, transparent 40%),
+    radial-gradient(circle at 40% 80%, #1F8765 0%, transparent 40%);
+  filter: blur(80px);
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.hand-drawn-underline {
+  position: relative;
+  display: inline-block;
+}
+.hand-drawn-underline::after {
+  content: "";
+  position: absolute;
+  left: -2%;
+  bottom: 4px;
+  width: 104%;
+  height: 4px;
+  background-color: #F6A488;
+  border-radius: 50% 40% 50% 40%;
+  z-index: -1;
+  animation: drawUnderline 1.2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+@keyframes drawUnderline {
+  to { transform: scaleX(1); }
+}
+
+.shape-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+.pop-shadow {
+  box-shadow:
+    0 4px 6px -1px rgba(0,0,0,0.10),
+    0 2px 4px -1px rgba(0,0,0,0.06),
+    0 20px 40px -10px rgba(0,0,0,0.04);
+}
+
+.soft-shadow {
+  box-shadow:
+    0 1px 2px rgba(10,11,13,0.04),
+    0 4px 12px rgba(10,11,13,0.04);
+}
+
+/* Reading column prose styles for topic reader */
+.reading-prose {
+  color: var(--color-ink-900);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 30px;
+}
+.reading-prose > * + * { margin-top: 20px; }
+.reading-prose > p:first-of-type::first-letter {
+  font-family: var(--font-serif);
+  float: left;
+  font-size: 64px;
+  line-height: 56px;
+  padding: 6px 10px 0 0;
+  color: var(--color-primary-900);
+  font-weight: 400;
+}
+.reading-prose h1, .reading-prose h2, .reading-prose h3 {
+  font-family: var(--font-serif);
+  color: var(--color-primary-900);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  margin-top: 40px;
+  margin-bottom: 8px;
+}
+.reading-prose h1 { font-size: 40px; line-height: 46px; }
+.reading-prose h2 {
+  font-size: 30px; line-height: 36px;
+  padding-top: 24px; border-top: 1px solid var(--color-ink-200);
+}
+.reading-prose h3 { font-size: 22px; line-height: 28px; font-weight: 600; font-family: var(--font-sans); }
+.reading-prose p { color: var(--color-ink-700); }
+.reading-prose strong { color: var(--color-ink-900); font-weight: 600; }
+.reading-prose a {
+  color: var(--color-primary-700);
+  text-decoration: underline;
+  text-decoration-color: var(--color-coral-300);
+  text-underline-offset: 3px;
+}
+.reading-prose a:hover { text-decoration-color: var(--color-coral-700); }
+.reading-prose blockquote {
+  margin: 32px 0;
+  padding: 20px 28px;
+  background: var(--color-primary-50);
+  border-left: 4px solid var(--color-primary-700);
+  font-family: var(--font-serif);
+  font-size: 22px;
+  line-height: 30px;
+  color: var(--color-primary-900);
+  border-radius: 0 14px 14px 0;
+}
+.reading-prose code {
+  background: var(--color-ink-100);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-primary-900);
+}
+.reading-prose pre {
+  background: var(--color-ink-100);
+  padding: 20px 24px;
+  border-radius: 14px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 22px;
+  border: 1px solid var(--color-ink-200);
+}
+.reading-prose pre code { background: transparent; padding: 0; }
+.reading-prose ul, .reading-prose ol { padding-left: 24px; color: var(--color-ink-700); }
+.reading-prose ul { list-style: disc; }
+.reading-prose ol { list-style: decimal; }
+.reading-prose li + li { margin-top: 6px; }
+.reading-prose hr {
+  border: 0;
+  border-top: 1px solid var(--color-ink-200);
+  margin: 40px 0;
+}
+
+/* KaTeX block sizing inside topic reader */
+.katex-display {
+  margin: 1em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.katex { font-size: 1.05em; }
+
+/* Material Symbols utility */
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined", sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: "liga";
+  -webkit-font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+}

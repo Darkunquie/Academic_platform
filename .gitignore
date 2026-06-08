@@ -9,3 +9,4 @@ build
 drizzle/meta
 .vercel
 next-env.d.ts
+storage

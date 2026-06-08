@@ -1,0 +1,42 @@
+# Production stack for a single VPS (Hetzner + Coolify, or plain Docker).
+# Coolify provides TLS + reverse proxy; if running standalone, add Caddy/Nginx.
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env.production
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      piston:
+        condition: service_started
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
+      POSTGRES_DB: ${POSTGRES_DB:-academic}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-app}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Self-hosted code sandbox. Install languages once via /api/v2/packages.
+  piston:
+    image: ghcr.io/engineer-man/piston:latest
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - piston_packages:/piston/packages
+    # Internal only — the app reaches it at http://piston:2000.
+
+volumes:
+  pgdata:
+  piston_packages:

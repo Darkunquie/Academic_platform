@@ -26,11 +26,12 @@ async function upsertProvider(
   sectionId: string,
   kind: Kind,
   name: string,
-  createdBy: string
+  createdBy: string,
+  state: string | null = null
 ) {
   await db
     .insert(providers)
-    .values({ sectionId, kind, name, createdBy })
+    .values({ sectionId, kind, name, createdBy, state })
     .onConflictDoNothing();
   const [row] = await db
     .select()
@@ -73,38 +74,44 @@ async function ensureSuperAdmin(): Promise<string> {
 async function main() {
   const adminId = await ensureSuperAdmin();
 
-  const school = await upsertSection("school", "School (Class 1–10)", 1);
-  const inter = await upsertSection("intermediate", "Intermediate / +2", 2);
-  const college = await upsertSection(
-    "college",
-    "College (B.Tech / Degree)",
-    3
-  );
-  const pg = await upsertSection("postgrad", "Post Graduation", 4);
+  const school = await upsertSection("school", "School", 1);
+  const inter = await upsertSection("intermediate", "Intermediate", 2);
+  const college = await upsertSection("college", "College", 3);
+  const pg = await upsertSection("postgrad", "Postgrad", 4);
   const prof = await upsertSection("professional", "Professional", 5);
 
-  // --- School boards: Class 1..10 ---
-  const schoolBoards = [
-    "CBSE",
-    "ICSE",
-    "Telangana State Board (SSC)",
-    "Andhra Pradesh State Board",
+  // --- School boards: Class 1..10 (state = null means national) ---
+  const schoolBoards: { name: string; state: string | null }[] = [
+    { name: "CBSE", state: null },
+    { name: "ICSE", state: null },
+    { name: "Telangana State Board (SSC)", state: "Telangana" },
+    { name: "Andhra Pradesh State Board", state: "Andhra Pradesh" },
+    { name: "Karnataka State Board (KSEEB)", state: "Karnataka" },
+    { name: "Tamil Nadu State Board", state: "Tamil Nadu" },
+    { name: "Maharashtra State Board", state: "Maharashtra" },
+    { name: "Rajasthan State Board (RBSE)", state: "Rajasthan" },
+    { name: "Uttar Pradesh State Board", state: "Uttar Pradesh" },
+    { name: "Kerala State Board (SCERT)", state: "Kerala" },
+    { name: "West Bengal Board (WBBSE)", state: "West Bengal" },
+    { name: "Gujarat State Board (GSEB)", state: "Gujarat" },
+    { name: "Punjab School Education Board", state: "Punjab" },
+    { name: "Delhi (Directorate of Education)", state: "Delhi" },
   ];
-  for (const name of schoolBoards) {
-    const p = await upsertProvider(school.id, "board", name, adminId);
+  for (const b of schoolBoards) {
+    const p = await upsertProvider(school.id, "board", b.name, adminId, b.state);
     for (let i = 1; i <= 10; i++) {
       await upsertGrade(p.id, `Class ${i}`, i, adminId);
     }
   }
 
   // --- Intermediate boards: 1st / 2nd year ---
-  const interBoards = [
-    "Telangana Board of Intermediate Education",
-    "Andhra Board of Intermediate Education",
-    "CBSE (Class 11–12)",
+  const interBoards: { name: string; state: string | null }[] = [
+    { name: "Telangana Board of Intermediate Education", state: "Telangana" },
+    { name: "Andhra Board of Intermediate Education", state: "Andhra Pradesh" },
+    { name: "CBSE (Class 11–12)", state: null },
   ];
-  for (const name of interBoards) {
-    const p = await upsertProvider(inter.id, "board", name, adminId);
+  for (const b of interBoards) {
+    const p = await upsertProvider(inter.id, "board", b.name, adminId, b.state);
     await upsertGrade(p.id, "1st Year", 1, adminId);
     await upsertGrade(p.id, "2nd Year", 2, adminId);
   }

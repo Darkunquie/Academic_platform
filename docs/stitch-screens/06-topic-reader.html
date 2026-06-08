@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@100..900&amp;family=Geist+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#544dc4",
+                        "on-surface-variant": "#3f4944",
+                        "forest-950": "#062B1F",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "background": "#fbf9f4",
+                        "surface-variant": "#e4e2dd",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#8a85fe",
+                        "inverse-on-surface": "#f2f1ec",
+                        "on-error-container": "#93000a",
+                        "danger": "#B23A3A",
+                        "ink-900": "#16181C",
+                        "error": "#ba1a1a",
+                        "coral-300": "#F6A488",
+                        "primary": "#004530",
+                        "surface-container-high": "#eae8e3",
+                        "on-tertiary-fixed": "#3c0800",
+                        "indigo-700": "#3E3A8C",
+                        "paper": "#F8F6F1",
+                        "ink-950": "#0A0B0D",
+                        "outline": "#707973",
+                        "on-primary-fixed": "#002115",
+                        "outline-variant": "#bfc9c2",
+                        "primary-container": "#155e45",
+                        "on-surface": "#1b1c19",
+                        "tertiary": "#751900",
+                        "ink-200": "#E2E4E8",
+                        "tertiary-fixed": "#ffdbd2",
+                        "on-tertiary-container": "#ffb5a2",
+                        "inverse-primary": "#90d5b5",
+                        "surface-container-highest": "#e4e2dd",
+                        "surface-bright": "#fbf9f4",
+                        "forest-500": "#1F8765",
+                        "tertiary-fixed-dim": "#ffb4a1",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#246a50",
+                        "secondary-fixed": "#e3dfff",
+                        "forest-100": "#D9EBE3",
+                        "on-background": "#1b1c19",
+                        "on-secondary-container": "#1e0892",
+                        "secondary-fixed-dim": "#c3c0ff",
+                        "on-primary-fixed-variant": "#005139",
+                        "coral-700": "#C9462C",
+                        "tertiary-container": "#982c0e",
+                        "on-error": "#ffffff",
+                        "surface": "#fbf9f4",
+                        "ink-100": "#EFEEEA",
+                        "on-secondary-fixed-variant": "#3b33ac",
+                        "surface-container-low": "#f5f3ee",
+                        "warning": "#D97A1F",
+                        "primary-fixed": "#abf1d0",
+                        "primary-fixed-dim": "#90d5b5",
+                        "on-tertiary-fixed-variant": "#872002",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#90d5b5",
+                        "surface-dim": "#dbdad5",
+                        "on-secondary-fixed": "#100069",
+                        "inverse-surface": "#30312e",
+                        "success": "#1F8765",
+                        "surface-container": "#f0eee9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "16px",
+                        "sm": "8px",
+                        "4xl": "64px",
+                        "md": "12px",
+                        "layout-margin": "24px",
+                        "base": "8px",
+                        "2xl": "32px",
+                        "xs": "4px",
+                        "max-width": "1280px",
+                        "3xl": "48px",
+                        "xl": "24px",
+                        "layout-gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "small": ["Geist"],
+                        "h3": ["Geist"],
+                        "hero": ["Instrument Serif"],
+                        "h1": ["Instrument Serif"],
+                        "eyebrow": ["Geist Mono"],
+                        "body-lg": ["Geist"],
+                        "h2": ["Geist"],
+                        "display": ["Instrument Serif"],
+                        "body": ["Geist"]
+                    },
+                    "fontSize": {
+                        "small": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "h3": ["18px", {"lineHeight": "26px", "fontWeight": "600"}],
+                        "hero": ["72px", {"lineHeight": "76px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "h1": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                        "eyebrow": ["11px", {"lineHeight": "16px", "letterSpacing": "0.12em", "fontWeight": "500"}],
+                        "body-lg": ["17px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "h2": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display": ["48px", {"lineHeight": "56px", "fontWeight": "400"}],
+                        "body": ["15px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .waveform-bar {
+            @apply bg-forest-500 rounded-full w-[3px];
+            animation: waveform 1.2s ease-in-out infinite alternate;
+        }
+        @keyframes waveform {
+            0% { height: 4px; }
+            100% { height: 16px; }
+        }
+        .coral-underline {
+            background-image: linear-gradient(transparent 80%, #C9462C 80%);
+            background-repeat: no-repeat;
+            background-size: 0% 100%;
+            animation: underline-reveal 1s ease-out forwards 0.5s;
+        }
+        @keyframes underline-reveal {
+            to { background-size: 100% 100%; }
+        }
+        .glass-panel {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid #E2E4E8;
+        }
+        .dotted-bg {
+            background-image: radial-gradient(circle at 1px 1px, #707973 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="bg-paper text-on-surface font-body selection:bg-coral-300 selection:text-ink-900">
+<!-- Top Navigation Shell (Based on TopAppBar JSON Anchor) -->
+<header class="sticky top-0 z-50 bg-paper border-b border-ink-200 h-20 w-full flex justify-between items-center px-layout-margin md:px-3xl">
+<div class="flex items-center gap-md">
+<span class="font-hero text-h1 text-primary">Scholaris</span>
+<div class="hidden md:flex items-center gap-sm text-on-surface-variant font-eyebrow text-[10px] uppercase tracking-widest ml-xl">
+<span>English</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>Grammar</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-bold">Tenses</span>
+</div>
+</div>
+<div class="flex items-center gap-xl">
+<div class="flex gap-md">
+<button class="font-eyebrow text-eyebrow text-on-surface-variant hover:text-coral-700 transition-colors duration-300 relative group flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">quiz</span>
+                    Mock test
+                    <span class="absolute bottom-0 left-0 w-0 h-[1px] bg-coral-700 transition-all duration-300 group-hover:w-full"></span>
+</button>
+<button class="font-eyebrow text-eyebrow text-on-surface-variant hover:text-coral-700 transition-colors duration-300 relative group flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">record_voice_over</span>
+                    Mock interview
+                    <span class="absolute bottom-0 left-0 w-0 h-[1px] bg-coral-700 transition-all duration-300 group-hover:w-full"></span>
+</button>
+</div>
+<div class="h-8 w-px bg-ink-200 hidden md:block"></div>
+<button class="bg-primary text-on-primary font-eyebrow text-eyebrow px-xl py-md rounded-[14px] hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] transition-all hover:-translate-y-0.5 active:scale-95">
+                Join
+            </button>
+</div>
+</header>
+<!-- Main Content Layout -->
+<main class="relative min-h-screen flex flex-col items-center">
+<!-- Audio Player Pill (Sticky underneath header) -->
+<div class="sticky top-24 z-40 w-full max-w-[720px] px-layout-margin md:px-0 mb-4xl">
+<div class="glass-panel h-[64px] rounded-full flex items-center px-md shadow-md gap-xl">
+<!-- Play Button -->
+<button class="bg-primary-container h-12 w-12 rounded-full flex items-center justify-center text-primary-fixed hover:scale-105 transition-transform">
+<span class="material-symbols-outlined fill-1 text-[28px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<!-- Waveform -->
+<div class="flex-1 flex items-center gap-[3px] h-6 px-sm overflow-hidden">
+<div class="waveform-bar" style="animation-delay: 0.1s"></div>
+<div class="waveform-bar" style="animation-delay: 0.3s"></div>
+<div class="waveform-bar" style="animation-delay: 0.5s"></div>
+<div class="waveform-bar" style="animation-delay: 0.2s"></div>
+<div class="waveform-bar" style="animation-delay: 0.4s"></div>
+<div class="waveform-bar" style="animation-delay: 0.6s"></div>
+<div class="waveform-bar" style="animation-delay: 0.1s"></div>
+<div class="waveform-bar" style="animation-delay: 0.3s"></div>
+<div class="waveform-bar" style="animation-delay: 0.5s"></div>
+<div class="waveform-bar" style="animation-delay: 0.7s"></div>
+<div class="waveform-bar opacity-40" style="animation-play-state: paused;"></div>
+<div class="waveform-bar opacity-40" style="animation-play-state: paused;"></div>
+<div class="waveform-bar opacity-40" style="animation-play-state: paused;"></div>
+</div>
+<!-- Speed Chips & Voice -->
+<div class="flex items-center gap-md pr-sm">
+<div class="flex bg-ink-100 rounded-lg p-[2px]">
+<button class="px-sm py-1 text-[11px] font-eyebrow text-on-surface-variant hover:text-primary transition-colors">1x</button>
+<button class="px-sm py-1 text-[11px] font-eyebrow bg-white rounded-md shadow-sm text-primary font-bold">1.25x</button>
+</div>
+<button class="flex items-center gap-xs text-[11px] font-eyebrow text-on-surface-variant border border-ink-200 px-sm py-1.5 rounded-lg hover:bg-paper transition-colors">
+                        Narrator: Aris
+                        <span class="material-symbols-outlined text-[14px]">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Topic Reading Column -->
+<article class="w-full max-w-[720px] px-layout-margin md:px-0 pb-4xl">
+<!-- Hero Area -->
+<section class="relative mb-4xl">
+<!-- Background Decoration -->
+<div class="absolute -top-12 -right-16 h-32 w-32 bg-coral-300 opacity-20 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute -top-4 -right-4 h-16 w-16 border-2 border-coral-700 rounded-full opacity-40 pointer-events-none"></div>
+<p class="font-eyebrow text-eyebrow text-on-surface-variant mb-md">01 — TOPIC TENSES</p>
+<h1 class="font-hero text-[64px] md:text-hero italic text-primary leading-tight">
+                    Tenses, in <span class="coral-underline italic px-1">three breaths.</span>
+</h1>
+</section>
+<!-- Article Body -->
+<div class="space-y-xl text-body-lg font-body text-on-surface-variant leading-relaxed">
+<p class="first-letter:text-6xl first-letter:font-hero first-letter:float-left first-letter:mr-sm first-letter:text-primary">
+                    To master a language is to master time itself. In English, tenses are not merely grammatical rules; they are the architectural scaffolding of narrative. They define when an action occurred, how long it lasted, and its relationship to the present moment of speaking.
+                </p>
+<h2 class="font-display text-display italic text-primary pt-xl border-t border-ink-200">The Present Contemplation</h2>
+<p>
+                    The simple present is often a misnomer. It rarely describes what is happening "now" (that is the domain of the present continuous), but rather what is true eternally. Habits, universal truths, and scheduled futures find their home here.
+                </p>
+<!-- Blockquote -->
+<blockquote class="my-3xl py-md px-3xl bg-forest-100 border-l-4 border-primary italic font-display text-h2 text-primary-fixed-variant relative overflow-hidden">
+<div class="absolute -top-8 -right-8 opacity-10 pointer-events-none">
+<span class="material-symbols-outlined text-[120px]">format_quote</span>
+</div>
+                    "Language is the road map of a culture. It tells you where its people come from and where they are going."
+                </blockquote>
+<h2 class="font-display text-display italic text-primary pt-xl">The Temporal Arc</h2>
+<p>
+                    Consider the shift from "I wrote" to "I have written." One is a finished artifact in the graveyard of the past; the other is a living connection between what was and what is.
+                </p>
+<!-- Image Component -->
+<figure class="my-4xl space-y-md">
+<div class="relative aspect-video rounded-xl overflow-hidden shadow-soft group">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A cinematic, high-contrast photograph of an open vintage ledger resting on a dark wood desk. Shafts of sunlight illuminate floating dust particles and the crisp texture of the paper. A fountain pen rests elegantly across the pages. The overall mood is scholarly, precise, and quiet, reflecting a modern editorial aesthetic with deep greens and warm highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoC_94buLiZvEQZkeMDdYukuhPnAF5LRziqw4xPZWQQ0z0J7x2-tFtvjjptuWwqKr9RE2MMWyyhjUTgT4o1o9xPW5-xw2J-PAC3YYYcienKnGnM2KSVtu6McquXoAgGRxoZsJNbFJhdPiBIoyZEgGJt8sFr6_E3OAlgIgb3TVSZQ_NdfkMVQAP5b_ZjQMRTUrCxfUJ8-J8foLLLqjV0Li-W8O5yFtwhXzQC_lfEqOCciMu7aAg6OzeR27L5o6pVtl15e1bAOqGseE"/>
+<div class="absolute inset-0 bg-ink-900/10 pointer-events-none"></div>
+<!-- Interactive Marker Overlay -->
+<div class="absolute bottom-4 right-4 flex gap-xs">
+<span class="bg-white/80 backdrop-blur-md px-sm py-1 rounded text-[10px] font-eyebrow uppercase">Fig 1.1: Temporal Vectors</span>
+</div>
+</div>
+<figcaption class="text-small font-small text-outline italic text-center italic">A visual representation of linear vs. perfective aspect in English grammar.</figcaption>
+</figure>
+<!-- PDF Card -->
+<div class="bg-white border border-ink-200 p-xl rounded-xl flex items-center justify-between shadow-soft hover:shadow-pop transition-all hover:-translate-y-1 group">
+<div class="flex items-center gap-xl">
+<div class="h-12 w-12 rounded-lg bg-coral-300/10 flex items-center justify-center text-coral-700">
+<span class="material-symbols-outlined text-[32px]">picture_as_pdf</span>
+</div>
+<div>
+<p class="font-h3 text-h3 text-primary">Download Chapter Summary</p>
+<p class="font-small text-small text-on-surface-variant">PDF • 1.2 MB • Revision 4</p>
+</div>
+</div>
+<button class="material-symbols-outlined h-10 w-10 flex items-center justify-center border border-ink-200 rounded-full hover:bg-ink-100 transition-colors group-hover:border-primary group-hover:text-primary">
+                        download
+                    </button>
+</div>
+</div>
+<!-- Footer Actions -->
+<footer class="mt-4xl pt-3xl border-t border-ink-200 flex flex-col items-center gap-xl">
+<button class="w-full md:w-auto bg-primary text-on-primary font-h3 text-h3 px-4xl py-xl rounded-[14px] shadow-soft hover:shadow-pop hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-md">
+<span class="material-symbols-outlined">check_circle</span>
+                    Mark complete
+                </button>
+<a class="group flex items-center gap-sm font-eyebrow text-eyebrow text-on-surface-variant hover:text-coral-700 transition-colors" href="#">
+                    Next topic: Sentence Structure
+                    <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
+</a>
+</footer>
+</article>
+<!-- Global Footer Shell (Based on Footer JSON Anchor) -->
+<footer class="w-full bg-surface-container-highest dark:bg-ink-950 mt-4xl">
+<div class="max-w-max-width mx-auto flex flex-col md:flex-row justify-between items-center px-layout-margin py-xl">
+<span class="font-hero text-h3 text-primary mb-xl md:mb-0">Scholaris</span>
+<div class="flex flex-wrap justify-center gap-xl mb-xl md:mb-0">
+<a class="font-eyebrow text-eyebrow text-on-surface-variant hover:underline decoration-coral-700 decoration-2 transition-all" href="#">Privacy Policy</a>
+<a class="font-eyebrow text-eyebrow text-on-surface-variant hover:underline decoration-coral-700 decoration-2 transition-all" href="#">Terms of Service</a>
+<a class="font-eyebrow text-eyebrow text-on-surface-variant hover:underline decoration-coral-700 decoration-2 transition-all" href="#">Open Access Policy</a>
+<a class="font-eyebrow text-eyebrow text-on-surface-variant hover:underline decoration-coral-700 decoration-2 transition-all" href="#">Contact</a>
+</div>
+<p class="font-small text-small text-on-surface-variant opacity-60">
+                    © 2024 Scholaris Editorial Collective. All rights reserved.
+                </p>
+</div>
+</footer>
+</main>
+<script>
+        // Simple Interaction logic for the waveform animation toggle
+        const playBtn = document.querySelector('.bg-primary-container');
+        const waveformBars = document.querySelectorAll('.waveform-bar');
+        let isPlaying = false;
+
+        playBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            const icon = playBtn.querySelector('.material-symbols-outlined');
+            icon.innerText = isPlaying ? 'pause' : 'play_arrow';
+            
+            waveformBars.forEach(bar => {
+                bar.style.animationPlayState = isPlaying ? 'running' : 'paused';
+            });
+        });
+
+        // Initially pause animations
+        waveformBars.forEach(bar => {
+            bar.style.animationPlayState = 'paused';
+        });
+    </script>
+</body></html>

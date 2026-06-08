@@ -1,0 +1,84 @@
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+
+export const GROQ_MODEL = "llama-3.3-70b-versatile";
+export const GROQ_FAST_MODEL = "llama-3.1-8b-instant";
+
+type GroqArgs = {
+  system: string;
+  user: string;
+  model?: string;
+  temperature?: number;
+  json?: boolean;
+};
+
+/** Low-level Groq chat call (OpenAI-compatible API). */
+export async function groqChat({
+  system,
+  user,
+  model = GROQ_MODEL,
+  temperature = 0.4,
+  json = false,
+}: GroqArgs): Promise<string> {
+  const key = process.env.GROQ_API_KEY;
+  if (!key) throw new Error("GROQ_API_KEY is not set. Add it to .env");
+
+  const res = await fetch(GROQ_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${key}`,
+    },
+    body: JSON.stringify({
+      model,
+      temperature,
+      ...(json ? { response_format: { type: "json_object" } } : {}),
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Groq error ${res.status}: ${text.slice(0, 300)}`);
+  }
+
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content ?? "";
+}
+
+/** Groq call that returns parsed JSON (forces JSON response mode). */
+export async function groqJson<T = unknown>(args: GroqArgs): Promise<T> {
+  const raw = await groqChat({ ...args, json: true });
+  return JSON.parse(raw) as T;
+}
+
+const GROQ_STT_URL = "https://api.groq.com/openai/v1/audio/transcriptions";
+export const GROQ_STT_MODEL = "whisper-large-v3-turbo";
+
+/** Transcribe an audio file with Groq Whisper. Returns the text. */
+export async function groqTranscribe(
+  file: File,
+  model: string = GROQ_STT_MODEL
+): Promise<string> {
+  const key = process.env.GROQ_API_KEY;
+  if (!key) throw new Error("GROQ_API_KEY is not set. Add it to .env");
+
+  const form = new FormData();
+  form.append("file", file, file.name || "audio.webm");
+  form.append("model", model);
+  form.append("response_format", "json");
+
+  const res = await fetch(GROQ_STT_URL, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${key}` },
+    body: form,
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Groq STT ${res.status}: ${text.slice(0, 200)}`);
+  }
+  const data = await res.json();
+  return data.text ?? "";
+}

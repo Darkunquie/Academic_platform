@@ -84,6 +84,13 @@ export const providers = pgTable(
     name: text("name").notNull(),
     code: text("code"),
     country: text("country"),
+    // State this board/university belongs to. NULL = national / all-states (e.g. CBSE).
+    state: text("state"),
+    // Universities only:
+    city: text("city"),
+    universityType: text("university_type"), // central|state|deemed|private|INI
+    website: text("website"),
+    establishedYear: integer("established_year"),
     createdBy: uuid("created_by"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -92,6 +99,8 @@ export const providers = pgTable(
   (t) => [
     unique("providers_section_name_uq").on(t.sectionId, t.name),
     index("providers_section_idx").on(t.sectionId),
+    index("providers_state_idx").on(t.state),
+    index("providers_kind_state_idx").on(t.kind, t.state),
   ]
 );
 

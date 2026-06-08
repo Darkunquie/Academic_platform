@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Academic Success Platform",
+  title: "Academic Platform",
   description: "Learn, practice, assess — School to Professional.",
 };
 
@@ -11,10 +11,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        suppressHydrationWarning
-        className="min-h-screen bg-gray-50 text-gray-900 antialiased"
-      >
+      <body suppressHydrationWarning className="min-h-screen antialiased">
         {children}
       </body>
     </html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ScholarCore — Sign Up</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@100..900&amp;family=Geist+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#90d5b5",
+                        "tertiary": "#751900",
+                        "on-surface-variant": "#3f4944",
+                        "ink-900": "#16181C",
+                        "secondary-fixed": "#e3dfff",
+                        "on-tertiary-fixed-variant": "#872002",
+                        "surface-dim": "#dbdad5",
+                        "surface-container-high": "#eae8e3",
+                        "on-tertiary-container": "#ffb5a2",
+                        "coral-700": "#C9462C",
+                        "coral-500": "#E65A3E",
+                        "secondary-fixed-dim": "#c3c0ff",
+                        "forest-500": "#1F8765",
+                        "forest-700": "#155e45",
+                        "primary-fixed-dim": "#90d5b5",
+                        "surface-tint": "#246a50",
+                        "outline": "#707973",
+                        "on-secondary-fixed": "#100069",
+                        "ink-100": "#EFEEEA",
+                        "surface-bright": "#fbf9f4",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#30312e",
+                        "tertiary-fixed-dim": "#ffb4a1",
+                        "ink-950": "#0A0B0D",
+                        "inverse-primary": "#90d5b5",
+                        "surface-variant": "#e4e2dd",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#005139",
+                        "secondary-container": "#8a85fe",
+                        "on-secondary-fixed-variant": "#3b33ac",
+                        "indigo-700": "#3E3A8C",
+                        "warning": "#D97A1F",
+                        "success": "#1F8765",
+                        "surface-container-highest": "#e4e2dd",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#abf1d0",
+                        "surface-container-low": "#f5f3ee",
+                        "ink-200": "#E2E4E8",
+                        "error": "#ba1a1a",
+                        "on-background": "#1b1c19",
+                        "forest-950": "#062B1F",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#fbf9f4",
+                        "on-surface": "#1b1c19",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#1e0892",
+                        "coral-300": "#F6A488",
+                        "tertiary-container": "#982c0e",
+                        "tertiary-fixed": "#ffdbd2",
+                        "danger": "#B23A3A",
+                        "background": "#fbf9f4",
+                        "on-primary-fixed": "#002115",
+                        "forest-100": "#D9EBE3",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#004530",
+                        "paper": "#F8F6F1",
+                        "surface-container": "#f0eee9",
+                        "primary-container": "#155e45",
+                        "outline-variant": "#bfc9c2",
+                        "on-tertiary-fixed": "#3c0800",
+                        "on-error-container": "#93000a",
+                        "secondary": "#544dc4",
+                        "inverse-on-surface": "#f2f1ec"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "2xl": "32px",
+                        "layout-gutter": "16px",
+                        "base": "8px",
+                        "sm": "8px",
+                        "lg": "16px",
+                        "max-width": "1280px",
+                        "layout-margin": "24px",
+                        "4xl": "64px",
+                        "xl": "24px",
+                        "xs": "4px",
+                        "md": "12px",
+                        "3xl": "48px"
+                    },
+                    "fontFamily": {
+                        "hero": ["Instrument Serif", "serif"],
+                        "h3": ["Geist", "sans-serif"],
+                        "body-lg": ["Geist", "sans-serif"],
+                        "small": ["Geist", "sans-serif"],
+                        "h2": ["Geist", "sans-serif"],
+                        "display": ["Instrument Serif", "serif"],
+                        "body": ["Geist", "sans-serif"],
+                        "eyebrow": ["Geist Mono", "monospace"],
+                        "h1": ["Instrument Serif", "serif"]
+                    },
+                    "fontSize": {
+                        "hero": ["72px", {"lineHeight": "76px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "h3": ["18px", {"lineHeight": "26px", "fontWeight": "600"}],
+                        "body-lg": ["17px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "small": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "h2": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display": ["48px", {"lineHeight": "56px", "fontWeight": "400"}],
+                        "body": ["15px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "eyebrow": ["11px", {"lineHeight": "16px", "letterSpacing": "0.12em", "fontWeight": "500"}],
+                        "h1": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.01em", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .dotted-bg {
+            background-image: radial-gradient(circle, #E2E4E8 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .mesh-gradient {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        .mesh-blob {
+            position: absolute;
+            filter: blur(600px);
+            opacity: 0.18;
+            border-radius: 100%;
+        }
+        .underline-draw {
+            position: relative;
+            display: inline-block;
+        }
+        .underline-draw::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 4px;
+            width: 0;
+            height: 4px;
+            background-color: #E65A3E;
+            border-radius: 2px;
+            animation: draw-line 1.2s ease-out forwards;
+        }
+        @keyframes draw-line {
+            to { width: 100%; }
+        }
+        .floating-shape {
+            position: absolute;
+            opacity: 0.3;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-forest-100">
+<main class="min-h-screen flex flex-col md:flex-row overflow-hidden">
+<!-- LEFT SIDE: Editorial Panel -->
+<section class="relative w-full md:w-1/2 min-h-[50vh] md:min-h-screen bg-paper flex flex-col justify-between p-layout-margin md:p-4xl dotted-bg">
+<!-- Mesh Background -->
+<div class="mesh-gradient">
+<div class="mesh-blob bg-coral-300 top-0 left-0 w-[600px] h-[600px]"></div>
+<div class="mesh-blob bg-indigo-700 bottom-0 right-0 w-[500px] h-[500px]"></div>
+<div class="mesh-blob bg-forest-500 top-1/2 left-1/4 w-[450px] h-[450px]"></div>
+</div>
+<!-- Floating Shapes -->
+<div class="floating-shape top-20 left-20 text-coral-300" style="animation-delay: 0s;">
+<span class="material-symbols-outlined text-[32px]">circle</span>
+</div>
+<div class="floating-shape top-1/3 right-20 text-indigo-700" style="animation-delay: 2s;">
+<span class="material-symbols-outlined text-[40px]">change_history</span>
+</div>
+<div class="floating-shape bottom-1/4 left-1/3 text-forest-500" style="animation-delay: 1s;">
+<span class="material-symbols-outlined text-[28px]">add</span>
+</div>
+<!-- Top Brand/Header -->
+<div class="z-10">
+<div class="font-eyebrow text-eyebrow text-on-surface-variant uppercase mb-sm tracking-widest">
+                    02 — JOIN
+                </div>
+</div>
+<!-- Central Content -->
+<div class="z-10 max-w-[540px]">
+<h1 class="font-hero text-hero italic mb-lg text-ink-900 leading-none">
+                    Begin your <span class="underline-draw italic">journey.</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant/80">
+                    Tell us where you study — we will match the right syllabus.
+                </p>
+</div>
+<!-- Bottom Branding -->
+<div class="z-10 flex flex-col gap-sm">
+<img alt="ScholarCore Branding Logo" class="h-10 w-auto object-contain self-start" src="https://lh3.googleusercontent.com/aida/AP1WRLuiJZBoGMx0ttMc6TFU6KS1GpvNA9N2ZR1EN0wF61iMITyMwebusIuWK7PXFYSLmLeT8FeWNW4AJdHbh30jEVoMdYfIX318Zs1i0rbF_QFjUJLh7TXYBTzjI4S7PnxcwI96waaRF2hXexGaYDPoX6f2mpXHCKV3mb_1wXQMGiRa4hdeO_tMkrygU_p-is_Yh9-tMcJWYKEC1DrkoQTKqqxYeJvF_RzqdjNOaelpQeQbojPA1Qyl7RL3CM4"/>
+<div class="font-small text-small text-on-surface-variant/60 font-medium">
+                    © 2026 Scholaris Academic Press
+                </div>
+</div>
+</section>
+<!-- RIGHT SIDE: Form Panel -->
+<section class="w-full md:w-1/2 bg-white flex items-center justify-center p-layout-margin md:p-4xl overflow-y-auto">
+<div class="w-full max-w-[480px] py-xl">
+<div class="mb-3xl">
+<span class="font-eyebrow text-eyebrow text-on-surface-variant uppercase tracking-widest mb-xs block">CREATE ACCOUNT</span>
+<h2 class="font-h2 text-h2 text-ink-950">Sign up</h2>
+</div>
+<form class="space-y-lg" onsubmit="event.preventDefault();">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Full Name -->
+<div class="flex flex-col gap-xs">
+<label class="font-eyebrow text-eyebrow text-on-surface-variant uppercase" for="name">Full Name</label>
+<input class="h-[48px] px-lg rounded-lg border-[1.5px] border-ink-200 focus:border-forest-500 focus:ring-2 focus:ring-forest-100 outline-none transition-all placeholder:text-on-surface-variant/30" id="name" placeholder="John Doe" type="text"/>
+</div>
+<!-- Email -->
+<div class="flex flex-col gap-xs">
+<label class="font-eyebrow text-eyebrow text-on-surface-variant uppercase" for="email">Email Address</label>
+<input class="h-[48px] px-lg rounded-lg border-[1.5px] border-ink-200 focus:border-forest-500 focus:ring-2 focus:ring-forest-100 outline-none transition-all placeholder:text-on-surface-variant/30" id="email" placeholder="john@university.edu" type="email"/>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Phone -->
+<div class="flex flex-col gap-xs">
+<label class="font-eyebrow text-eyebrow text-on-surface-variant uppercase" for="phone">Phone Number</label>
+<input class="h-[48px] px-lg rounded-lg border-[1.5px] border-ink-200 focus:border-forest-500 focus:ring-2 focus:ring-forest-100 outline-none transition-all placeholder:text-on-surface-variant/30" id="phone" placeholder="+1 (555) 000-0000" type="tel"/>
+</div>
+<!-- Password -->
+<div class="flex flex-col gap-xs">
+<label class="font-eyebrow text-eyebrow text-on-surface-variant uppercase" for="password">Password</label>
+<input class="h-[48px] px-lg rounded-lg border-[1.5px] border-ink-200 focus:border-forest-500 focus:ring-2 focus:ring-forest-100 outline-none transition-all placeholder:text-on-surface-variant/30" id="password" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Country -->
+<div class="flex flex-col gap-xs">
+<label class="font-eyebrow text-eyebrow text-on-surface-variant uppercase" for="country">Country</label>
+<select class="h-[48px] px-lg rounded-lg border-[1.5px] border-ink-200 focus:border-forest-500 focus:ring-2 focus:ring-forest-100 outline-none transition-all appearance-none bg-white" id="country">
+<option value="">Select Country</option>
+<option value="us">United States</option>
+<option value="uk">United Kingdom</option>
+<option value="ca">Canada</option>
+<option value="au">Australia</option>
+</select>
+</div>
+<!-- State -->
+<div class="flex flex-col gap-xs">
+<label class="font-eyebrow text-eyebrow text-on-surface-variant uppercase" for="state">State / Province</label>
+<select class="h-[48px] px-lg rounded-lg border-[1.5px] border-ink-200 focus:border-forest-500 focus:ring-2 focus:ring-forest-100 outline-none transition-all appearance-none bg-white" id="state">
+<option value="">Select State</option>
+<option value="ny">New York</option>
+<option value="ca">California</option>
+<option value="tx">Texas</option>
+</select>
+</div>
+</div>
+<!-- Academic Section -->
+<div class="flex flex-col gap-xs">
+<label class="font-eyebrow text-eyebrow text-on-surface-variant uppercase" for="section">Academic Section</label>
+<select class="h-[48px] px-lg rounded-lg border-[1.5px] border-ink-200 focus:border-forest-500 focus:ring-2 focus:ring-forest-100 outline-none transition-all appearance-none bg-white" id="section" onchange="updateProviderLabel(this.value)">
+<option value="School">School</option>
+<option value="Intermediate">Intermediate</option>
+<option value="College">College</option>
+<option value="Postgrad">Postgraduate</option>
+<option value="Professional">Professional</option>
+</select>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Provider -->
+<div class="flex flex-col gap-xs">
+<label class="font-eyebrow text-eyebrow text-on-surface-variant uppercase" for="provider" id="provider-label">Board</label>
+<select class="h-[48px] px-lg rounded-lg border-[1.5px] border-ink-200 focus:border-forest-500 focus:ring-2 focus:ring-forest-100 outline-none transition-all appearance-none bg-white" id="provider">
+<option value="cambridge">Cambridge International</option>
+<option value="ib">IB World</option>
+<option value="national">National Board</option>
+</select>
+</div>
+<!-- Grade/Class -->
+<div class="flex flex-col gap-xs">
+<label class="font-eyebrow text-eyebrow text-on-surface-variant uppercase" for="grade">Grade / Year</label>
+<select class="h-[48px] px-lg rounded-lg border-[1.5px] border-ink-200 focus:border-forest-500 focus:ring-2 focus:ring-forest-100 outline-none transition-all appearance-none bg-white" id="grade">
+<option value="11">Year 11 / Grade 10</option>
+<option value="12">Year 12 / Grade 11</option>
+<option value="13">Year 13 / Grade 12</option>
+</select>
+</div>
+</div>
+<div class="pt-lg">
+<button class="w-full h-14 bg-forest-700 text-white font-h3 text-h3 rounded-xl hover:shadow-[0_20px_40px_rgba(31,135,101,0.2)] hover:-translate-y-0.5 transition-all active:scale-95" type="submit">
+                            Request access
+                        </button>
+</div>
+</form>
+<footer class="mt-3xl text-center">
+<p class="font-body text-body text-on-surface-variant/70">
+                        Already a member? 
+                        <a class="inline-block relative group text-ink-900 font-semibold ml-1" href="#">
+                            Sign in.
+                            <span class="absolute left-0 -bottom-1 w-0 h-[3px] bg-coral-500 group-hover:w-full transition-all duration-300"></span>
+</a>
+</p>
+</footer>
+</div>
+</section>
+</main>
+<script>
+        function updateProviderLabel(section) {
+            const label = document.getElementById('provider-label');
+            const providerSelect = document.getElementById('provider');
+            
+            if (section === 'College' || section === 'Postgrad' || section === 'Professional') {
+                label.innerText = 'University / Institution';
+                providerSelect.innerHTML = `
+                    <option value="oxford">University of Oxford</option>
+                    <option value="harvard">Harvard University</option>
+                    <option value="mit">MIT</option>
+                    <option value="other">Other University</option>
+                `;
+            } else {
+                label.innerText = 'Board';
+                providerSelect.innerHTML = `
+                    <option value="cambridge">Cambridge International</option>
+                    <option value="ib">IB World</option>
+                    <option value="national">National Board</option>
+                `;
+            }
+        }
+    </script>
+</body></html>
