@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { getTopicChain } from "@/modules/curriculum/admin";
 import { getStudentTest } from "@/modules/assessment/service";
 import { studentGradeId } from "@/modules/content/student";
-import { Breadcrumb } from "@/components/curriculum/breadcrumb";
 import { TestRunner } from "@/components/assessment/test-runner";
 import { StudentHeader } from "@/components/student-header";
 
@@ -11,9 +10,9 @@ export const dynamic = "force-dynamic";
 
 export default async function StudentTestPage({
   params,
-}: {
+}: Readonly<{
   params: Promise<{ topicId: string }>;
-}) {
+}>) {
   const { topicId } = await params;
   const gradeId = await studentGradeId();
   const topic = await getTopicChain(topicId);
@@ -23,40 +22,85 @@ export default async function StudentTestPage({
   const questions = await getStudentTest(topicId);
 
   return (
-    <main className="min-h-screen bg-paper">
+    <div
+      className="flex min-h-screen flex-col"
+      style={{
+        backgroundColor: "#f1f5f9",
+        color: "#334155",
+        fontFamily: "Geist, sans-serif",
+      }}
+    >
       <StudentHeader active="library" />
-      <div className="mx-auto max-w-3xl px-6 py-10 md:py-14">
-      <Breadcrumb
-        items={[
-          { label: "My Subjects", href: "/dashboard" },
-          {
-            label: topic.chapterName,
-            href: `/dashboard/chapter/${topic.chapterId}`,
-          },
-          { label: topic.name, href: `/dashboard/topic/${topicId}` },
-          { label: "Mock test" },
-        ]}
-      />
-      <h1 className="text-2xl font-bold">Mock test — {topic.name}</h1>
 
-      {questions.length === 0 ? (
-        <div className="mt-6 rounded-lg border border-dashed border-gray-300 p-8 text-center text-gray-500">
-          No questions published for this topic yet.
-          <div className="mt-3">
-            <Link
-              href={`/dashboard/topic/${topicId}`}
-              className="text-sm font-medium text-blue-700 hover:underline"
-            >
-              ← Back to topic
-            </Link>
+      <main className="mx-auto w-full max-w-3xl flex-1 px-6 pb-10 pt-4 md:pb-14 md:pt-5">
+        {/* Breadcrumb */}
+        <nav className="mb-4 flex flex-wrap items-center gap-2 text-[12px] font-bold text-solar-text/60">
+          <Link
+            href="/dashboard"
+            className="transition-colors hover:text-solar-amber"
+          >
+            My Subjects
+          </Link>
+          <Chev />
+          <Link
+            href={`/dashboard/chapter/${topic.chapterId}`}
+            className="transition-colors hover:text-solar-amber"
+          >
+            {topic.chapterName}
+          </Link>
+          <Chev />
+          <Link
+            href={`/dashboard/topic/${topicId}`}
+            className="transition-colors hover:text-solar-amber"
+          >
+            {topic.name}
+          </Link>
+          <Chev />
+          <span className="text-solar-text-dark">Mock Test</span>
+        </nav>
+
+        {/* Hero */}
+        <section className="mb-8 flex flex-col gap-3">
+          <p className="text-[10px] font-black text-solar-amber">
+            Mock Test · {topic.name}
+          </p>
+          <h1 className="text-4xl font-black tracking-tighter text-solar-text-dark md:text-5xl">
+            Drill yourself.
+          </h1>
+        </section>
+
+        {questions.length === 0 ? (
+          <div className="solar-card rounded-xxl border-dashed bg-white p-12 text-center text-solar-text">
+            No questions published for this topic yet.
+            <div className="mt-4">
+              <Link
+                href={`/dashboard/topic/${topicId}`}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-blue-800 px-5 py-2.5 text-[11px] font-black text-white shadow-lg shadow-blue-900/20 transition-colors hover:bg-blue-700"
+              >
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontSize: "14px" }}
+                >
+                  arrow_back
+                </span>
+                {" "}Back to topic
+              </Link>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="mt-6">
-          <TestRunner topicId={topicId} questions={questions} />
-        </div>
-      )}
-      </div>
-    </main>
+        ) : (
+          <div className="solar-card rounded-xxl bg-white p-6">
+            <TestRunner topicId={topicId} questions={questions} />
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
+
+function Chev() {
+  return (
+    <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>
+      chevron_right
+    </span>
   );
 }

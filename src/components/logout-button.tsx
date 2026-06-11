@@ -6,12 +6,12 @@ export function LogoutButton() {
   return (
     <button
       onClick={() => signOut({ callbackUrl: "/login" })}
-      className="inline-flex items-center gap-1.5 rounded-[14px] border border-ink-200 bg-white px-4 py-2.5 text-sm font-medium text-ink-900 transition-colors hover:bg-paper"
+      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-black text-solar-text-dark transition-colors hover:border-blue-800 hover:text-blue-800"
     >
-      <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
+      <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>
         logout
       </span>
-      Log out
+      {" "}Log out
     </button>
   );
 }

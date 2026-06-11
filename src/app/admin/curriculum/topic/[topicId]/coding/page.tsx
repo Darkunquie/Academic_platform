@@ -10,6 +10,7 @@ import { LANG_KEYS, LANGUAGES } from "@/modules/coding/languages";
 import { Breadcrumb } from "@/components/curriculum/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
+import { LangCheckboxes } from "@/components/coding/lang-checkboxes";
 
 export const dynamic = "force-dynamic";
 
@@ -61,20 +62,46 @@ export default async function CodingAdminPage({
             />
           </div>
           <div>
-            <Label>Allowed languages</Label>
-            <div className="flex flex-wrap gap-3">
-              {LANG_KEYS.map((k) => (
-                <label key={k} className="flex items-center gap-1.5 text-sm">
-                  <input
-                    type="checkbox"
-                    name="lang"
-                    value={k}
-                    defaultChecked={k === "python"}
-                  />
-                  {LANGUAGES[k].label}
-                </label>
-              ))}
+            <Label>Constraints</Label>
+            <p className="mb-1 text-xs text-gray-500">
+              One per line. Rendered as bullets on the student page. Example:{" "}
+              <code className="font-mono">1 ≤ N ≤ 10^5</code>.
+            </p>
+            <textarea
+              name="constraints"
+              rows={4}
+              placeholder={"1 ≤ N ≤ 10^5\n-10^9 ≤ a[i] ≤ 10^9\nSum fits in 64-bit int"}
+              className="w-full rounded-md border border-gray-300 p-3 font-mono text-xs outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label>Time limit (ms)</Label>
+              <Input
+                name="timeLimitMs"
+                type="number"
+                min={100}
+                step={100}
+                defaultValue={2000}
+              />
             </div>
+            <div>
+              <Label>Memory limit (KB)</Label>
+              <Input
+                name="memLimitKb"
+                type="number"
+                min={16000}
+                step={1000}
+                defaultValue={128000}
+              />
+            </div>
+          </div>
+          <div>
+            <Label>Allowed languages</Label>
+            <LangCheckboxes
+              options={LANG_KEYS.map((k) => ({ key: k, label: LANGUAGES[k].label }))}
+              defaultSelected={LANG_KEYS as unknown as string[]}
+            />
           </div>
           <div className="flex items-end gap-3">
             <div>

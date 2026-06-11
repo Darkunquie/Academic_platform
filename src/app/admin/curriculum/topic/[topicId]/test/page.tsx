@@ -7,6 +7,7 @@ import {
 } from "@/modules/assessment/actions";
 import { Breadcrumb } from "@/components/curriculum/breadcrumb";
 import { GenerateButton } from "@/components/assessment/generate-button";
+import { McqImporter } from "@/components/assessment/mcq-importer";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 
@@ -44,6 +45,17 @@ export default async function TopicTestAdminPage({
 
       <section className="mt-5">
         <GenerateButton topicId={topicId} />
+      </section>
+
+      <section className="mt-6">
+        <h2 className="text-lg font-semibold">Bulk import (.docx / .md)</h2>
+        <p className="mt-1 text-xs text-gray-500">
+          Upload a file in the template format. Preview + edit each question
+          before committing to the bank.
+        </p>
+        <div className="mt-3">
+          <McqImporter topicId={topicId} />
+        </div>
       </section>
 
       {/* Manual add */}

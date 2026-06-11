@@ -108,15 +108,14 @@ export function TtsReader({ text }: { text: string }) {
             key={r}
             type="button"
             onClick={() => setRate(r)}
-            className={`px-2.5 py-1 text-[11px] uppercase transition-all ${
+            className={`px-2.5 py-1 text-[11px] transition-all ${
               rate === r
                 ? "rounded-full bg-white font-semibold text-primary-700 soft-shadow"
                 : "text-ink-500 hover:text-ink-900"
             }`}
             style={{
               fontFamily: "var(--font-mono)",
-              letterSpacing: "0.08em",
-            }}
+              }}
           >
             {r}x
           </button>

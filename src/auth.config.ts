@@ -3,6 +3,24 @@ import type { NextAuthConfig } from "next-auth";
 type Role = "super_admin" | "admin" | "student";
 type Status = "pending" | "approved" | "rejected";
 
+declare module "next-auth" {
+  interface User {
+    id: string;
+    email: string;
+    name?: string | null;
+    role: Role;
+    status: Status;
+    providerId?: string | null;
+    gradeId?: string | null;
+    sectionId?: string | null;
+    jti?: string;
+  }
+  interface Session {
+    user: User;
+  }
+}
+
+
 /**
  * Edge-safe auth config (NO database imports).
  * Used by middleware and extended by src/auth.ts with the Credentials provider.

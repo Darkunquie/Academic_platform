@@ -16,14 +16,15 @@ export async function getTopicContent(topicId: string) {
 export async function upsertTopicContent(
   topicId: string,
   bodyHtml: string,
-  updatedBy: string
+  updatedBy: string,
+  videoUrl?: string | null
 ) {
   await db
     .insert(topicContent)
-    .values({ topicId, bodyHtml, updatedBy })
+    .values({ topicId, bodyHtml, updatedBy, videoUrl: videoUrl || null })
     .onConflictDoUpdate({
       target: topicContent.topicId,
-      set: { bodyHtml, updatedBy, updatedAt: new Date() },
+      set: { bodyHtml, updatedBy, videoUrl: videoUrl || null, updatedAt: new Date() },
     });
 }
 

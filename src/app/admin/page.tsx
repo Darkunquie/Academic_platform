@@ -55,8 +55,8 @@ export default async function AdminHome() {
     <div className="flex flex-col gap-12">
       <header className="flex flex-col gap-3">
         <p
-          className="text-[11px] uppercase text-ink-500"
-          style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+          className="text-[11px] text-ink-500"
+          style={{ fontFamily: "var(--font-mono)", }}
         >
           01 — Control room
         </p>
@@ -90,11 +90,10 @@ export default async function AdminHome() {
           >
             <div className="flex items-start justify-between">
               <span
-                className="text-[11px] uppercase text-ink-500"
+                className="text-[11px] text-ink-500"
                 style={{
                   fontFamily: "var(--font-mono)",
-                  letterSpacing: "0.12em",
-                }}
+                  }}
               >
                 {s.label}
               </span>
@@ -130,11 +129,10 @@ export default async function AdminHome() {
           <div className="flex items-center justify-between">
             <div className="flex flex-col gap-1">
               <span
-                className="text-[11px] uppercase text-ink-500"
+                className="text-[11px] text-ink-500"
                 style={{
                   fontFamily: "var(--font-mono)",
-                  letterSpacing: "0.12em",
-                }}
+                  }}
               >
                 Approval queue
               </span>
@@ -204,11 +202,10 @@ export default async function AdminHome() {
                       </div>
                     </div>
                     <span
-                      className="inline-flex items-center gap-1.5 rounded-full bg-coral-100 px-2.5 py-1 text-[11px] font-semibold uppercase text-coral-700"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-coral-100 px-2.5 py-1 text-[11px] font-semibold text-coral-700"
                       style={{
                         fontFamily: "var(--font-mono)",
-                        letterSpacing: "0.1em",
-                      }}
+                        }}
                     >
                       <span className="h-1.5 w-1.5 rounded-full bg-coral-700" />
                       Pending
@@ -242,11 +239,10 @@ export default async function AdminHome() {
           </div>
           <div className="relative z-10 flex flex-col gap-1">
             <span
-              className="text-[11px] uppercase text-coral-300"
+              className="text-[11px] text-coral-300"
               style={{
                 fontFamily: "var(--font-mono)",
-                letterSpacing: "0.12em",
-              }}
+                }}
             >
               Quick actions
             </span>

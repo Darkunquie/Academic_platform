@@ -51,8 +51,8 @@ export default async function ChapterPage({
 
       <header className="flex flex-col gap-2">
         <p
-          className="text-[11px] uppercase text-ink-500"
-          style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+          className="text-[11px] text-ink-500"
+          style={{ fontFamily: "var(--font-mono)", }}
         >
           Chapter · {items.length} {items.length === 1 ? "topic" : "topics"}
         </p>

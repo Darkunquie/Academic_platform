@@ -1,0 +1,1 @@
+ALTER TABLE "coding_questions" ADD COLUMN "constraints" text DEFAULT '' NOT NULL;

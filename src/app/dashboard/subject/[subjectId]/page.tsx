@@ -20,66 +20,56 @@ export default async function StudentSubjectPage({
   const chapters = await listChapters(subjectId);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-paper">
-      <div className="dotted-pattern absolute inset-0" />
+    <div
+      className="flex min-h-screen flex-col"
+      style={{
+        backgroundColor: "#f1f5f9",
+        color: "#334155",
+        fontFamily: "Geist, sans-serif",
+      }}
+    >
+      <StudentHeader active="library" />
 
-      <div className="relative z-10">
-        <StudentHeader active="library" />
-      </div>
-
-      <div className="relative mx-auto w-full max-w-[1400px] px-6 py-10 md:px-16 md:py-14">
-        <nav className="mb-8 flex items-center gap-2 text-[13px] text-ink-500">
+      <main className="mx-auto w-full max-w-[1500px] flex-1 px-4 pb-10 pt-4 md:px-6 md:pb-14 md:pt-5">
+        {/* Breadcrumb */}
+        <nav className="mb-4 flex items-center gap-2 text-[12px] font-bold text-solar-text/60">
           <Link
             href="/dashboard"
-            className="transition-colors hover:text-primary-700"
+            className="transition-colors hover:text-solar-amber"
           >
-            My subjects
+            My Subjects
           </Link>
-          <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>
+          <span
+            className="material-symbols-outlined"
+            style={{ fontSize: "14px" }}
+          >
             chevron_right
           </span>
-          <span className="font-medium text-ink-900">{subject.name}</span>
+          <span className="text-solar-text-dark">{subject.name}</span>
         </nav>
 
-        <section className="relative mb-12 overflow-hidden rounded-[28px] border border-ink-200 bg-white p-10 soft-shadow">
-          <div className="mesh-gradient absolute inset-0 opacity-60" />
+        {/* Hero card */}
+        <section className="solar-card relative mb-8 overflow-hidden rounded-xxl border-2 border-solar-amber/20 bg-white p-6">
+          <div className="solar-scanline" />
           <div
-            className="absolute -right-12 -top-8 text-primary-500 opacity-10"
-            style={{ fontSize: "240px", lineHeight: 1 }}
+            className="absolute -right-4 -top-4 text-solar-amber/10"
+            style={{ fontSize: "140px", lineHeight: 1 }}
           >
             <span
               className="material-symbols-outlined"
-              style={{ fontSize: "240px", fontVariationSettings: "'wght' 200" }}
+              style={{ fontSize: "140px" }}
             >
               auto_stories
             </span>
           </div>
           <div className="relative z-10 max-w-2xl">
-            <p
-              className="mb-3 text-[11px] uppercase text-ink-500"
-              style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
-            >
-              Subject · {subject.name}
+            <p className="mb-2 text-[10px] font-black text-solar-amber">
+              Subject Node · {subject.name}
             </p>
-            <h1
-              className="text-primary-900"
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "64px",
-                lineHeight: "68px",
-                letterSpacing: "-0.02em",
-                fontWeight: 400,
-              }}
-            >
-              Your library,{" "}
-              <span className="hand-drawn-underline">
-                {subject.name}.
-              </span>
+            <h1 className="text-2xl font-black tracking-tighter text-solar-text-dark md:text-3xl">
+              Your library.
             </h1>
-            <p
-              className="mt-4 text-ink-700"
-              style={{ fontSize: "17px", lineHeight: "28px" }}
-            >
+            <p className="mt-2 text-[13px] text-solar-text">
               {chapters.length}{" "}
               {chapters.length === 1 ? "chapter" : "chapters"}
               {subject.isCoding ? " · Coding subject" : ""}
@@ -87,57 +77,53 @@ export default async function StudentSubjectPage({
           </div>
         </section>
 
+        {/* Section header */}
+        <div className="mb-6 flex items-center justify-between border-b border-solar-card pb-4">
+          <h2 className="text-xl font-bold text-solar-text-dark">
+            Chapter Index
+          </h2>
+          <span className="text-[13px] font-semibold text-solar-text/70">
+            {chapters.length}{" "}
+            {chapters.length === 1 ? "chapter" : "chapters"}
+          </span>
+        </div>
+
         {chapters.length === 0 ? (
-          <div className="rounded-[20px] border border-dashed border-ink-300 bg-white/60 p-12 text-center text-ink-500">
+          <div className="solar-card rounded-xxl border-dashed bg-white p-12 text-center text-solar-text">
             No chapters published yet.
           </div>
         ) : (
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-4">
             {chapters.map((c, idx) => (
               <Link
                 key={c.id}
                 href={`/dashboard/chapter/${c.id}`}
-                className="group flex flex-col gap-6 rounded-[20px] border border-ink-200 bg-white p-7 soft-shadow transition-all hover:-translate-y-0.5 hover:pop-shadow md:flex-row md:items-center md:justify-between"
+                className="solar-card group flex items-center gap-6 rounded-xxl bg-white p-6 transition-all hover:-translate-y-0.5"
               >
-                <div className="flex-1">
-                  <p
-                    className="mb-2 text-[11px] uppercase text-ink-500"
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      letterSpacing: "0.12em",
-                    }}
-                  >
-                    Ch {String(idx + 1).padStart(2, "0")}
-                  </p>
-                  <h2
-                    className="text-ink-900 transition-colors group-hover:text-coral-700"
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: "20px",
-                      lineHeight: "28px",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {c.name}
-                  </h2>
-                </div>
-                <span
-                  className="inline-flex items-center gap-2 text-[15px] font-semibold text-primary-700 transition-transform group-hover:translate-x-1"
-                  style={{ fontFamily: "var(--font-sans)" }}
-                >
-                  Open
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-solar-amber/10 text-solar-amber">
                   <span
-                    className="material-symbols-outlined"
+                    className="material-symbols-outlined font-bold"
                     style={{ fontSize: "20px" }}
                   >
-                    arrow_forward
+                    bookmark
                   </span>
+                </div>
+                <div className="flex-1">
+                  <p className="text-[10px] font-bold text-solar-text/60">
+                    Ch {String(idx + 1).padStart(2, "0")}
+                  </p>
+                  <h3 className="text-lg font-bold text-solar-text-dark transition-colors group-hover:text-solar-amber">
+                    {c.name}
+                  </h3>
+                </div>
+                <span className="rounded-xl bg-blue-800 px-6 py-3 text-[11px] font-black text-white shadow-lg shadow-blue-900/20 transition-all group-hover:bg-blue-700">
+                  Open
                 </span>
               </Link>
             ))}
           </div>
         )}
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

@@ -20,25 +20,24 @@ export default async function InterviewSetupPage({
   );
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-paper">
-      <div className="dotted-pattern absolute inset-0" />
-      <div className="mesh-gradient absolute inset-0 opacity-40" />
-      <div
-        className="shape-float absolute right-[6%] top-32 h-28 w-28 rounded-full bg-coral-300 opacity-25 blur-3xl"
-        style={{ animationDelay: "0s" }}
-      />
+    <div
+      className="flex min-h-screen flex-col"
+      style={{
+        backgroundColor: "#f1f5f9",
+        color: "#334155",
+        fontFamily: "Geist, sans-serif",
+      }}
+    >
+      <StudentHeader active="interview" />
 
-      <div className="relative z-10">
-        <StudentHeader active="interview" />
-      </div>
-
-      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-col gap-12 px-6 pb-24 pt-10 md:px-16 md:pt-14">
-        <nav className="flex flex-wrap items-center gap-2 text-[13px] text-ink-500">
+      <main className="mx-auto w-full max-w-[1500px] flex-1 px-4 pb-24 pt-4 md:px-6 md:pt-5">
+        {/* Breadcrumb */}
+        <nav className="mb-4 flex flex-wrap items-center gap-2 text-[12px] font-bold text-solar-text/60">
           <Link
             href="/dashboard"
-            className="transition-colors hover:text-primary-700"
+            className="transition-colors hover:text-solar-amber"
           >
-            My subjects
+            My Subjects
           </Link>
           <span
             className="material-symbols-outlined"
@@ -46,40 +45,41 @@ export default async function InterviewSetupPage({
           >
             chevron_right
           </span>
-          <span className="font-medium text-ink-900">Mock interview</span>
+          <span className="text-solar-text-dark">Mock Interview</span>
         </nav>
 
-        <header className="flex flex-col gap-4">
-          <p
-            className="text-[11px] uppercase text-coral-700"
-            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+        {/* Hero card */}
+        <section className="solar-card relative mb-8 overflow-hidden rounded-xxl border-2 border-solar-amber/20 bg-white p-6">
+          <div className="solar-scanline" />
+          <div
+            className="absolute -right-4 -top-4 text-solar-amber/10"
+            style={{ fontSize: "140px", lineHeight: 1 }}
           >
-            AI mock interview · Setup
-          </p>
-          <h1
-            className="text-primary-900"
-            style={{
-              fontFamily: "var(--font-serif)",
-              fontSize: "68px",
-              lineHeight: "72px",
-              letterSpacing: "-0.02em",
-              fontWeight: 400,
-            }}
-          >
-            Rehearse{" "}
-            <span className="hand-drawn-underline">out loud.</span>
-          </h1>
-          <p
-            className="max-w-2xl text-ink-700"
-            style={{ fontSize: "17px", lineHeight: "28px" }}
-          >
-            Pick topics from one or more chapters — questions span your whole
-            selection. {topicCount} topics available in your class.
-          </p>
-        </header>
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: "140px" }}
+            >
+              record_voice_over
+            </span>
+          </div>
+          <div className="relative z-10 max-w-2xl">
+            <p className="mb-2 text-[10px] font-black text-solar-amber">
+              AI Mock Interview · Setup
+            </p>
+            <h1 className="text-2xl font-black tracking-tighter text-solar-text-dark md:text-3xl">
+              Rehearse out loud.
+            </h1>
+            <p className="mt-2 text-[13px] text-solar-text">
+              Pick topics from one or more chapters — questions span your whole
+              selection. {topicCount} topics available in your class.
+            </p>
+          </div>
+        </section>
 
-        <InterviewSetup tree={tree} preselect={topic} />
-      </div>
-    </main>
+        <div className="solar-card rounded-xxl bg-white p-6 md:p-8">
+          <InterviewSetup tree={tree} preselect={topic} />
+        </div>
+      </main>
+    </div>
   );
 }

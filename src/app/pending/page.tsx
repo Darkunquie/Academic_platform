@@ -17,12 +17,11 @@ export default async function PendingPage() {
 
       <header className="relative z-10 flex items-center justify-between px-6 py-5 md:px-12">
         <Link href="/" className="flex items-center gap-2">
-          <span
-            className="material-symbols-outlined text-primary-700"
-            style={{ fontSize: "22px" }}
-          >
-            menu_book
-          </span>
+          <svg width="26" height="26" viewBox="0 0 32 32">
+            <rect width="32" height="32" rx="7" fill="#155E45" />
+            <path d="M6 16.8 25 6.5 17.4 25.5l-3.2-7.2-8.2-1.5Z" fill="#F6A488" />
+            <path d="M14.2 18.3 25 6.5l-10 14.6-.8-2.8Z" fill="#C9462C" />
+          </svg>
           <span
             className="text-ink-900"
             style={{
@@ -31,12 +30,12 @@ export default async function PendingPage() {
               lineHeight: "28px",
             }}
           >
-            Academic
+            Preplyfly
           </span>
         </Link>
         <span
-          className="text-[11px] uppercase text-ink-500"
-          style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+          className="text-[11px] text-ink-500"
+          style={{ fontFamily: "var(--font-mono)", }}
         >
           03 — Pending
         </span>
@@ -65,21 +64,19 @@ export default async function PendingPage() {
               <div className="inline-flex items-center gap-2 rounded-full bg-coral-100 px-3 py-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-coral-700" />
                 <span
-                  className="text-[11px] font-medium uppercase text-coral-700"
+                  className="text-[11px] font-medium text-coral-700"
                   style={{
                     fontFamily: "var(--font-mono)",
-                    letterSpacing: "0.12em",
-                  }}
+                    }}
                 >
                   Pending review
                 </span>
               </div>
               <span
-                className="text-[11px] uppercase text-ink-500"
+                className="text-[11px] text-ink-500"
                 style={{
                   fontFamily: "var(--font-mono)",
-                  letterSpacing: "0.12em",
-                }}
+                  }}
               >
                 ID: {shortId}
               </span>
@@ -87,11 +84,10 @@ export default async function PendingPage() {
 
             <div className="mb-8 flex flex-col gap-3">
               <p
-                className="text-[11px] uppercase text-ink-500"
+                className="text-[11px] text-ink-500"
                 style={{
                   fontFamily: "var(--font-mono)",
-                  letterSpacing: "0.12em",
-                }}
+                  }}
               >
                 03 — Pending review
               </p>
@@ -122,11 +118,10 @@ export default async function PendingPage() {
             <div className="mb-8 grid grid-cols-1 gap-6 rounded-[20px] border border-ink-200 bg-paper p-6 md:grid-cols-2">
               <div className="flex flex-col gap-1">
                 <span
-                  className="text-[11px] uppercase text-ink-500"
+                  className="text-[11px] text-ink-500"
                   style={{
                     fontFamily: "var(--font-mono)",
-                    letterSpacing: "0.12em",
-                  }}
+                    }}
                 >
                   Applicant name
                 </span>
@@ -136,11 +131,10 @@ export default async function PendingPage() {
               </div>
               <div className="flex flex-col gap-1">
                 <span
-                  className="text-[11px] uppercase text-ink-500"
+                  className="text-[11px] text-ink-500"
                   style={{
                     fontFamily: "var(--font-mono)",
-                    letterSpacing: "0.12em",
-                  }}
+                    }}
                 >
                   Email
                 </span>

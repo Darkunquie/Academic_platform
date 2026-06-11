@@ -148,11 +148,10 @@ export function NewAdminForm({
         />
         <div className="flex flex-col gap-1.5">
           <label
-            className="ml-1 text-[11px] font-medium uppercase text-ink-700"
+            className="ml-1 text-[11px] font-medium text-ink-700"
             style={{
               fontFamily: "var(--font-mono)",
-              letterSpacing: "0.12em",
-            }}
+              }}
           >
             Role
           </label>
@@ -174,11 +173,10 @@ export function NewAdminForm({
         <section className="mt-5">
           <div className="mb-2 flex items-center justify-between">
             <label
-              className="ml-1 text-[11px] font-medium uppercase text-ink-700"
+              className="ml-1 text-[11px] font-medium text-ink-700"
               style={{
                 fontFamily: "var(--font-mono)",
-                letterSpacing: "0.12em",
-              }}
+                }}
             >
               Scope · pick providers ({picked.size} selected)
             </label>
@@ -271,8 +269,8 @@ function Field({
     <div className="flex flex-col gap-1.5">
       <label
         htmlFor={name}
-        className="ml-1 text-[11px] font-medium uppercase text-ink-700"
-        style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+        className="ml-1 text-[11px] font-medium text-ink-700"
+        style={{ fontFamily: "var(--font-mono)", }}
       >
         {label}
       </label>

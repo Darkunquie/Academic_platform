@@ -1,3 +1,6 @@
+import { UpstreamError } from "./errors";
+import { isOverCap, recordGroqError, recordTokensFast } from "./groq-cost";
+
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 export const GROQ_MODEL = "llama-3.3-70b-versatile";
@@ -22,6 +25,15 @@ export async function groqChat({
   const key = process.env.GROQ_API_KEY;
   if (!key) throw new Error("GROQ_API_KEY is not set. Add it to .env");
 
+  if (await isOverCap()) {
+    throw new UpstreamError(
+      "groq",
+      429,
+      "AI service paused for the day. Try again tomorrow or contact support.",
+      "daily token cap reached"
+    );
+  }
+
   const res = await fetch(GROQ_URL, {
     method: "POST",
     headers: {
@@ -41,10 +53,18 @@ export async function groqChat({
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Groq error ${res.status}: ${text.slice(0, 300)}`);
+    void recordGroqError();
+    throw new UpstreamError(
+      "groq",
+      res.status,
+      "AI service unavailable. Please retry shortly.",
+      text.slice(0, 1000)
+    );
   }
 
   const data = await res.json();
+  const tokens = Number(data.usage?.total_tokens) || 0;
+  if (tokens > 0) void recordTokensFast(tokens);
   return data.choices?.[0]?.message?.content ?? "";
 }
 
@@ -77,7 +97,12 @@ export async function groqTranscribe(
   });
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Groq STT ${res.status}: ${text.slice(0, 200)}`);
+    throw new UpstreamError(
+      "stt",
+      res.status,
+      "Voice transcription unavailable. Please retry shortly.",
+      text.slice(0, 1000)
+    );
   }
   const data = await res.json();
   return data.text ?? "";

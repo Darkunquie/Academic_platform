@@ -5,6 +5,8 @@ export const LANGUAGES = {
   c: { id: 50, label: "C (GCC 9)" },
   java: { id: 62, label: "Java" },
   javascript: { id: 63, label: "JavaScript (Node)" },
+  csharp: { id: 51, label: "C# (.NET)" },
+  sql: { id: 82, label: "SQL (SQLite)" },
 } as const;
 
 export type LangKey = keyof typeof LANGUAGES;

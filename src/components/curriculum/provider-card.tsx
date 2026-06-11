@@ -47,8 +47,8 @@ export function ProviderCard({
           {lm.emoji}
         </span>
         <span
-          className="relative z-10 text-[11px] font-semibold uppercase text-white/90"
-          style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.1em" }}
+          className="relative z-10 text-[11px] font-semibold text-white/90"
+          style={{ fontFamily: "var(--font-mono)", }}
         >
           {lm.landmark}
         </span>

@@ -50,6 +50,143 @@
   --radius-md: 14px;
   --radius-lg: 20px;
   --radius-xl: 28px;
+  --radius-xxl: 24px;
+
+  /* Solar Command palette (student dashboard) */
+  --color-solar-amber: #b58900;
+  --color-solar-orange: #cb4b16;
+  --color-solar-bg: #fdf6e3;
+  --color-solar-card: #eee8d5;
+  --color-solar-text: #586e75;
+  --color-solar-text-dark: #073642;
+  --color-solar-ink: #93a1a1;
+}
+
+/* Solar Command card + scanline (student dashboard) */
+.solar-card {
+  background: #ffffff;
+  border: 1px solid rgba(147, 161, 161, 0.25);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.solar-card:hover {
+  border-color: #b58900;
+  box-shadow: 0 10px 30px rgba(181, 137, 0, 0.10);
+}
+.solar-scanline {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, rgba(181, 137, 0, 0.4), transparent);
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: solar-scan 6s linear infinite;
+  opacity: 0.6;
+  pointer-events: none;
+}
+@keyframes solar-scan {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+.avatar-stack > * {
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  border: 2px solid #ffffff;
+  margin-left: -10px;
+  object-fit: cover;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatar-stack > *:first-child { margin-left: 0; }
+
+/* Drop cap for topic reader first paragraph */
+.drop-cap::first-letter {
+  float: left;
+  font-size: 4.5rem;
+  line-height: 1;
+  padding-top: 4px;
+  padding-right: 12px;
+  font-weight: 900;
+  color: #073642;
+}
+
+/* Topic reader prose (Solar) */
+.solar-prose {
+  font-family: var(--font-sans);
+  color: #334155;
+  font-size: 16px;
+  line-height: 26px;
+}
+.solar-prose > * + * { margin-top: 14px; }
+.solar-prose h1, .solar-prose h2, .solar-prose h3, .solar-prose h4 {
+  color: #073642;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-top: 22px;
+  margin-bottom: 6px;
+}
+.solar-prose h1 { font-size: 22px; line-height: 1.3; }
+.solar-prose h2 { font-size: 19px; line-height: 1.35; }
+.solar-prose h3 { font-size: 17px; line-height: 1.4; }
+.solar-prose h4 { font-size: 16px; line-height: 1.4; }
+.solar-prose p { color: #586e75; }
+.solar-prose strong { color: #073642; font-weight: 700; }
+.solar-prose em { font-style: italic; }
+.solar-prose a {
+  color: #1e40af;
+  text-decoration: underline;
+  text-decoration-color: #b58900;
+  text-underline-offset: 3px;
+}
+.solar-prose a:hover { text-decoration-color: #cb4b16; }
+.solar-prose ul, .solar-prose ol { padding-left: 24px; }
+.solar-prose ul { list-style: disc; }
+.solar-prose ol { list-style: decimal; }
+.solar-prose li + li { margin-top: 6px; }
+.solar-prose blockquote {
+  margin: 24px 0;
+  padding: 18px 22px;
+  background: #f1f5f9;
+  border-left: 4px solid #1e40af;
+  border-radius: 0 12px 12px 0;
+  color: #073642;
+  font-style: italic;
+}
+.solar-prose code {
+  background: #eee8d5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: #073642;
+}
+.solar-prose pre {
+  background: #073642;
+  color: #fdf6e3;
+  padding: 18px 22px;
+  border-radius: 14px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 22px;
+}
+.solar-prose pre code { background: transparent; padding: 0; color: inherit; }
+.solar-prose hr {
+  border: 0;
+  border-top: 1px solid #cbd5e1;
+  margin: 32px 0;
+}
+
+/* TTS audio bar animation (decorative) */
+@keyframes solar-tts-bar {
+  from { height: 4px; }
+  to { height: 16px; }
+}
+.solar-tts-bar {
+  animation: solar-tts-bar 1s ease-in-out infinite alternate;
 }
 
 html, body {

@@ -4,10 +4,14 @@ import { getCodingQuestion, listTestCases } from "@/modules/coding/service";
 import {
   addTestCaseAction,
   deleteTestCaseAction,
+  updateCodingLanguagesAction,
+  updateCodingConstraintsAction,
 } from "@/modules/coding/actions";
+import { LANG_KEYS, LANGUAGES } from "@/modules/coding/languages";
 import { Breadcrumb } from "@/components/curriculum/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
+import { LangCheckboxes } from "@/components/coding/lang-checkboxes";
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +42,63 @@ export default async function CodingQuestionAdminPage({
       <p className="mt-1 whitespace-pre-wrap text-sm text-gray-600">
         {question.prompt}
       </p>
+
+      <section className="mt-8">
+        <h2 className="text-lg font-semibold">Constraints & limits</h2>
+        <form action={updateCodingConstraintsAction} className="mt-3 space-y-3">
+          <input type="hidden" name="id" value={questionId} />
+          <input type="hidden" name="revalidate" value={path} />
+          <div>
+            <Label>Constraints (one per line)</Label>
+            <textarea
+              name="constraints"
+              rows={4}
+              defaultValue={question.constraints ?? ""}
+              placeholder={"1 ≤ N ≤ 10^5\n-10^9 ≤ a[i] ≤ 10^9"}
+              className="w-full rounded-md border border-gray-300 p-3 font-mono text-xs outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label>Time limit (ms)</Label>
+              <Input
+                name="timeLimitMs"
+                type="number"
+                min={100}
+                step={100}
+                defaultValue={question.timeLimitMs ?? 2000}
+              />
+            </div>
+            <div>
+              <Label>Memory limit (KB)</Label>
+              <Input
+                name="memLimitKb"
+                type="number"
+                min={16000}
+                step={1000}
+                defaultValue={question.memLimitKb ?? 128000}
+              />
+            </div>
+          </div>
+          <Button type="submit">Save constraints</Button>
+        </form>
+      </section>
+
+      <section className="mt-8">
+        <h2 className="text-lg font-semibold">Allowed languages</h2>
+        <form
+          action={updateCodingLanguagesAction}
+          className="mt-3 flex flex-wrap items-end gap-3"
+        >
+          <input type="hidden" name="id" value={questionId} />
+          <input type="hidden" name="revalidate" value={path} />
+          <LangCheckboxes
+            options={LANG_KEYS.map((k) => ({ key: k, label: LANGUAGES[k].label }))}
+            defaultSelected={question.languages as string[]}
+          />
+          <Button type="submit">Save languages</Button>
+        </form>
+      </section>
 
       <section className="mt-8">
         <h2 className="text-lg font-semibold">Add test case</h2>

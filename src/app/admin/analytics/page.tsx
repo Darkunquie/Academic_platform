@@ -39,8 +39,8 @@ function PageHeader({
   return (
     <header className="flex flex-col gap-3">
       <p
-        className="text-[11px] uppercase text-ink-500"
-        style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+        className="text-[11px] text-ink-500"
+        style={{ fontFamily: "var(--font-mono)", }}
       >
         {eyebrow}
       </p>
@@ -127,11 +127,10 @@ async function SectionLevel() {
         <div className="flex items-end justify-between gap-4">
           <div>
             <p
-              className="text-[11px] uppercase text-ink-500"
+              className="text-[11px] text-ink-500"
               style={{
                 fontFamily: "var(--font-mono)",
-                letterSpacing: "0.12em",
-              }}
+                }}
             >
               By section
             </p>
@@ -151,8 +150,7 @@ async function SectionLevel() {
             className="text-[12px] text-ink-500"
             style={{
               fontFamily: "var(--font-mono)",
-              letterSpacing: "0.08em",
-            }}
+              }}
           >
             {rows.length} sections
           </span>
@@ -167,11 +165,10 @@ async function SectionLevel() {
             >
               <div className="flex items-start justify-between">
                 <span
-                  className="text-[11px] uppercase text-ink-500"
+                  className="text-[11px] text-ink-500"
                   style={{
                     fontFamily: "var(--font-mono)",
-                    letterSpacing: "0.12em",
-                  }}
+                    }}
                 >
                   {r.code ?? "Section"}
                 </span>
@@ -281,11 +278,10 @@ async function ProviderLevel({ sectionId }: Readonly<{ sectionId: string }>) {
                 </div>
                 <div className="mt-1 flex items-center gap-2">
                   <span
-                    className="text-[10px] uppercase text-ink-500"
+                    className="text-[10px] text-ink-500"
                     style={{
                       fontFamily: "var(--font-mono)",
-                      letterSpacing: "0.12em",
-                    }}
+                      }}
                   >
                     {r.kind}
                   </span>
@@ -411,8 +407,8 @@ function Kpi({
     <div className="flex flex-col gap-4 rounded-[20px] border border-ink-200 bg-white p-5 soft-shadow transition-all hover:-translate-y-0.5 hover:pop-shadow">
       <div className="flex items-start justify-between">
         <span
-          className="text-[11px] uppercase text-ink-500"
-          style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+          className="text-[11px] text-ink-500"
+          style={{ fontFamily: "var(--font-mono)", }}
         >
           {label}
         </span>
@@ -443,8 +439,8 @@ function Kpi({
 function Th({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <th
-      className="px-5 py-3 text-[11px] uppercase text-coral-300"
-      style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+      className="px-5 py-3 text-[11px] text-coral-300"
+      style={{ fontFamily: "var(--font-mono)", }}
     >
       {children}
     </th>
@@ -469,8 +465,8 @@ function Empty({ text }: Readonly<{ text: string }>) {
   return (
     <div className="rounded-[24px] border border-dashed border-ink-300 bg-white/60 p-16 text-center">
       <p
-        className="mb-2 text-[11px] uppercase text-ink-500"
-        style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+        className="mb-2 text-[11px] text-ink-500"
+        style={{ fontFamily: "var(--font-mono)", }}
       >
         Empty
       </p>

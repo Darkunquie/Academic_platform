@@ -35,6 +35,9 @@ export async function createCodingQuestion(args: {
   prompt: string;
   languages: string[];
   difficulty: "easy" | "medium" | "hard";
+  constraints?: string;
+  timeLimitMs?: number;
+  memLimitKb?: number;
   createdBy?: string;
 }) {
   const [row] = await db
@@ -45,6 +48,9 @@ export async function createCodingQuestion(args: {
       prompt: args.prompt,
       languages: args.languages,
       difficulty: args.difficulty,
+      constraints: args.constraints ?? "",
+      timeLimitMs: args.timeLimitMs ?? 2000,
+      memLimitKb: args.memLimitKb ?? 128000,
       source: "human",
       createdBy: args.createdBy,
     })
@@ -52,8 +58,22 @@ export async function createCodingQuestion(args: {
   return row.id;
 }
 
+export function updateCodingConstraints(
+  id: string,
+  args: { constraints: string; timeLimitMs: number; memLimitKb: number }
+) {
+  return db.update(codingQuestions).set(args).where(eq(codingQuestions.id, id));
+}
+
 export function deleteCodingQuestion(id: string) {
   return db.delete(codingQuestions).where(eq(codingQuestions.id, id));
+}
+
+export function updateCodingLanguages(id: string, languages: string[]) {
+  return db
+    .update(codingQuestions)
+    .set({ languages })
+    .where(eq(codingQuestions.id, id));
 }
 
 /* --------------------------- Admin: test cases --------------------- */

@@ -93,8 +93,8 @@ export function NewTopicForm({
           <div className="grid gap-5 lg:grid-cols-2">
             <div className="flex flex-col gap-2">
               <label
-                className="text-[11px] font-medium uppercase text-ink-700"
-                style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+                className="text-[11px] font-medium text-ink-700"
+                style={{ fontFamily: "var(--font-mono)", }}
               >
                 Content (Markdown · optional)
               </label>
@@ -111,8 +111,8 @@ export function NewTopicForm({
 
             <div className="flex flex-col gap-2">
               <label
-                className="text-[11px] font-medium uppercase text-ink-700"
-                style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+                className="text-[11px] font-medium text-ink-700"
+                style={{ fontFamily: "var(--font-mono)", }}
               >
                 Attach files (optional)
               </label>

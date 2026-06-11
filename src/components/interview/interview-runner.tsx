@@ -7,14 +7,18 @@ import {
   transcribeAction,
   completeInterviewAction,
 } from "@/modules/interview/actions";
+import {
+  startWebSpeech,
+  webSpeechAvailable,
+  type WebSpeechSession,
+} from "@/lib/web-speech";
 
 type Q = { id: string; question: string };
 type Res = { question: string; answer: string; score: number; feedback: string };
 
 const labelStyle = {
   fontFamily: "var(--font-mono)",
-  letterSpacing: "0.12em",
-} as const;
+  } as const;
 
 function submitLabel(submitting: boolean, hasNext: boolean): string {
   if (submitting) return "Scoring…";
@@ -62,6 +66,7 @@ export function InterviewRunner({
 
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const speechRef = useRef<WebSpeechSession | null>(null);
 
   const q = questions[idx];
 
@@ -77,6 +82,20 @@ export function InterviewRunner({
 
   async function startRec() {
     setError(null);
+
+    if (webSpeechAvailable()) {
+      const session = startWebSpeech({
+        onTranscript: (text) => setDraft(text),
+        onError: (err) => setError(err),
+        onEnd: () => setRecording(false),
+      });
+      if (session) {
+        speechRef.current = session;
+        setRecording(true);
+        return;
+      }
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mr = new MediaRecorder(stream);
@@ -103,6 +122,12 @@ export function InterviewRunner({
   }
 
   function stopRec() {
+    if (speechRef.current) {
+      speechRef.current.stop();
+      speechRef.current = null;
+      setRecording(false);
+      return;
+    }
     recorderRef.current?.stop();
     setRecording(false);
   }
@@ -165,7 +190,7 @@ export function InterviewRunner({
           <div className="relative z-10 flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <p
-                className="mb-2 text-[11px] uppercase text-ink-500"
+                className="mb-2 text-[11px] text-ink-500"
                 style={labelStyle}
               >
                 Overall interview score
@@ -186,7 +211,7 @@ export function InterviewRunner({
             </div>
             <div className="w-full max-w-xs">
               <div
-                className="mb-1 flex items-center justify-between text-[11px] uppercase text-ink-500"
+                className="mb-1 flex items-center justify-between text-[11px] text-ink-500"
                 style={labelStyle}
               >
                 <span>Mastery</span>
@@ -239,7 +264,7 @@ export function InterviewRunner({
                 </div>
                 <div className="mt-5 rounded-[14px] border border-ink-100 bg-paper p-4">
                   <p
-                    className="mb-1 text-[10px] uppercase text-ink-500"
+                    className="mb-1 text-[10px] text-ink-500"
                     style={labelStyle}
                   >
                     Your answer
@@ -260,7 +285,7 @@ export function InterviewRunner({
                     </span>
                     <div className="flex-1">
                       <p
-                        className="mb-1 text-[10px] uppercase text-coral-700"
+                        className="mb-1 text-[10px] text-coral-700"
                         style={labelStyle}
                       >
                         Examiner feedback · {tone.label}
@@ -279,7 +304,7 @@ export function InterviewRunner({
         <div className="border-t border-ink-200 pt-6">
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-1.5 text-[13px] uppercase text-ink-500 transition-colors hover:text-coral-700"
+            className="inline-flex items-center gap-1.5 text-[13px] text-ink-500 transition-colors hover:text-coral-700"
             style={labelStyle}
           >
             <span
@@ -301,7 +326,7 @@ export function InterviewRunner({
     <div className="flex flex-col gap-6">
       {/* Progress strip */}
       <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between text-[11px] uppercase text-ink-500"
+        <div className="flex items-center justify-between text-[11px] text-ink-500"
           style={labelStyle}>
           <span>
             Question {idx + 1} / {questions.length}
@@ -341,7 +366,7 @@ export function InterviewRunner({
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1">
               <p
-                className="mb-2 text-[11px] uppercase text-coral-700"
+                className="mb-2 text-[11px] text-coral-700"
                 style={labelStyle}
               >
                 Interviewer asks
@@ -430,7 +455,7 @@ export function InterviewRunner({
             </div>
             {transcribing && (
               <span
-                className="pr-3 text-[11px] uppercase text-ink-500"
+                className="pr-3 text-[11px] text-ink-500"
                 style={labelStyle}
               >
                 Transcribing…
@@ -440,7 +465,7 @@ export function InterviewRunner({
 
           <div className="flex flex-col gap-2">
             <span
-              className="ml-1 text-[11px] uppercase text-ink-700"
+              className="ml-1 text-[11px] text-ink-700"
               style={labelStyle}
             >
               Your answer

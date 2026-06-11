@@ -59,8 +59,8 @@ export function ProviderBoardGrid({
       {(states.length > 0 || hasNational) && (
         <div className="mt-6 flex flex-wrap items-center gap-2">
           <span
-            className="mr-1 text-[11px] uppercase text-ink-500"
-            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.1em" }}
+            className="mr-1 text-[11px] text-ink-500"
+            style={{ fontFamily: "var(--font-mono)", }}
           >
             Filter by state
           </span>

@@ -21,8 +21,8 @@ export default async function CurriculumPage() {
 
       <header className="flex flex-col gap-3">
         <p
-          className="text-[11px] uppercase text-ink-500"
-          style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+          className="text-[11px] text-ink-500"
+          style={{ fontFamily: "var(--font-mono)", }}
         >
           Curriculum editor
         </p>
@@ -68,11 +68,10 @@ export default async function CurriculumPage() {
             </div>
 
             <span
-              className="relative z-10 text-[11px] uppercase text-ink-500"
+              className="relative z-10 text-[11px] text-ink-500"
               style={{
                 fontFamily: "var(--font-mono)",
-                letterSpacing: "0.12em",
-              }}
+                }}
             >
               {s.code ?? "Section"}
             </span>

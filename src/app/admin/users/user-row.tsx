@@ -167,8 +167,8 @@ export function UserRow({
         </div>
 
         <span
-          className={`inline-flex h-6 w-fit items-center rounded-full px-2.5 text-[10px] font-semibold uppercase ${ROLE_CHIP[user.role]}`}
-          style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.1em" }}
+          className={`inline-flex h-6 w-fit items-center rounded-full px-2.5 text-[10px] font-semibold ${ROLE_CHIP[user.role]}`}
+          style={{ fontFamily: "var(--font-mono)", }}
         >
           {user.role === "super_admin" ? "Super admin" : user.role}
           {user.role === "admin" && (
@@ -177,8 +177,8 @@ export function UserRow({
         </span>
 
         <span
-          className={`inline-flex h-6 w-fit items-center rounded-full px-2.5 text-[10px] font-semibold uppercase ${STATUS_CHIP[user.status]}`}
-          style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.1em" }}
+          className={`inline-flex h-6 w-fit items-center rounded-full px-2.5 text-[10px] font-semibold ${STATUS_CHIP[user.status]}`}
+          style={{ fontFamily: "var(--font-mono)", }}
         >
           {user.status}
         </span>
@@ -243,11 +243,10 @@ export function UserRow({
           {open === "role" && (
             <div className="flex flex-wrap items-center gap-2">
               <span
-                className="text-[11px] uppercase text-ink-500"
+                className="text-[11px] text-ink-500"
                 style={{
                   fontFamily: "var(--font-mono)",
-                  letterSpacing: "0.12em",
-                }}
+                  }}
               >
                 Change role to:
               </span>
@@ -273,11 +272,10 @@ export function UserRow({
             <div>
               <div className="mb-2 flex items-center justify-between">
                 <span
-                  className="text-[11px] uppercase text-ink-500"
+                  className="text-[11px] text-ink-500"
                   style={{
                     fontFamily: "var(--font-mono)",
-                    letterSpacing: "0.12em",
-                  }}
+                    }}
                 >
                   Scope · {picked.size} selected
                 </span>
@@ -331,11 +329,10 @@ export function UserRow({
           {open === "pw" && (
             <div className="flex flex-wrap items-center gap-2">
               <span
-                className="text-[11px] uppercase text-ink-500"
+                className="text-[11px] text-ink-500"
                 style={{
                   fontFamily: "var(--font-mono)",
-                  letterSpacing: "0.12em",
-                }}
+                  }}
               >
                 New password:
               </span>

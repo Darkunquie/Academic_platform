@@ -25,6 +25,8 @@ const MONACO_LANG: Record<LangKey, string> = {
   cpp: "cpp",
   c: "c",
   java: "java",
+  csharp: "csharp",
+  sql: "sql",
 };
 
 const SNIPPET: Partial<Record<LangKey, string>> = {
@@ -34,6 +36,9 @@ const SNIPPET: Partial<Record<LangKey, string>> = {
   cpp: "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n  // your code here\n}\n",
   c: "#include <stdio.h>\nint main(){\n  // your code here\n  return 0;\n}\n",
   java: "import java.util.*;\npublic class Main {\n  public static void main(String[] a){\n    // your code here\n  }\n}\n",
+  csharp:
+    "using System;\n// Class name must stay `Program` with `static void Main` —\n// renaming breaks compilation in the sandbox.\nclass Program {\n  static void Main() {\n    // your code here\n  }\n}\n",
+  sql: "-- SQLite. Statements run in order; SELECT rows print to stdout\n-- as values separated by | (e.g. `1|alice`). No headers.\nSELECT 1;\n",
 };
 
 export function CodeRunner({
@@ -89,8 +94,8 @@ export function CodeRunner({
             ))}
           </select>
           <span
-            className="text-[10px] uppercase text-ink-500"
-            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+            className="text-[10px] text-ink-500"
+            style={{ fontFamily: "var(--font-mono)", }}
           >
             Auto-saved locally
           </span>
@@ -285,8 +290,8 @@ function Cell({
   return (
     <div className="rounded-[8px] bg-[#0E1014] p-2">
       <div
-        className="mb-1 text-[10px] uppercase text-ink-500"
-        style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.1em" }}
+        className="mb-1 text-[10px] text-ink-500"
+        style={{ fontFamily: "var(--font-mono)", }}
       >
         {label}
       </div>

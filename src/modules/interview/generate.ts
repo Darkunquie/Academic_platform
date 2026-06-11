@@ -1,7 +1,7 @@
 import { inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { topics, topicContent } from "@/db/schema";
-import { groqJson, GROQ_MODEL } from "@/lib/groq";
+import { groqJson, GROQ_MODEL, GROQ_FAST_MODEL } from "@/lib/groq";
 import { cacheKey, getCached, saveCached } from "@/modules/assessment/cache";
 
 export type GenInterviewQ = { question: string; idealAnswer: string };
@@ -15,7 +15,7 @@ export async function generateInterviewQuestions(
   count: number,
   difficulty: "easy" | "medium" | "hard"
 ): Promise<{ questions: GenInterviewQ[]; cached: boolean }> {
-  const sorted = [...topicIds].sort();
+  const sorted = [...topicIds].sort((a, b) => a.localeCompare(b));
   const key = cacheKey([...sorted, "interview", difficulty, count]);
 
   const hit = await getCached(key);
@@ -34,11 +34,11 @@ export async function generateInterviewQuestions(
   const topicNames = ts.map((t) => t.name).join(", ");
   let ctx = ts
     .map((t) => {
-      const body = (contentMap.get(t.id) ?? "").slice(0, 1200);
+      const body = (contentMap.get(t.id) ?? "").slice(0, 500);
       return `## ${t.name}\n${body}`;
     })
     .join("\n\n")
-    .slice(0, 6000);
+    .slice(0, 2000);
 
   const system =
     "You are a friendly but rigorous technical/academic interviewer. Respond with strict JSON only.";
@@ -53,11 +53,12 @@ Mix conceptual and applied questions. Return JSON:
   const json = await groqJson<{ questions?: GenInterviewQ[] }>({
     system,
     user,
+    model: GROQ_FAST_MODEL,
     temperature: 0.5,
   });
   const questions = Array.isArray(json.questions) ? json.questions : [];
 
-  await saveCached(key, "interview", { questions }, GROQ_MODEL);
+  await saveCached(key, "interview", { questions }, GROQ_FAST_MODEL);
   return { questions, cached: false };
 }
 

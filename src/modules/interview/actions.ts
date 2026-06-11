@@ -1,5 +1,5 @@
 "use server";
-
+import { safeErrorMessage } from "@/lib/errors";
 import { requireStudent } from "@/modules/auth/guard";
 import { getTopicChain } from "@/modules/curriculum/admin";
 import { groqTranscribe } from "@/lib/groq";
@@ -40,7 +40,7 @@ export async function startInterviewAction(input: {
     );
     return { ok: true, sessionId };
   } catch (e) {
-    return { ok: false, error: (e as Error).message };
+    return { ok: false, error: safeErrorMessage(e, "Something went wrong. Please retry.") };
   }
 }
 
@@ -59,7 +59,7 @@ export async function transcribeAction(
     const text = await groqTranscribe(file);
     return { ok: true, text };
   } catch (e) {
-    return { ok: false, error: (e as Error).message };
+    return { ok: false, error: safeErrorMessage(e, "Something went wrong. Please retry.") };
   }
 }
 
@@ -68,6 +68,9 @@ export async function submitAnswerAction(input: {
   transcript: string;
 }): Promise<{ ok: boolean; score?: number; feedback?: string; error?: string }> {
   const user = await requireStudent();
+  if (!rateLimit(`grade:${user.id}`, 30, 60_000)) {
+    return { ok: false, error: "Rate limit hit. Slow down a moment." };
+  }
   try {
     const { score, feedback } = await svc.answerQuestion(
       user.id,
@@ -76,7 +79,7 @@ export async function submitAnswerAction(input: {
     );
     return { ok: true, score, feedback };
   } catch (e) {
-    return { ok: false, error: (e as Error).message };
+    return { ok: false, error: safeErrorMessage(e, "Something went wrong. Please retry.") };
   }
 }
 
@@ -88,6 +91,6 @@ export async function completeInterviewAction(
     const { overall } = await svc.completeSession(user.id, sessionId);
     return { ok: true, overall };
   } catch (e) {
-    return { ok: false, error: (e as Error).message };
+    return { ok: false, error: safeErrorMessage(e, "Something went wrong. Please retry.") };
   }
 }

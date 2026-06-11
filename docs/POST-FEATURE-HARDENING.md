@@ -46,7 +46,7 @@ Findings from CSO audit run after Phase 1-7 redesign + builds. Order = severity 
 | H0.14 | **postcss < 8.5.10, esbuild ≤0.24.2 transitive CVEs** | `pnpm-lock.yaml` | `pnpm up next postcss drizzle-kit` — refresh transitive lockfile | 10m |
 | H0.15 | **No audit log on curriculum mutations** — only approve/reject log | `src/modules/curriculum/actions.ts` (all mutators) | Add `auditLog` insert in each `createX/renameX/deleteX/toggleX` action. Folds into **H1.6** | 2h |
 | H0.16 | **Asset filename unescaped in `Content-Disposition`** | `src/app/api/assets/[id]/route.ts:36` | RFC 5987 form: `filename*=UTF-8''${encodeURIComponent(asset.filename)}` | 5m |
-| H0.17 | **In-memory rate limiter — single-instance only** | `src/lib/rate-limit.ts` | Doc decision: acceptable on single VPS. Migrate to Redis/Postgres when horizontal scale. Folds into "Architecture-level open items" | doc |
+| H0.17 | **In-memory rate limiter — single-instance only, lost on restart, bypassable across deploys** | `src/lib/rate-limit.ts` | Reversed decision (2026-06-10): wire Upstash Redis at launch, not post-scale. In-memory becomes fallback for Redis circuit-break only. See [INFRASTRUCTURE.md §6a](INFRASTRUCTURE.md). Folds into **H1.10**. | 4h |
 
 ### H0 Acceptance gates
 
@@ -79,7 +79,7 @@ Production-blocking items. Do first.
 
 | # | Task | Why | Effort |
 |---|---|---|---|
-| H1.1 | Rate limit `/api/signup`, `/api/auth/*`, `/api/ai/*`, `/api/judge0/*` | Bot signup, AI cost runaway, brute-force | 2h |
+| H1.1 | Rate limit `/api/signup`, `/api/auth/*`, `/api/ai/*`, `/api/judge0/*` (Redis-backed, sliding window, see H1.10) | Bot signup, AI cost runaway, brute-force | 2h |
 | H1.2 | CSRF + cookie audit — confirm Auth.js `secure: true`, `sameSite: lax` in prod | Session hijack | 30m |
 | H1.3 | Strong `AUTH_SECRET` per env (dev/staging/prod) | Token forgery | 15m |
 | H1.4 | JWT TTL drop to 1h + silent refresh | Force-revoke after admin demote/reject | 2h |
@@ -88,8 +88,12 @@ Production-blocking items. Do first.
 | H1.7 | Cross-board access test — student A logs in, requests subject from board B → must 404 | Multi-tenant leak | 1h test + fix |
 | H1.8 | 2FA TOTP for super-admin role | Admin account compromise | 3h |
 | H1.9 | CSP + HSTS + X-Frame-Options via `next.config.ts` headers | XSS, clickjacking | 1h |
+| H1.10 | **Upstash Redis wire-up** — install `@upstash/redis` + `@upstash/ratelimit`, build `src/lib/cache.ts` (timeout, circuit breaker, env-prefix, JSON codec), migrate all rate-limit callers, add Groq response cache layer, add JWT revocation list, add submission locks, add daily metric counters. Full design in [INFRASTRUCTURE.md §6a](INFRASTRUCTURE.md) | Bypassable in-memory limiter; no force-logout on admin demote; no cost ceiling visibility; double-submit races on test/coding | 4h |
+| H1.11 | JWT revocation check in `middleware.ts` — read `sess:revoke:<jti>` on every protected request | Admin demoted mid-session keeps powers until token expiry (H1.4 reduces window but doesn't close it) | 1h |
+| H1.12 | Groq cost guard — daily token counter (Redis), hard cutoff at `GROQ_DAILY_TOKEN_CAP=5M`, Sentry alert at 80%. Pairs with H1.13 reductions to keep spend visible. | Runaway prompt → $1000 surprise bill | 1h |
+| H1.13 | **Groq spend reduction (L1-L6, see [INFRASTRUCTURE.md §6b](INFRASTRUCTURE.md)).** Switch gen flows to llama-3.1-8b (L1), pre-warm cache on admin publish (L2), truncate context (L3), Web Speech API fallback for STT (L4), tighten self-upload limits (L5), Redis hot cache on `groqJson` (L6). Target: $110/mo → $17/mo at 10k MAU. | LLM spend is single biggest variable cost; left unchecked, breaks $100/mo budget at 5k MAU. | 6h |
 
-**Gate:** Penetration smoke test — try common OWASP 10 vectors, all blocked.
+**Gate:** Penetration smoke test — try common OWASP 10 vectors, all blocked. Redis circuit-break drill — block Upstash via firewall, verify app keeps serving with in-memory fallback + Sentry warning.
 
 ---
 
@@ -257,7 +261,8 @@ These are decisions / design questions to resolve during hardening, not code.
 
 - ❌ Microservices / NestJS split — modular monolith decided in Phase 0 research
 - ❌ Kubernetes — single Hetzner VPS enough
-- ❌ Redis — Postgres handles cache + JWT covers sessions
+- ✅ **Redis (Upstash) — REVERSED 2026-06-10.** Originally deferred; now wired at launch for rate-limit accuracy, Groq cost cap, JWT revocation, and submission locks. See [INFRASTRUCTURE.md §6a](INFRASTRUCTURE.md).
+- ❌ Self-hosted Redis on the VPS — uses Upstash serverless instead. Same VPS shouldn't hold rate-limit state we care about
 - ❌ Qdrant / vector DB — topic content small, RAG not needed
 - ❌ Apache Kafka / event bus — not at this scale
 - ❌ GraphQL — REST + server actions sufficient
@@ -272,7 +277,7 @@ These are decisions / design questions to resolve during hardening, not code.
 | Phase | Days |
 |---|---|
 | **H0 Immediate (audit)** | **1** |
-| H1 Security | 1 |
+| H1 Security (incl. Redis H1.10-12, LLM cost cuts H1.13) | 2 |
 | H2 Observability | 0.5 |
 | H3 Backups & DR | 0.5 |
 | H4 Performance | 1 |
@@ -282,9 +287,9 @@ These are decisions / design questions to resolve during hardening, not code.
 | H8 Polish & UX | 1 |
 | H9 Indian-market | 1 (optional, defer) |
 | H10 Operational | ongoing |
-| **Total** | **~8-9 days** for H0–H8, +1 for H9 |
+| **Total** | **~9-10 days** for H0–H8, +1 for H9 |
 
-After feature phases 0-7 (~30 days) finish, this hardening track = roughly 8-11 days to production-ready. H0 is non-negotiable before any public exposure.
+After feature phases 0-7 (~30 days) finish, this hardening track = roughly 9-12 days to production-ready. H0 is non-negotiable before any public exposure.
 
 ---
 
@@ -308,4 +313,7 @@ Reason: H0 closes audit-surfaced exploit paths (prompt injection, sandbox abuse,
 - **Audit:** /cso ran 2026-06-08. 15 findings: 1 CRIT, 4 HIGH, 7 MED, 3 LOW. Logged as Phase **H0** above.
 - **Immediate action:** Rotate `GROQ_API_KEY` (H0.1) before next dev session.
 - **After feature freeze:** Run H0 in full, then H1-H8 per execution order.
-- **Updated:** 2026-06-08
+- **Infra design locked 2026-06-10:** Hetzner CCX23 + Self-hosted Postgres 16 + Upstash Redis + Cloudflare R2 + Groq + Resend + Sentry. ~$73/mo at 10k MAU target. AWS migration path documented for 50k+ MAU trigger. See [INFRASTRUCTURE.md](INFRASTRUCTURE.md).
+- **Redis decision reversed 2026-06-10:** wire at launch instead of post-scale. 3 new items added to H1 (H1.10, H1.11, H1.12).
+- **Neon decision reversed 2026-06-11:** self-host Postgres on VPS (Docker) instead of Neon. Saves $19/mo. Trigger for migration: DB > 30GB OR first DR incident OR 25k MAU. Reduces total to $73/mo.
+- **Updated:** 2026-06-11

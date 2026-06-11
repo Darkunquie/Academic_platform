@@ -10,8 +10,8 @@ export default async function ApprovalsPage() {
     <div className="flex flex-col gap-10">
       <header className="flex flex-col gap-3">
         <p
-          className="text-[11px] uppercase text-ink-500"
-          style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+          className="text-[11px] text-ink-500"
+          style={{ fontFamily: "var(--font-mono)", }}
         >
           Pending review · {pending.length} applicant
           {pending.length === 1 ? "" : "s"}
@@ -41,8 +41,8 @@ export default async function ApprovalsPage() {
       {pending.length === 0 ? (
         <div className="rounded-[24px] border border-dashed border-ink-300 bg-white/60 p-16 text-center">
           <p
-            className="mb-3 text-[11px] uppercase text-ink-500"
-            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+            className="mb-3 text-[11px] text-ink-500"
+            style={{ fontFamily: "var(--font-mono)", }}
           >
             Inbox zero
           </p>
@@ -97,11 +97,10 @@ export default async function ApprovalsPage() {
                     </div>
                   </div>
                   <span
-                    className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-coral-100 px-2.5 py-1 text-[11px] font-semibold uppercase text-coral-700"
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-coral-100 px-2.5 py-1 text-[11px] font-semibold text-coral-700"
                     style={{
                       fontFamily: "var(--font-mono)",
-                      letterSpacing: "0.1em",
-                    }}
+                      }}
                   >
                     <span className="h-1.5 w-1.5 rounded-full bg-coral-700" />
                     Pending
@@ -135,8 +134,8 @@ function Detail({
   return (
     <div className="flex min-w-0 flex-col gap-0.5">
       <span
-        className="text-[10px] uppercase text-ink-500"
-        style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+        className="text-[10px] text-ink-500"
+        style={{ fontFamily: "var(--font-mono)", }}
       >
         {label}
       </span>

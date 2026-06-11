@@ -23,82 +23,50 @@ export default async function InterviewSessionPage({
   const completed = s.status === "completed";
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-paper">
-      <div className="dotted-pattern absolute inset-0" />
-      <div className="mesh-gradient absolute inset-0 opacity-40" />
-      <div
-        className="shape-float absolute right-[6%] top-32 h-28 w-28 rounded-full bg-coral-300 opacity-20 blur-3xl"
-        style={{ animationDelay: "0s" }}
-      />
+    <div
+      className="flex min-h-screen flex-col"
+      style={{
+        backgroundColor: "#f1f5f9",
+        color: "#334155",
+        fontFamily: "Geist, sans-serif",
+      }}
+    >
+      <StudentHeader active="interview" />
 
-      <div className="relative z-10">
-        <StudentHeader active="interview" />
-      </div>
-
-      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-col gap-10 px-6 pb-24 pt-10 md:px-16 md:pt-14">
-        <nav className="flex flex-wrap items-center gap-2 text-[13px] text-ink-500">
+      <main className="mx-auto w-full max-w-[1500px] flex-1 px-4 pb-24 pt-4 md:px-6 md:pt-5">
+        {/* Breadcrumb */}
+        <nav className="mb-4 flex flex-wrap items-center gap-2 text-[12px] font-bold text-solar-text/60">
           <Link
             href="/dashboard"
-            className="transition-colors hover:text-primary-700"
+            className="transition-colors hover:text-solar-amber"
           >
-            My subjects
+            My Subjects
           </Link>
-          <span
-            className="material-symbols-outlined"
-            style={{ fontSize: "14px" }}
-          >
-            chevron_right
-          </span>
+          <Chev />
           <Link
             href="/dashboard/interview"
-            className="transition-colors hover:text-primary-700"
+            className="transition-colors hover:text-solar-amber"
           >
-            Mock interview
+            Mock Interview
           </Link>
-          <span
-            className="material-symbols-outlined"
-            style={{ fontSize: "14px" }}
-          >
-            chevron_right
-          </span>
-          <span className="font-medium text-ink-900">
-            {completed ? "Result" : "In progress"}
+          <Chev />
+          <span className="text-solar-text-dark">
+            {completed ? "Result" : "In Progress"}
           </span>
         </nav>
 
-        <header className="flex flex-col gap-3">
-          <p
-            className="text-[11px] uppercase text-coral-700"
-            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
-          >
-            {completed ? "Session complete" : "Live · interviewer is listening"}
+        {/* Hero */}
+        <header className="mb-10 flex flex-col gap-3">
+          <p className="text-[10px] font-black text-solar-amber">
+            {completed ? "Session Complete" : "Live · Interviewer Listening"}
           </p>
-          <h1
-            className="text-primary-900"
-            style={{
-              fontFamily: "var(--font-serif)",
-              fontSize: "60px",
-              lineHeight: "64px",
-              letterSpacing: "-0.02em",
-              fontWeight: 400,
-            }}
-          >
-            {completed ? (
-              <>
-                Your{" "}
-                <span className="hand-drawn-underline">verdict.</span>
-              </>
-            ) : (
-              <>
-                Mock{" "}
-                <span className="hand-drawn-underline">interview.</span>
-              </>
-            )}
+          <h1 className="text-5xl font-black tracking-tighter text-solar-text-dark md:text-6xl">
+            {completed ? "Your verdict." : "Mock interview."}
           </h1>
         </header>
 
         {questions.length === 0 ? (
-          <div className="rounded-[24px] border border-dashed border-ink-300 bg-white/60 p-12 text-center text-ink-500">
+          <div className="solar-card rounded-xxl border-dashed bg-white p-12 text-center text-solar-text">
             No questions were generated. Try starting again.
           </div>
         ) : completed ? (
@@ -108,34 +76,47 @@ export default async function InterviewSessionPage({
             overall={s.overallScore}
           />
         ) : (
-          <InterviewRunner
-            sessionId={sessionId}
-            mode={s.mode}
-            questions={questions.map((q) => ({ id: q.id, question: q.question }))}
-          />
+          <div className="solar-card rounded-xxl bg-white p-6 md:p-8">
+            <InterviewRunner
+              sessionId={sessionId}
+              mode={s.mode}
+              questions={questions.map((q) => ({
+                id: q.id,
+                question: q.question,
+              }))}
+            />
+          </div>
         )}
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
 
-function scoreTone(n: number): { ring: string; chip: string; label: string } {
+function Chev() {
+  return (
+    <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>
+      chevron_right
+    </span>
+  );
+}
+
+function scoreTone(n: number): { accent: string; chip: string; label: string } {
   if (n >= 8)
     return {
-      ring: "ring-primary-500",
-      chip: "bg-primary-100 text-primary-700",
+      accent: "#10b981",
+      chip: "bg-emerald-500/10 text-emerald-700",
       label: "Strong",
     };
   if (n >= 5)
     return {
-      ring: "ring-indigo-300",
-      chip: "bg-indigo-100 text-indigo-700",
+      accent: "#b58900",
+      chip: "bg-solar-amber/10 text-solar-amber",
       label: "Partial",
     };
   return {
-    ring: "ring-coral-300",
-    chip: "bg-coral-100 text-coral-700",
-    label: "Off-mark",
+    accent: "#cb4b16",
+    chip: "bg-solar-orange/10 text-solar-orange",
+    label: "Off-Mark",
   };
 }
 
@@ -160,59 +141,34 @@ function CompletedView({
   return (
     <div className="flex flex-col gap-8">
       {/* Hero score card */}
-      <div className="relative overflow-hidden rounded-[28px] border border-ink-200 bg-white p-8 pop-shadow md:p-10">
-        <div
-          className="absolute -right-8 -top-8 text-primary-100 opacity-60"
-          style={{ fontSize: "220px", lineHeight: 1 }}
-        >
-          <span
-            className="material-symbols-outlined"
-            style={{ fontSize: "220px" }}
-          >
-            military_tech
-          </span>
-        </div>
+      <div className="solar-card relative overflow-hidden rounded-xxl border-t-4 border-t-blue-800 bg-white p-8 md:p-10">
+        <div className="solar-scanline" />
         <div className="relative z-10 flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p
-              className="mb-2 text-[11px] uppercase text-ink-500"
-              style={{
-                fontFamily: "var(--font-mono)",
-                letterSpacing: "0.12em",
-              }}
-            >
-              Overall interview score
+            <p className="mb-2 text-[10px] font-black text-solar-amber">
+              Overall Interview Score
             </p>
-            <div
-              className="flex items-baseline gap-2 text-primary-900"
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontWeight: 400,
-                letterSpacing: "-0.02em",
-              }}
-            >
-              <span style={{ fontSize: "96px", lineHeight: "96px" }}>
+            <div className="flex items-baseline gap-2">
+              <span className="text-7xl font-black tracking-tighter text-solar-text-dark md:text-[96px]">
                 {overall ?? "—"}
               </span>
-              <span className="text-[28px] text-ink-500">/ 100</span>
+              <span className="text-2xl font-bold text-solar-text/40">
+                / 100
+              </span>
             </div>
-            <p className="mt-2 text-[15px] text-ink-700">
+            <p className="mt-2 text-[15px] text-solar-text">
               {questions.length} questions ·{" "}
               {answers.filter((a) => a.transcript).length} answered
             </p>
           </div>
           <div className="w-full max-w-xs">
-            <div className="mb-1 flex items-center justify-between text-[11px] uppercase text-ink-500"
-              style={{
-                fontFamily: "var(--font-mono)",
-                letterSpacing: "0.12em",
-              }}>
+            <div className="mb-1 flex items-center justify-between text-[10px] font-black text-solar-text/60">
               <span>Mastery</span>
               <span>{pct}%</span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-ink-100">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-solar-card">
               <div
-                className="h-full rounded-full bg-primary-700 transition-all"
+                className="h-full rounded-full bg-solar-amber transition-all"
                 style={{ width: `${pct}%` }}
               />
             </div>
@@ -222,12 +178,11 @@ function CompletedView({
 
       {/* Per-question cards */}
       <div className="flex flex-col gap-4">
-        <p
-          className="text-[11px] uppercase text-ink-500"
-          style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
-        >
-          Per-question breakdown
-        </p>
+        <div className="flex items-center justify-between border-b border-solar-card pb-4">
+          <h2 className="text-lg font-black italic text-solar-text-dark">
+            Per-Question Breakdown
+          </h2>
+        </div>
         {questions.map((q, i) => {
           const a = byQ.get(q.id);
           const score = Number(a?.score ?? 0);
@@ -235,72 +190,52 @@ function CompletedView({
           return (
             <article
               key={q.id}
-              className={`rounded-[20px] border border-ink-200 bg-white p-6 soft-shadow ring-1 ${tone.ring}`}
+              className="solar-card rounded-xxl bg-white p-6"
+              style={{ borderLeft: `4px solid ${tone.accent}` }}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3">
-                  <span
-                    className="mt-1 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-paper text-[12px] font-semibold text-ink-700"
-                    style={{ fontFamily: "var(--font-mono)" }}
-                  >
+                  <span className="mt-1 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[11px] font-black text-solar-text-dark">
                     {i + 1}
                   </span>
-                  <h3
-                    className="text-ink-900"
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: "17px",
-                      lineHeight: "26px",
-                      fontWeight: 600,
-                    }}
-                  >
+                  <h3 className="text-base font-bold leading-relaxed text-solar-text-dark">
                     {q.question}
                   </h3>
                 </div>
                 <span
-                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-semibold ${tone.chip}`}
-                  style={{ fontFamily: "var(--font-mono)" }}
+                  className={
+                    "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-black " +
+                    tone.chip
+                  }
                 >
                   {a?.score ?? 0}/10
                 </span>
               </div>
 
-              <div className="mt-5 rounded-[14px] border border-ink-100 bg-paper p-4">
-                <p
-                  className="mb-1 text-[10px] uppercase text-ink-500"
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    letterSpacing: "0.12em",
-                  }}
-                >
-                  Your answer
+              <div className="mt-5 rounded-xl border border-solar-card bg-slate-50 p-4">
+                <p className="mb-1 text-[10px] font-black text-solar-text/60">
+                  Your Answer
                 </p>
-                <p className="text-[15px] leading-[24px] text-ink-900">
+                <p className="text-[14px] leading-[22px] text-solar-text-dark">
                   {a?.transcript || (
-                    <em className="text-ink-500">No answer was given.</em>
+                    <em className="text-solar-text/60">No answer was given.</em>
                   )}
                 </p>
               </div>
 
               {a?.feedback && (
-                <div className="mt-3 flex items-start gap-3 rounded-[14px] border border-ink-100 bg-white p-4">
+                <div className="mt-3 flex items-start gap-3 rounded-xl border border-solar-card bg-white p-4">
                   <span
-                    className="mt-0.5 material-symbols-outlined text-coral-700"
+                    className="material-symbols-outlined mt-0.5 text-solar-amber"
                     style={{ fontSize: "20px" }}
                   >
                     auto_awesome
                   </span>
                   <div className="flex-1">
-                    <p
-                      className="mb-1 text-[10px] uppercase text-coral-700"
-                      style={{
-                        fontFamily: "var(--font-mono)",
-                        letterSpacing: "0.12em",
-                      }}
-                    >
-                      Examiner feedback · {tone.label}
+                    <p className="mb-1 text-[10px] font-black text-solar-amber">
+                      Examiner Feedback · {tone.label}
                     </p>
-                    <p className="text-[14px] leading-[22px] text-ink-700">
+                    <p className="text-[13px] leading-[20px] text-solar-text">
                       {a.feedback}
                     </p>
                   </div>
@@ -311,11 +246,10 @@ function CompletedView({
         })}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink-200 pt-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-solar-card pt-6">
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-1.5 text-[13px] uppercase text-ink-500 transition-colors hover:text-coral-700"
-          style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+          className="inline-flex items-center gap-1.5 text-[11px] font-black text-solar-text transition-colors hover:text-solar-amber"
         >
           <span
             className="material-symbols-outlined"
@@ -323,13 +257,13 @@ function CompletedView({
           >
             arrow_back
           </span>
-          Back to dashboard
+          {" "}Back to Dashboard
         </Link>
         <Link
           href="/dashboard/interview"
-          className="group inline-flex items-center gap-2 rounded-[14px] bg-primary-700 px-5 py-2.5 text-[14px] font-semibold text-white soft-shadow transition-all hover:-translate-y-0.5 hover:bg-primary-900 hover:pop-shadow"
+          className="group inline-flex items-center gap-2 rounded-xl bg-blue-800 px-5 py-3 text-xs font-black text-white shadow-lg shadow-blue-900/20 transition-all hover:bg-blue-700"
         >
-          Run another interview
+          Run Another Interview{" "}
           <span
             className="material-symbols-outlined transition-transform group-hover:translate-x-1"
             style={{ fontSize: "18px" }}

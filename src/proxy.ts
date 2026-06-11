@@ -66,6 +66,8 @@ export default auth((req) => {
 });
 
 export const config = {
-  // Skip Next internals and static assets.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // Skip Next internals, static assets, and generated brand/metadata files.
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon|opengraph-image|twitter-image|robots.txt|sitemap.xml).*)",
+  ],
 };

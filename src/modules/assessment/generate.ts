@@ -1,6 +1,6 @@
 import { getTopicChain } from "@/modules/curriculum/admin";
 import { getTopicContent } from "@/modules/content/service";
-import { groqJson, GROQ_MODEL } from "@/lib/groq";
+import { groqJson, GROQ_FAST_MODEL } from "@/lib/groq";
 import { cacheKey, getCached, saveCached } from "./cache";
 
 export type GenMcq = {
@@ -39,7 +39,7 @@ export async function generateMcqs(
   }
 
   const content = await getTopicContent(topicId);
-  const ctx = (content?.bodyHtml ?? "").slice(0, 6000);
+  const ctx = (content?.bodyHtml ?? "").slice(0, 2000);
 
   const system =
     "You are an expert exam question writer. Always respond with strict JSON only.";
@@ -51,9 +51,13 @@ ${ctx || "(no material provided — use standard curriculum knowledge for this t
 Rules: exactly 4 options per question, exactly one correct. Return JSON of the shape:
 {"questions":[{"prompt":"...","options":[{"text":"...","isCorrect":true},{"text":"...","isCorrect":false},{"text":"...","isCorrect":false},{"text":"...","isCorrect":false}],"explanation":"short reason"}]}`;
 
-  const json = await groqJson<{ questions?: GenMcq[] }>({ system, user });
+  const json = await groqJson<{ questions?: GenMcq[] }>({
+    system,
+    user,
+    model: GROQ_FAST_MODEL,
+  });
   const questions = Array.isArray(json.questions) ? json.questions : [];
 
-  await saveCached(key, "mock_test", { questions }, GROQ_MODEL);
+  await saveCached(key, "mock_test", { questions }, GROQ_FAST_MODEL);
   return questions;
 }

@@ -1,6 +1,8 @@
 // Judge0 client. Works with self-hosted Judge0 (JUDGE0_URL only) or
 // Judge0 CE on RapidAPI (JUDGE0_URL + JUDGE0_KEY).
 
+import { UpstreamError } from "./errors";
+
 export type Judge0Result = {
   stdout: string | null;
   stderr: string | null;
@@ -35,6 +37,8 @@ export async function runOne(args: {
   source: string;
   stdin?: string;
   expectedOutput?: string;
+  cpuTimeLimit?: number;
+  wallTimeLimit?: number;
 }): Promise<Judge0Result> {
   const res = await fetch(
     `${base()}/submissions?base64_encoded=false&wait=true`,
@@ -46,13 +50,19 @@ export async function runOne(args: {
         source_code: args.source,
         stdin: args.stdin ?? "",
         expected_output: args.expectedOutput ?? null,
-        cpu_time_limit: 5,
+        cpu_time_limit: args.cpuTimeLimit ?? 5,
+        wall_time_limit: args.wallTimeLimit ?? (args.cpuTimeLimit ?? 5) * 2,
       }),
     }
   );
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Judge0 ${res.status}: ${text.slice(0, 200)}`);
+    throw new UpstreamError(
+      "judge0",
+      res.status,
+      "Code sandbox unavailable. Please retry shortly.",
+      text.slice(0, 1000)
+    );
   }
   return res.json();
 }

@@ -55,8 +55,8 @@ export default async function AdminUsersPage({
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p
-            className="mb-1 text-[11px] uppercase text-ink-500"
-            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+            className="mb-1 text-[11px] text-ink-500"
+            style={{ fontFamily: "var(--font-mono)", }}
           >
             01 — User management
           </p>
@@ -134,22 +134,22 @@ export default async function AdminUsersPage({
       </form>
 
       <div className="overflow-hidden rounded-[20px] border border-ink-200 bg-white soft-shadow">
-        <header className="grid grid-cols-[minmax(0,2fr)_1fr_1fr_1fr_120px] gap-3 border-b border-ink-200 bg-ink-900 px-5 py-3 text-[10px] uppercase text-white">
-          <span style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}>
+        <header className="grid grid-cols-[minmax(0,2fr)_1fr_1fr_1fr_120px] gap-3 border-b border-ink-200 bg-ink-900 px-5 py-3 text-[10px] text-white">
+          <span style={{ fontFamily: "var(--font-mono)", }}>
             User
           </span>
-          <span style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}>
+          <span style={{ fontFamily: "var(--font-mono)", }}>
             Role
           </span>
-          <span style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}>
+          <span style={{ fontFamily: "var(--font-mono)", }}>
             Status
           </span>
-          <span style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}>
+          <span style={{ fontFamily: "var(--font-mono)", }}>
             Scope / Class
           </span>
           <span
             className="text-right"
-            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+            style={{ fontFamily: "var(--font-mono)", }}
           >
             Actions
           </span>
@@ -215,8 +215,8 @@ function Stat({
   return (
     <div className="rounded-[16px] border border-ink-200 bg-white px-4 py-3 soft-shadow">
       <p
-        className="text-[10px] uppercase text-ink-500"
-        style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+        className="text-[10px] text-ink-500"
+        style={{ fontFamily: "var(--font-mono)", }}
       >
         {label}
       </p>
@@ -248,8 +248,8 @@ function Filter({
   return (
     <div className={`flex flex-col gap-1 ${wide ? "min-w-[260px] flex-1" : ""}`}>
       <label
-        className="ml-1 text-[10px] uppercase text-ink-500"
-        style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+        className="ml-1 text-[10px] text-ink-500"
+        style={{ fontFamily: "var(--font-mono)", }}
       >
         {label}
       </label>
@@ -278,8 +278,8 @@ function SelectFilter({
   return (
     <div className="flex flex-col gap-1">
       <label
-        className="ml-1 text-[10px] uppercase text-ink-500"
-        style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+        className="ml-1 text-[10px] text-ink-500"
+        style={{ fontFamily: "var(--font-mono)", }}
       >
         {label}
       </label>

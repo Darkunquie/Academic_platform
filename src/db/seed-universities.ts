@@ -2,15 +2,30 @@
  * One-shot seeder: ingest UGC universities CSV into providers + grades.
  * Source: github.com/saptarshimazumdar/UGC_Indian-University-Dataset
  *
- * Run:   pnpm tsx src/db/seed-universities.ts
+ * Run:   pnpm db:seed:universities
+ *
+ * Production safety: refuses to run with NODE_ENV=production unless
+ * ALLOW_PROD_SEED=1. Real curriculum data — safe to seed in prod once
+ * confirmed, but require explicit opt-in to prevent accidents.
  */
 import "dotenv/config";
 import { readFileSync } from "node:fs";
 import { parse } from "csv-parse/sync";
 import { db } from "./index";
-import { sections, providers, grades } from "./schema";
+import { sections, providers, grades, users } from "./schema";
 import { eq, and } from "drizzle-orm";
 import { INDIAN_STATES } from "../lib/states";
+
+function checkProdGuard() {
+  if (
+    process.env.NODE_ENV === "production" &&
+    process.env.ALLOW_PROD_SEED !== "1"
+  ) {
+    throw new Error(
+      "Refusing to run seed-universities.ts in production. Set ALLOW_PROD_SEED=1 to override."
+    );
+  }
+}
 
 const CSV_PATH = "data/raw/ugc-universities.csv";
 
@@ -122,6 +137,7 @@ async function ensureGradesForProvider(
 }
 
 async function main() {
+  checkProdGuard();
   console.log("Reading", CSV_PATH);
   const raw = readFileSync(CSV_PATH, "utf8");
   const rows = parse(raw, {

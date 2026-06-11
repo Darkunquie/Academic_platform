@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 import { INDIAN_STATES } from "@/lib/states";
 
 type SectionOpt = { id: string; code: string; name: string };
@@ -12,13 +13,12 @@ type ProviderOpt = {
 };
 type GradeOpt = { id: string; name: string; level: number };
 
-const labelClass = "ml-1 text-[11px] font-medium uppercase text-ink-700";
-const labelStyle = {
-  fontFamily: "var(--font-mono)",
-  letterSpacing: "0.12em",
-} as const;
+const labelClass =
+  "block text-[11px] font-medium uppercase tracking-[0.05em] text-[#071e24]";
+const labelStyle = { fontFamily: "JetBrains Mono, monospace" } as const;
+
 const fieldClass =
-  "h-12 w-full rounded-[14px] border-[1.5px] border-ink-200 bg-white px-4 text-[15px] text-ink-900 outline-none transition-all placeholder:text-ink-300 focus:border-primary-500 focus:ring-4 focus:ring-primary-100 disabled:bg-paper disabled:cursor-not-allowed";
+  "h-12 w-full rounded-lg border border-[#cbd5e1] bg-white px-4 text-[15px] text-[#071e24] outline-none transition-all placeholder:text-[#c1c8cb] focus:border-[#785a00] focus:ring-2 focus:ring-[#785a00]/20 disabled:bg-[#e1f7ff] disabled:cursor-not-allowed";
 
 const STAGE_LABEL: Record<string, string> = {
   school: "Class",
@@ -41,6 +41,8 @@ export function SignupForm() {
   const [providers, setProviders] = useState<ProviderOpt[]>([]);
   const [grades, setGrades] = useState<GradeOpt[]>([]);
   const [providerSearch, setProviderSearch] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -111,6 +113,10 @@ export function SignupForm() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (!agreed) {
+      setError("Acknowledge the terms before continuing.");
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch("/api/signup", {
@@ -134,10 +140,17 @@ export function SignupForm() {
 
   if (done) {
     return (
-      <div className="rounded-[14px] border border-primary-200 bg-primary-50 px-5 py-4 text-[14px] text-primary-900">
+      <div
+        className="rounded-lg border px-5 py-4 text-[14px]"
+        style={{
+          borderColor: "#a4cddc",
+          backgroundColor: "#e1f7ff",
+          color: "#002028",
+        }}
+      >
         Account created. It is now{" "}
-        <strong className="font-semibold">pending admin approval</strong>.
-        Redirecting to login…
+        <strong className="font-bold">pending admin approval</strong>. Redirecting
+        to login…
       </div>
     );
   }
@@ -151,31 +164,40 @@ export function SignupForm() {
   const sortedGrades = [...grades].sort((a, b) => a.level - b.level);
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-5">
+    <form onSubmit={submit} className="space-y-5">
       {error && (
-        <div className="rounded-[14px] border border-danger/30 bg-coral-100 px-4 py-3 text-[13px] text-coral-700">
+        <div
+          className="rounded-lg border px-4 py-3 text-[13px]"
+          style={{
+            borderColor: "rgba(186,26,26,0.3)",
+            backgroundColor: "#ffdad6",
+            color: "#93000a",
+          }}
+        >
           {error}
         </div>
       )}
 
-      <div className="flex flex-col gap-1.5">
+      {/* Full name */}
+      <div className="flex flex-col gap-2">
         <label htmlFor="name" className={labelClass} style={labelStyle}>
-          Full name
+          Full Name
         </label>
         <input
           id="name"
           required
           value={form.name}
           onChange={(e) => set("name", e.target.value)}
-          placeholder="Jane Doe"
+          placeholder="ALAN TURING"
           className={fieldClass}
         />
       </div>
 
+      {/* Email + phone */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2">
           <label htmlFor="email" className={labelClass} style={labelStyle}>
-            Email
+            Email Address
           </label>
           <input
             id="email"
@@ -183,11 +205,11 @@ export function SignupForm() {
             required
             value={form.email}
             onChange={(e) => set("email", e.target.value)}
-            placeholder="you@school.edu"
+            placeholder="a.turing@preplyfly.edu"
             className={fieldClass}
           />
         </div>
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2">
           <label htmlFor="phone" className={labelClass} style={labelStyle}>
             Phone
           </label>
@@ -202,8 +224,9 @@ export function SignupForm() {
         </div>
       </div>
 
+      {/* Country + state */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2">
           <label htmlFor="country" className={labelClass} style={labelStyle}>
             Country
           </label>
@@ -215,7 +238,7 @@ export function SignupForm() {
             className={fieldClass}
           />
         </div>
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2">
           <label htmlFor="state" className={labelClass} style={labelStyle}>
             State
           </label>
@@ -240,12 +263,15 @@ export function SignupForm() {
         </div>
       </div>
 
+      {/* Stage */}
       <div className="flex flex-col gap-2">
         <span className={labelClass} style={labelStyle}>
           Stage
         </span>
         {sections.length === 0 ? (
-          <p className="text-[13px] text-ink-500">Loading…</p>
+          <p className="text-[13px]" style={{ color: "#41484b" }}>
+            Loading…
+          </p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {sections.map((s) => {
@@ -255,11 +281,12 @@ export function SignupForm() {
                   key={s.id}
                   type="button"
                   onClick={() => pickStage(s.id)}
-                  className={`inline-flex h-10 items-center rounded-[12px] border px-4 text-[13px] font-medium transition-all ${
-                    active
-                      ? "border-primary-700 bg-primary-700 text-white soft-shadow"
-                      : "border-ink-200 bg-white text-ink-900 hover:border-primary-500 hover:text-primary-700"
-                  }`}
+                  className="inline-flex h-10 items-center rounded-lg border px-4 text-[13px] font-medium transition-all"
+                  style={{
+                    borderColor: active ? "#002028" : "#cbd5e1",
+                    backgroundColor: active ? "#002028" : "#ffffff",
+                    color: active ? "#ffffff" : "#071e24",
+                  }}
                 >
                   {s.name}
                 </button>
@@ -269,6 +296,7 @@ export function SignupForm() {
         )}
       </div>
 
+      {/* Provider */}
       {form.sectionId && providers.length > 0 && (
         <div className="flex flex-col gap-2">
           <span className={labelClass} style={labelStyle}>
@@ -286,9 +314,15 @@ export function SignupForm() {
             />
           )}
 
-          <div className="flex max-h-60 flex-wrap gap-2 overflow-y-auto rounded-[14px] border border-ink-200 bg-paper p-2">
+          <div
+            className="flex max-h-60 flex-wrap gap-2 overflow-y-auto rounded-lg border p-2"
+            style={{ borderColor: "#cbd5e1", backgroundColor: "#e1f7ff" }}
+          >
             {filteredProviders.length === 0 ? (
-              <span className="px-2 py-1 text-[13px] text-ink-500">
+              <span
+                className="px-2 py-1 text-[13px]"
+                style={{ color: "#41484b" }}
+              >
                 No matches.
               </span>
             ) : (
@@ -299,11 +333,12 @@ export function SignupForm() {
                     key={p.id}
                     type="button"
                     onClick={() => pickProvider(p.id)}
-                    className={`inline-flex h-9 items-center rounded-[10px] border px-3 text-[13px] font-medium transition-all ${
-                      active
-                        ? "border-primary-700 bg-primary-700 text-white"
-                        : "border-ink-200 bg-white text-ink-900 hover:border-primary-500 hover:text-primary-700"
-                    }`}
+                    className="inline-flex h-9 items-center rounded-md border px-3 text-[13px] font-medium transition-all"
+                    style={{
+                      borderColor: active ? "#002028" : "#cbd5e1",
+                      backgroundColor: active ? "#002028" : "#ffffff",
+                      color: active ? "#ffffff" : "#071e24",
+                    }}
                   >
                     {p.name}
                   </button>
@@ -314,6 +349,7 @@ export function SignupForm() {
         </div>
       )}
 
+      {/* Grade */}
       {form.providerId && grades.length > 0 && (
         <div className="flex flex-col gap-2">
           <span className={labelClass} style={labelStyle}>
@@ -327,11 +363,12 @@ export function SignupForm() {
                   key={g.id}
                   type="button"
                   onClick={() => set("gradeId", g.id)}
-                  className={`inline-flex h-10 min-w-[44px] items-center justify-center rounded-[10px] border px-3 text-[13px] font-medium transition-all ${
-                    active
-                      ? "border-primary-700 bg-primary-700 text-white soft-shadow"
-                      : "border-ink-200 bg-white text-ink-900 hover:border-primary-500 hover:text-primary-700"
-                  }`}
+                  className="inline-flex h-10 min-w-[44px] items-center justify-center rounded-md border px-3 text-[13px] font-medium transition-all"
+                  style={{
+                    borderColor: active ? "#002028" : "#cbd5e1",
+                    backgroundColor: active ? "#002028" : "#ffffff",
+                    color: active ? "#ffffff" : "#071e24",
+                  }}
                 >
                   {g.name}
                 </button>
@@ -341,38 +378,81 @@ export function SignupForm() {
         </div>
       )}
 
+      {/* Password */}
       {form.gradeId && (
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2">
           <label htmlFor="password" className={labelClass} style={labelStyle}>
-            Password
+            Security Password
           </label>
-          <input
-            id="password"
-            type="password"
-            required
-            minLength={8}
-            value={form.password}
-            onChange={(e) => set("password", e.target.value)}
-            placeholder="••••••••"
-            className={fieldClass}
-          />
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              required
+              minLength={8}
+              value={form.password}
+              onChange={(e) => set("password", e.target.value)}
+              placeholder="••••••••"
+              className={`${fieldClass} pr-12`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-pressed={showPassword}
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 transition-colors hover:bg-[#daf2fa]"
+              style={{ color: "#41484b" }}
+            >
+              {showPassword ? (
+                <EyeOff className="h-5 w-5" />
+              ) : (
+                <Eye className="h-5 w-5" />
+              )}
+            </button>
+          </div>
         </div>
       )}
 
+      {/* Terms */}
+      <div className="flex items-start gap-3 py-2">
+        <input
+          id="terms"
+          type="checkbox"
+          checked={agreed}
+          onChange={(e) => setAgreed(e.target.checked)}
+          className="mt-0.5 h-5 w-5 rounded border-[#cbd5e1] text-[#785a00] focus:ring-[#785a00]/30"
+        />
+        <label
+          htmlFor="terms"
+          className="text-[14px]"
+          style={{ color: "#41484b", fontFamily: "Geist, sans-serif" }}
+        >
+          I acknowledge the{" "}
+          <a
+            href="#"
+            className="font-medium underline underline-offset-4"
+            style={{ color: "#785a00" }}
+          >
+            Terms of Service
+          </a>{" "}
+          and confirm my alignment with the academic integrity protocols.
+        </label>
+      </div>
+
+      {/* Submit */}
       <button
         type="submit"
-        disabled={loading || !form.gradeId || !form.password}
-        className="group mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-[14px] bg-primary-700 text-[15px] font-semibold text-white soft-shadow transition-all hover:-translate-y-0.5 hover:bg-primary-900 hover:pop-shadow disabled:cursor-not-allowed disabled:opacity-60"
+        disabled={loading || !form.gradeId || !form.password || !agreed}
+        className="w-full rounded-lg px-6 py-4 text-white shadow-sm transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+        style={{
+          backgroundColor: "#002028",
+          fontFamily: "Geist, sans-serif",
+          fontSize: "16px",
+          fontWeight: 700,
+          letterSpacing: "-0.01em",
+        }}
       >
-        {loading ? "Creating…" : "Request access"}
-        {!loading && (
-          <span
-            className="material-symbols-outlined transition-transform group-hover:translate-x-1"
-            style={{ fontSize: "20px" }}
-          >
-            arrow_forward
-          </span>
-        )}
+        {loading ? "Initialising…" : "Create Account"}
       </button>
     </form>
   );

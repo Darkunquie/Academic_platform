@@ -1,113 +1,246 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { SignupForm } from "./signup-form";
 
 export default function SignupPage() {
   return (
-    <main className="flex min-h-screen flex-col md:flex-row">
-      <section className="relative flex w-full flex-col justify-between overflow-hidden bg-paper p-6 md:w-1/2 md:p-16">
-        <div className="dotted-pattern absolute inset-0" />
-        <div className="mesh-gradient absolute inset-0" />
-
-        <div
-          className="shape-float absolute right-16 top-20 h-20 w-20 rounded-full bg-coral-300 opacity-25"
-          style={{ animationDelay: "0s" }}
-        />
-        <div
-          className="shape-float absolute right-24 top-1/3 text-indigo-500 opacity-25"
-          style={{ animationDelay: "2s" }}
-        >
-          <span
-            className="material-symbols-outlined"
-            style={{ fontSize: "40px", fontVariationSettings: "'wght' 200" }}
-          >
-            change_history
-          </span>
-        </div>
-        <div
-          className="shape-float absolute bottom-1/3 left-1/3 text-primary-500 opacity-30"
-          style={{ animationDelay: "1s" }}
-        >
-          <span
-            className="material-symbols-outlined"
-            style={{ fontSize: "28px", fontVariationSettings: "'wght' 200" }}
-          >
-            add
-          </span>
-        </div>
-
-        <div className="relative z-10 mt-12 flex max-w-lg flex-col gap-6">
-          <p
-            className="text-[11px] font-medium uppercase text-ink-700"
-            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
-          >
-            02 — Join
-          </p>
-          <h1
-            className="text-primary-900"
+    <div className="flex min-h-screen w-full flex-col md:flex-row" style={{ backgroundColor: "#f1fbff" }}>
+      {/* Left Panel — visual */}
+      <section
+        className="relative hidden w-1/2 items-center justify-center overflow-hidden md:flex"
+        style={{ backgroundColor: "#002028" }}
+      >
+        <div className="absolute inset-0 z-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1400&q=80"
+            alt="Students collaborating in a study space"
+            className="h-full w-full object-cover opacity-60 mix-blend-overlay"
+          />
+          <div
+            className="absolute inset-0"
             style={{
-              fontFamily: "var(--font-serif)",
-              fontSize: "72px",
-              lineHeight: "76px",
-              letterSpacing: "-0.02em",
-              fontWeight: 400,
+              background:
+                "linear-gradient(135deg, rgba(0,32,40,0.8), rgba(60,100,113,0.4))",
+            }}
+          />
+        </div>
+        <div className="relative z-10 max-w-xl px-12 text-white">
+          <div className="mb-6">
+            <span
+              className="rounded px-2 py-1 text-[11px] font-black uppercase tracking-[0.2em]"
+              style={{
+                backgroundColor: "#ffdf9b",
+                color: "#251a00",
+                fontFamily: "JetBrains Mono, monospace",
+              }}
+            >
+              SYSTEM: AUTH_NEW
+            </span>
+          </div>
+          <h1
+            className="mb-6 text-white"
+            style={{
+              fontFamily: "Geist, sans-serif",
+              fontSize: "48px",
+              lineHeight: 1.1,
+              letterSpacing: "-0.05em",
+              fontWeight: 900,
             }}
           >
-            Begin your{" "}
-            <span className="hand-drawn-underline">journey.</span>
+            Master the architecture of learning.
           </h1>
           <p
-            className="max-w-sm text-ink-700"
-            style={{ fontSize: "17px", lineHeight: "28px" }}
+            className="leading-relaxed"
+            style={{
+              fontFamily: "Geist, sans-serif",
+              fontSize: "17px",
+              lineHeight: "30px",
+              color: "#779fad",
+            }}
           >
-            Tell us where you study — we will match the right syllabus.
+            Join preplyfly to access our technical curriculum and command center
+            for academic excellence. Structured. Precise. Rigorous.
           </p>
-        </div>
-
-        <div className="relative z-10 flex items-center gap-3 text-[13px] text-ink-500">
-          <span
-            className="material-symbols-outlined text-primary-700"
-            style={{ fontSize: "20px" }}
-          >
-            menu_book
-          </span>
-          <span className="font-medium text-ink-900">Academic</span>
-          <span>· © 2026</span>
+          <div className="mt-12 grid grid-cols-2 gap-6">
+            <div className="border-l-2 pl-4" style={{ borderColor: "#785a00" }}>
+              <div
+                className="mb-2 text-[12px] font-medium uppercase"
+                style={{
+                  color: "#f2bf43",
+                  fontFamily: "JetBrains Mono, monospace",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                01. Curriculum
+              </div>
+              <p
+                className="text-xs"
+                style={{
+                  color: "#cfe6ee",
+                  fontFamily: "Geist, sans-serif",
+                  fontSize: "14px",
+                  lineHeight: "22px",
+                }}
+              >
+                Indian K-12 boards + state universities. Mock test, interview,
+                and coding tracks per topic.
+              </p>
+            </div>
+            <div className="border-l-2 pl-4" style={{ borderColor: "#785a00" }}>
+              <div
+                className="mb-2 text-[12px] font-medium uppercase"
+                style={{
+                  color: "#f2bf43",
+                  fontFamily: "JetBrains Mono, monospace",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                02. AI Examiner
+              </div>
+              <p
+                className="text-xs"
+                style={{
+                  color: "#cfe6ee",
+                  fontFamily: "Geist, sans-serif",
+                  fontSize: "14px",
+                  lineHeight: "22px",
+                }}
+              >
+                Voice + text rehearsal with rubric-scored feedback the moment
+                you finish.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="flex w-full items-center justify-center overflow-y-auto bg-white p-6 md:w-1/2 md:p-16">
-        <div className="flex w-full max-w-[480px] flex-col gap-10 py-6">
-          <div className="flex flex-col gap-2">
-            <span
-              className="text-[10px] uppercase tracking-widest text-ink-500"
-              style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
+      {/* Right Panel — form */}
+      <section className="flex w-full items-center justify-center bg-white p-6 pb-32 md:w-1/2 md:p-12 md:pb-32">
+        <div className="w-full max-w-md">
+          {/* Top actions */}
+          <div className="mb-10 flex items-center justify-between">
+            <Link
+              href="/"
+              className="group inline-flex items-center gap-2 text-[12px] font-medium uppercase"
+              style={{
+                color: "#41484b",
+                fontFamily: "JetBrains Mono, monospace",
+                letterSpacing: "0.05em",
+              }}
             >
-              Create account
-            </span>
+              <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+              BACK TO HOME
+            </Link>
+            <div
+              className="text-2xl font-black tracking-tighter"
+              style={{ color: "#002028" }}
+            >
+              PREPLYFLY
+            </div>
+          </div>
+
+          {/* Form header */}
+          <div className="mb-8">
             <h2
-              className="text-ink-900"
-              style={{ fontSize: "28px", lineHeight: "36px", fontWeight: 600 }}
+              className="mb-2"
+              style={{
+                color: "#071e24",
+                fontFamily: "Geist, sans-serif",
+                fontSize: "32px",
+                lineHeight: 1.2,
+                letterSpacing: "-0.04em",
+                fontWeight: 900,
+              }}
             >
-              Sign up
+              Create an Account
             </h2>
-            <p className="text-[15px] text-ink-700">
-              After signup an admin reviews and approves your access.
+            <p
+              style={{
+                color: "#41484b",
+                fontFamily: "Geist, sans-serif",
+                fontSize: "14px",
+                lineHeight: "22px",
+              }}
+            >
+              Initialise your academic journey. Pick stage, board, and class —
+              we will route the right syllabus to you.
             </p>
           </div>
 
           <SignupForm />
 
-          <p className="text-center text-[13px] text-ink-500">
-            Already a member?{" "}
+          <p
+            className="mt-8 text-center"
+            style={{
+              color: "#41484b",
+              fontFamily: "Geist, sans-serif",
+              fontSize: "14px",
+            }}
+          >
+            Already part of the fleet?{" "}
             <Link
               href="/login"
-              className="font-semibold text-ink-900 underline decoration-coral-300 underline-offset-2 transition-colors hover:decoration-coral-700"
+              className="font-bold hover:underline"
+              style={{ color: "#785a00" }}
             >
-              Sign in.
+              Access Command Center
             </Link>
           </p>
         </div>
       </section>
-    </main>
+
+      {/* Fixed identity footer */}
+      <footer className="pointer-events-none fixed bottom-0 left-0 hidden w-full p-6 md:block">
+        <div className="flex items-end justify-between">
+          <div className="pointer-events-auto">
+            <div
+              className="rounded p-2 backdrop-blur-sm"
+              style={{
+                color: "#c1c8cb",
+                backgroundColor: "rgba(241,251,255,0.5)",
+                fontFamily: "JetBrains Mono, monospace",
+                fontSize: "11px",
+                fontWeight: 800,
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+              }}
+            >
+              © 2026 PREPLYFLY ACADEMIC SYSTEMS
+            </div>
+          </div>
+          <div className="pointer-events-auto flex gap-6">
+            <div
+              className="rounded p-2 backdrop-blur-sm"
+              style={{
+                color: "#c1c8cb",
+                backgroundColor: "rgba(241,251,255,0.5)",
+                fontFamily: "JetBrains Mono, monospace",
+                fontSize: "11px",
+                fontWeight: 800,
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+              }}
+            >
+              LATENCY: 14MS
+            </div>
+            <div
+              className="rounded p-2 backdrop-blur-sm"
+              style={{
+                color: "#c1c8cb",
+                backgroundColor: "rgba(241,251,255,0.5)",
+                fontFamily: "JetBrains Mono, monospace",
+                fontSize: "11px",
+                fontWeight: 800,
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+              }}
+            >
+              STATUS: NOMINAL
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 }

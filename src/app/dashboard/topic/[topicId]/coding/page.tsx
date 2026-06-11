@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { inArray, and, eq, sql } from "drizzle-orm";
+import { inArray, and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { codingSubmissions } from "@/db/schema";
 import { auth } from "@/auth";
@@ -12,9 +12,9 @@ import { StudentHeader } from "@/components/student-header";
 export const dynamic = "force-dynamic";
 
 const DIFFICULTY_CHIP: Record<string, string> = {
-  easy: "bg-primary-100 text-primary-700",
-  medium: "bg-coral-100 text-coral-700",
-  hard: "bg-[#FCE0DE] text-[#B23A3A]",
+  easy: "bg-emerald-500/10 text-emerald-700",
+  medium: "bg-solar-amber/10 text-solar-amber",
+  hard: "bg-solar-orange/10 text-solar-orange",
 };
 
 export default async function StudentCodingListPage({
@@ -33,7 +33,6 @@ export default async function StudentCodingListPage({
   const session = await auth();
   const items = await listCodingQuestions(topicId);
 
-  // Solved set for current student
   const solved = new Set<string>();
   if (session?.user?.id && items.length > 0) {
     const rows = await db
@@ -43,7 +42,10 @@ export default async function StudentCodingListPage({
         and(
           eq(codingSubmissions.studentId, session.user.id),
           eq(codingSubmissions.status, "accepted"),
-          inArray(codingSubmissions.codingQuestionId, items.map((i) => i.id))
+          inArray(
+            codingSubmissions.codingQuestionId,
+            items.map((i) => i.id)
+          )
         )
       );
     for (const r of rows) solved.add(r.id);
@@ -58,110 +60,87 @@ export default async function StudentCodingListPage({
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-paper">
-      <div className="dotted-pattern absolute inset-0 opacity-40" />
+    <div
+      className="flex min-h-screen flex-col"
+      style={{
+        backgroundColor: "#f1f5f9",
+        color: "#334155",
+        fontFamily: "Geist, sans-serif",
+      }}
+    >
+      <StudentHeader active="library" />
 
-      <div className="relative z-10">
-        <StudentHeader active="library" />
-      </div>
-
-      <div className="relative mx-auto w-full max-w-[1280px] px-6 pb-24 pt-6 md:px-10 md:pt-10">
-        <nav className="mb-6 flex flex-wrap items-center gap-2 text-[13px] text-ink-500">
-          <Link href="/dashboard" className="hover:text-primary-700">
-            My subjects
+      <main className="mx-auto w-full max-w-[1500px] flex-1 px-4 pb-24 pt-4 md:px-6 md:pt-5">
+        {/* Breadcrumb */}
+        <nav className="mb-4 flex flex-wrap items-center gap-2 text-[12px] font-bold text-solar-text/60">
+          <Link
+            href="/dashboard"
+            className="transition-colors hover:text-solar-amber"
+          >
+            My Subjects
           </Link>
           <Chev />
           <Link
             href={`/dashboard/subject/${topic.subjectId}`}
-            className="hover:text-primary-700"
+            className="transition-colors hover:text-solar-amber"
           >
             {topic.subjectName}
           </Link>
           <Chev />
           <Link
             href={`/dashboard/topic/${topicId}`}
-            className="hover:text-primary-700"
+            className="transition-colors hover:text-solar-amber"
           >
             {topic.name}
           </Link>
           <Chev />
-          <span className="font-medium text-ink-900">Coding</span>
+          <span className="text-solar-text-dark">Coding</span>
         </nav>
 
+        {/* Hero */}
         <section className="relative mb-10">
-          <div
-            className="shape-float absolute -top-6 right-0 h-20 w-20 rounded-full bg-indigo-300 opacity-30 blur-2xl"
-            style={{ animationDelay: "0s" }}
-          />
-          <p
-            className="mb-3 text-[11px] uppercase text-ink-500"
-            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
-          >
+          <p className="mb-3 text-[10px] font-black text-solar-orange">
             Coding · {topic.name}
           </p>
-          <h1
-            className="text-primary-900"
-            style={{
-              fontFamily: "var(--font-serif)",
-              fontSize: "52px",
-              lineHeight: "56px",
-              letterSpacing: "-0.02em",
-              fontWeight: 400,
-            }}
-          >
-            <span className="hand-drawn-underline">Practice</span>
+          <h1 className="text-5xl font-black tracking-tighter text-solar-text-dark md:text-6xl">
+            Practice.
           </h1>
-          <p className="mt-3 max-w-xl text-[15px] text-ink-700">
+          <p className="mt-3 max-w-xl text-[15px] text-solar-text">
             Solve problems against hidden test cases. Languages supported:
             Python, JavaScript, C++.
           </p>
         </section>
 
+        {/* Stats command bar */}
         <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
-          <Stat label="Total" value={stats.total} tone="ink" />
-          <Stat label="Solved" value={stats.solved} tone="primary" />
-          <Stat label="Easy" value={stats.easy} tone="primary" />
-          <Stat label="Medium" value={stats.medium} tone="coral" />
-          <Stat label="Hard" value={stats.hard} tone="danger" />
+          <Stat label="Total" value={stats.total} accent="#1e40af" />
+          <Stat label="Solved" value={stats.solved} accent="#10b981" />
+          <Stat label="Easy" value={stats.easy} accent="#10b981" />
+          <Stat label="Medium" value={stats.medium} accent="#b58900" />
+          <Stat label="Hard" value={stats.hard} accent="#cb4b16" />
         </div>
 
-        <div className="overflow-hidden rounded-[20px] border border-ink-200 bg-white soft-shadow">
-          <header className="grid grid-cols-[60px_minmax(0,1fr)_120px_120px_60px] items-center gap-4 border-b border-ink-200 bg-ink-900 px-5 py-3 text-[11px] uppercase text-white">
-            <span style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}>
-              Status
-            </span>
-            <span style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}>
-              Title
-            </span>
-            <span style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}>
-              Difficulty
-            </span>
-            <span
-              className="hidden md:inline"
-              style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
-            >
-              Acceptance
-            </span>
+        {/* Problem table */}
+        <div className="solar-card overflow-hidden rounded-xxl bg-white">
+          <header className="grid grid-cols-[60px_minmax(0,1fr)_120px_120px_60px] items-center gap-4 border-b border-solar-card bg-solar-text-dark px-5 py-3 text-[10px] font-black text-white">
+            <span>Status</span>
+            <span>Title</span>
+            <span>Difficulty</span>
+            <span className="hidden md:inline">Acceptance</span>
             <span />
           </header>
 
           {items.length === 0 ? (
             <div className="px-6 py-20 text-center">
-              <p
-                className="text-ink-900"
-                style={{
-                  fontFamily: "var(--font-serif)",
-                  fontSize: "22px",
-                }}
-              >
+              <p className="text-2xl font-black text-solar-text-dark">
                 No problems published yet.
               </p>
-              <p className="mt-2 text-[13px] text-ink-500">
+              <p className="mt-2 text-[13px] text-solar-text">
                 Hard refresh (Ctrl + Shift + R) if you expect some.
               </p>
             </div>
           ) : (
-            <ul className="divide-y divide-ink-200">
+            <ul className="divide-y divide-solar-card">
               {items.map((q, i) => {
                 const ok = solved.has(q.id);
                 const acceptance = mockAcceptance(q.id);
@@ -169,40 +148,37 @@ export default async function StudentCodingListPage({
                   <li key={q.id}>
                     <Link
                       href={`/dashboard/topic/${topicId}/coding/${q.id}`}
-                      className="grid grid-cols-[60px_minmax(0,1fr)_120px_120px_60px] items-center gap-4 px-5 py-4 transition-colors hover:bg-paper"
+                      className="group grid grid-cols-[60px_minmax(0,1fr)_120px_120px_60px] items-center gap-4 px-5 py-4 transition-colors hover:bg-slate-50"
                     >
                       <span
-                        className={`flex h-7 w-7 items-center justify-center rounded-full text-[12px] font-semibold ${
-                          ok
-                            ? "bg-primary-700 text-white"
-                            : "border border-ink-300 text-ink-500"
-                        }`}
-                        style={{ fontFamily: "var(--font-mono)" }}
+                        className={
+                          "flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-black " +
+                          (ok
+                            ? "bg-emerald-500 text-white"
+                            : "border border-solar-ink/40 text-solar-text/60")
+                        }
                       >
                         {ok ? "✓" : String(i + 1).padStart(2, "0")}
                       </span>
-                      <span className="min-w-0 truncate text-[15px] font-medium text-ink-900 group-hover:text-primary-700">
+                      <span className="min-w-0 truncate text-sm font-bold text-solar-text-dark group-hover:text-blue-800">
                         {q.title}
                       </span>
                       <span
-                        className={`inline-flex h-7 w-fit items-center rounded-full px-3 text-[11px] font-semibold uppercase ${
+                        className={
+                          "inline-flex h-7 w-fit items-center rounded-full px-3 text-[10px] font-black " +
                           DIFFICULTY_CHIP[q.difficulty ?? "medium"]
-                        }`}
-                        style={{
-                          fontFamily: "var(--font-mono)",
-                          letterSpacing: "0.08em",
-                        }}
+                        }
                       >
                         {q.difficulty ?? "medium"}
                       </span>
                       <span
-                        className="hidden text-[13px] text-ink-700 md:inline"
-                        style={{ fontFamily: "var(--font-mono)" }}
+                        className="hidden text-[12px] font-bold text-solar-text md:inline"
+                        style={{ fontFamily: "Geist Mono, monospace" }}
                       >
                         {acceptance}%
                       </span>
                       <span
-                        className="material-symbols-outlined justify-self-end text-ink-300 transition-all hover:translate-x-1 hover:text-primary-700"
+                        className="material-symbols-outlined justify-self-end text-solar-text/30 transition-all group-hover:translate-x-1 group-hover:text-blue-800"
                         style={{ fontSize: "20px" }}
                       >
                         arrow_forward
@@ -214,8 +190,8 @@ export default async function StudentCodingListPage({
             </ul>
           )}
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
 
@@ -230,27 +206,19 @@ function Chev() {
 function Stat({
   label,
   value,
-  tone,
-}: Readonly<{ label: string; value: number; tone: "ink" | "primary" | "coral" | "danger" }>) {
-  const t =
-    tone === "primary"
-      ? "text-primary-700"
-      : tone === "coral"
-        ? "text-coral-700"
-        : tone === "danger"
-          ? "text-[#B23A3A]"
-          : "text-ink-900";
+  accent,
+}: Readonly<{ label: string; value: number; accent: string }>) {
   return (
-    <div className="rounded-[16px] border border-ink-200 bg-white px-4 py-3 soft-shadow">
-      <p
-        className="text-[10px] uppercase text-ink-500"
-        style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.12em" }}
-      >
+    <div
+      className="solar-card rounded-xxl bg-white px-4 py-3"
+      style={{ borderTop: `4px solid ${accent}` }}
+    >
+      <p className="text-[10px] font-black text-solar-text/60">
         {label}
       </p>
       <p
-        className={`mt-1 text-[24px] font-semibold ${t}`}
-        style={{ fontFamily: "var(--font-mono)" }}
+        className="mt-1 text-3xl font-black tracking-tighter"
+        style={{ color: accent }}
       >
         {value}
       </p>
@@ -258,9 +226,8 @@ function Stat({
   );
 }
 
-/** Fake but deterministic per-question acceptance % for visual flavour. */
 function mockAcceptance(id: string) {
   let h = 0;
   for (const c of id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-  return 30 + (h % 60); // 30..89
+  return 30 + (h % 60);
 }

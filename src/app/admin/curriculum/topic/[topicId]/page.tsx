@@ -59,6 +59,21 @@ export default async function TopicAdminPage({
         <form action={saveTopicContentAction} className="mt-3 space-y-3">
           <input type="hidden" name="topicId" value={topicId} />
           <input type="hidden" name="revalidate" value={path} />
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              YouTube video URL (optional)
+            </label>
+            <input
+              name="videoUrl"
+              type="url"
+              defaultValue={content?.videoUrl ?? ""}
+              placeholder="https://www.youtube.com/watch?v=…"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            />
+            <p className="mt-1 text-xs text-gray-400">
+              Shown as an embedded player above the text for students.
+            </p>
+          </div>
           <textarea
             name="body"
             defaultValue={content?.bodyHtml ?? ""}
@@ -125,7 +140,7 @@ export default async function TopicAdminPage({
         </ul>
       </section>
 
-      <section className="mt-10 grid gap-4 sm:grid-cols-3">
+      <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <a
           href={`/admin/curriculum/topic/${topicId}/test`}
           className="rounded-lg border border-gray-200 bg-white p-5 text-sm font-medium text-blue-700 hover:border-blue-400"
@@ -147,6 +162,12 @@ export default async function TopicAdminPage({
             Coding (subject not flagged)
           </div>
         )}
+        <a
+          href={`/admin/curriculum/topic/${topicId}/web`}
+          className="rounded-lg border border-gray-200 bg-white p-5 text-sm font-medium text-blue-700 hover:border-blue-400"
+        >
+          Web (HTML/CSS/JS) →
+        </a>
       </section>
     </div>
   );

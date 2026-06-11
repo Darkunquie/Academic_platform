@@ -1,4 +1,6 @@
-# Academic Success Platform
+# Preplyfly — Prep. Fly.
+
+> Prepare yourself.
 
 Multi-board learning platform: School → Professional. Content, mock tests,
 voice/text AI interviews, and a coding sandbox.

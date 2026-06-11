@@ -36,12 +36,11 @@ export default async function AdminLayout({
 
         <div className="relative z-10 flex flex-col gap-1">
           <Link href="/admin" className="flex items-center gap-2">
-            <span
-              className="material-symbols-outlined text-coral-300"
-              style={{ fontSize: "26px" }}
-            >
-              menu_book
-            </span>
+            <svg width="30" height="30" viewBox="0 0 32 32">
+              <rect width="32" height="32" rx="7" fill="#F6A488" />
+              <path d="M6 16.8 25 6.5 17.4 25.5l-3.2-7.2-8.2-1.5Z" fill="#0B3D2E" />
+              <path d="M14.2 18.3 25 6.5l-10 14.6-.8-2.8Z" fill="#155E45" />
+            </svg>
             <span
               style={{
                 fontFamily: "var(--font-serif)",
@@ -50,12 +49,12 @@ export default async function AdminLayout({
                 color: "#EFEEEA",
               }}
             >
-              Academic
+              Preplyfly
             </span>
           </Link>
           <span
-            className="text-[10px] uppercase text-ink-300"
-            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.16em" }}
+            className="text-[10px] text-ink-300"
+            style={{ fontFamily: "var(--font-mono)", }}
           >
             Admin · v1
           </span>
@@ -75,11 +74,10 @@ export default async function AdminLayout({
                 {name}
               </span>
               <span
-                className="text-[10px] uppercase text-coral-300"
+                className="text-[10px] text-coral-300"
                 style={{
                   fontFamily: "var(--font-mono)",
-                  letterSpacing: "0.12em",
-                }}
+                  }}
               >
                 {role === "super_admin" ? "Super admin" : "Admin"}
               </span>
@@ -92,12 +90,11 @@ export default async function AdminLayout({
       <header className="sticky top-0 z-20 border-b border-ink-200 bg-paper/80 backdrop-blur md:hidden">
         <div className="flex items-center justify-between px-4 py-3">
           <Link href="/admin" className="flex items-center gap-2">
-            <span
-              className="material-symbols-outlined text-primary-700"
-              style={{ fontSize: "22px" }}
-            >
-              menu_book
-            </span>
+            <svg width="26" height="26" viewBox="0 0 32 32">
+              <rect width="32" height="32" rx="7" fill="#155E45" />
+              <path d="M6 16.8 25 6.5 17.4 25.5l-3.2-7.2-8.2-1.5Z" fill="#F6A488" />
+              <path d="M14.2 18.3 25 6.5l-10 14.6-.8-2.8Z" fill="#C9462C" />
+            </svg>
             <span
               style={{
                 fontFamily: "var(--font-serif)",
@@ -105,7 +102,7 @@ export default async function AdminLayout({
               }}
               className="text-primary-900"
             >
-              Academic
+              Preplyfly
             </span>
           </Link>
           <LogoutButton />

@@ -223,6 +223,7 @@ export const topicContent = pgTable("topic_content", {
     .unique()
     .references(() => topics.id, { onDelete: "cascade" }),
   bodyHtml: text("body_html").notNull().default(""),
+  videoUrl: text("video_url"),
   updatedBy: uuid("updated_by"),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
@@ -339,6 +340,7 @@ export const codingQuestions = pgTable(
       .references(() => topics.id, { onDelete: "cascade" }),
     title: text("title").notNull(),
     prompt: text("prompt").notNull(),
+    constraints: text("constraints").notNull().default(""),
     languages: text("languages").array().notNull().default([]),
     starterCode: jsonb("starter_code").notNull().default({}),
     timeLimitMs: integer("time_limit_ms").notNull().default(2000),
@@ -391,6 +393,71 @@ export const codingSubmissions = pgTable(
   (t) => [
     index("coding_submissions_student_idx").on(t.studentId),
     index("coding_submissions_q_idx").on(t.codingQuestionId),
+  ]
+);
+
+/* ------------------------------------------------------------------ */
+/* Web (HTML/CSS/JS) questions                                         */
+/* ------------------------------------------------------------------ */
+
+export const webQuestions = pgTable(
+  "web_questions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    topicId: uuid("topic_id")
+      .notNull()
+      .references(() => topics.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    prompt: text("prompt").notNull(),
+    htmlStarter: text("html_starter").notNull().default(""),
+    cssStarter: text("css_starter").notNull().default(""),
+    jsStarter: text("js_starter").notNull().default(""),
+    difficulty: difficultyEnum("difficulty").notNull().default("easy"),
+    source: contentSourceEnum("source").notNull().default("human"),
+    createdBy: uuid("created_by"),
+  },
+  (t) => [index("web_questions_topic_idx").on(t.topicId)]
+);
+
+export const webChecks = pgTable(
+  "web_checks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    webQuestionId: uuid("web_question_id")
+      .notNull()
+      .references(() => webQuestions.id, { onDelete: "cascade" }),
+    label: text("label").notNull(),
+    expression: text("expression").notNull(),
+    weight: integer("weight").notNull().default(1),
+    sortOrder: integer("sort_order").notNull().default(0),
+  },
+  (t) => [index("web_checks_q_idx").on(t.webQuestionId)]
+);
+
+export const webSubmissions = pgTable(
+  "web_submissions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    webQuestionId: uuid("web_question_id")
+      .notNull()
+      .references(() => webQuestions.id, { onDelete: "cascade" }),
+    html: text("html").notNull().default(""),
+    css: text("css").notNull().default(""),
+    js: text("js").notNull().default(""),
+    status: submissionStatusEnum("status").notNull().default("queued"),
+    passed: integer("passed").notNull().default(0),
+    total: integer("total").notNull().default(0),
+    score: numeric("score").notNull().default("0"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("web_submissions_student_idx").on(t.studentId),
+    index("web_submissions_q_idx").on(t.webQuestionId),
   ]
 );
 
@@ -475,6 +542,61 @@ export const interviewAnswers = pgTable("interview_answers", {
 });
 
 /* ------------------------------------------------------------------ */
+/* Self-upload practice (PDF-driven mock tests / interviews)           */
+/* ------------------------------------------------------------------ */
+
+export const selfModeEnum = pgEnum("self_mode", ["test", "interview"]);
+
+export const selfAttempts = pgTable(
+  "self_attempts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    subject: text("subject").notNull().default(""),
+    topic: text("topic").notNull().default(""),
+    mode: selfModeEnum("mode").notNull(),
+    difficulty: difficultyEnum("difficulty").notNull().default("medium"),
+    pdfHash: text("pdf_hash"),
+    totalQuestions: integer("total_questions").notNull().default(0),
+    correctCount: integer("correct_count").notNull().default(0),
+    scorePct: integer("score_pct").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("self_attempts_student_idx").on(t.studentId),
+    index("self_attempts_hash_idx").on(t.pdfHash),
+  ]
+);
+
+export const selfAttemptQuestions = pgTable(
+  "self_attempt_questions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    attemptId: uuid("attempt_id")
+      .notNull()
+      .references(() => selfAttempts.id, { onDelete: "cascade" }),
+    seq: integer("seq").notNull().default(0),
+    prompt: text("prompt").notNull(),
+    // For test: options=[{text, isCorrect}], correctIndex set.
+    // For interview: idealAnswer set, options/correctIndex null.
+    options: jsonb("options"),
+    correctIndex: integer("correct_index"),
+    explanation: text("explanation"),
+    idealAnswer: text("ideal_answer"),
+    studentChoice: integer("student_choice"),
+    studentAnswer: text("student_answer"),
+    isCorrect: boolean("is_correct"),
+    score: integer("score"),
+    feedback: text("feedback"),
+  },
+  (t) => [index("self_attempt_questions_attempt_idx").on(t.attemptId)]
+);
+
+/* ------------------------------------------------------------------ */
 /* AI cache + progress + audit                                         */
 /* ------------------------------------------------------------------ */
 
@@ -489,6 +611,43 @@ export const generatedContent = pgTable("generated_content", {
     .notNull()
     .defaultNow(),
 });
+
+export const prewarmStatusEnum = pgEnum("prewarm_status", [
+  "pending",
+  "running",
+  "done",
+  "failed",
+]);
+
+export const groqPrewarmQueue = pgTable(
+  "groq_prewarm_queue",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    topicId: uuid("topic_id")
+      .notNull()
+      .references(() => topics.id, { onDelete: "cascade" }),
+    kind: genTypeEnum("kind").notNull(),
+    difficulty: difficultyEnum("difficulty").notNull(),
+    count: integer("count").notNull(),
+    status: prewarmStatusEnum("status").notNull().default("pending"),
+    attempts: integer("attempts").notNull().default(0),
+    lastError: text("last_error"),
+    enqueuedAt: timestamp("enqueued_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    startedAt: timestamp("started_at", { withTimezone: true }),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (t) => [
+    index("prewarm_status_idx").on(t.status, t.enqueuedAt),
+    unique("prewarm_topic_kind_diff_count_uq").on(
+      t.topicId,
+      t.kind,
+      t.difficulty,
+      t.count
+    ),
+  ]
+);
 
 export const progress = pgTable(
   "progress",

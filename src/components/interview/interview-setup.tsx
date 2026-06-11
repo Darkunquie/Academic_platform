@@ -10,10 +10,9 @@ type Tree = {
   chapters: { id: string; name: string; topics: { id: string; name: string }[] }[];
 }[];
 
-const labelClass = "text-[11px] font-medium uppercase text-ink-700";
+const labelClass = "text-[13px] font-bold text-ink-900";
 const labelStyle = {
-  fontFamily: "var(--font-mono)",
-  letterSpacing: "0.12em",
+  fontFamily: "Geist, sans-serif",
 } as const;
 
 const DIFFICULTY_ON: Record<"easy" | "medium" | "hard", string> = {
@@ -40,6 +39,19 @@ export function InterviewSetup({
   const [count, setCount] = useState(5);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Subject containing preselect (if any), else first
+  const initialSubjectId = useMemo(() => {
+    if (preselect) {
+      const owner = tree.find((s) =>
+        s.chapters.some((c) => c.topics.some((t) => t.id === preselect))
+      );
+      if (owner) return owner.id;
+    }
+    return tree[0]?.id ?? "";
+  }, [tree, preselect]);
+  const [activeSubjectId, setActiveSubjectId] = useState<string>(initialSubjectId);
+  const activeSubject = tree.find((s) => s.id === activeSubjectId) ?? tree[0];
 
   function toggle(id: string) {
     setSelected((prev) => {
@@ -176,23 +188,20 @@ export function InterviewSetup({
 
           {/* Selection counter */}
           <div className="ml-auto flex flex-col items-end gap-1">
-            <span
-              className="text-[11px] uppercase text-ink-500"
-              style={{ ...labelStyle }}
-            >
+            <span className={labelClass} style={labelStyle}>
               Selected
             </span>
             <span
               className="text-primary-900"
               style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "32px",
+                fontFamily: "Geist, sans-serif",
+                fontSize: "28px",
                 lineHeight: "32px",
-                fontWeight: 400,
+                fontWeight: 700,
               }}
             >
               {selected.size}
-              <span className="text-[14px] font-normal text-ink-500">
+              <span className="text-[14px] font-semibold text-ink-500">
                 {" "}
                 / {totalSelectable}
               </span>
@@ -201,7 +210,7 @@ export function InterviewSetup({
               <button
                 type="button"
                 onClick={clearAll}
-                className="text-[11px] uppercase text-coral-700 transition-colors hover:text-coral-500"
+                className="text-[12px] font-semibold text-coral-700 transition-colors hover:text-coral-500"
                 style={labelStyle}
               >
                 Clear
@@ -211,55 +220,91 @@ export function InterviewSetup({
         </div>
       </div>
 
-      {/* Topic tree */}
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {tree.length === 0 && (
-          <div className="rounded-[20px] border border-dashed border-ink-300 bg-white/60 p-12 text-center text-ink-500">
-            No topics available for your class yet.
-          </div>
-        )}
-        {tree.map((subject) => {
-          const subjectTopicIds = subject.chapters.flatMap((c) =>
-            c.topics.map((t) => t.id)
-          );
-          const subjectSelected = subjectTopicIds.filter((id) =>
-            selected.has(id)
-          ).length;
-          return (
-            <section
-              key={subject.id}
-              className="rounded-[24px] border border-ink-200 bg-white p-7 soft-shadow"
-            >
-              <div className="mb-5 flex items-end justify-between gap-4">
-                <div>
-                  <p
-                    className="mb-1 text-[11px] uppercase text-ink-500"
+      {/* Subject tabs */}
+      {tree.length === 0 ? (
+        <div className="rounded-[20px] border border-dashed border-ink-300 bg-white/60 p-12 text-center text-ink-500">
+          No topics available for your class yet.
+        </div>
+      ) : (
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-wrap gap-2">
+            {tree.map((s) => {
+              const subjectTopicIds = s.chapters.flatMap((c) =>
+                c.topics.map((t) => t.id)
+              );
+              const subjectSelected = subjectTopicIds.filter((id) =>
+                selected.has(id)
+              ).length;
+              const active = s.id === activeSubject?.id;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setActiveSubjectId(s.id)}
+                  className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[13px] font-semibold transition-all ${
+                    active
+                      ? "border-primary-700 bg-primary-700 text-white soft-shadow"
+                      : "border-ink-200 bg-white text-ink-700 hover:border-primary-300 hover:bg-paper"
+                  }`}
+                >
+                  {s.name}
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[11px] ${
+                      active
+                        ? "bg-white/20 text-white"
+                        : subjectSelected > 0
+                          ? "bg-primary-100 text-primary-700"
+                          : "bg-paper text-ink-500"
+                    }`}
                     style={labelStyle}
                   >
-                    Subject
-                  </p>
-                  <h2
-                    className="text-ink-900"
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: "22px",
-                      lineHeight: "28px",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {subject.name}
-                  </h2>
-                </div>
-                <span
-                  className="rounded-full bg-paper px-3 py-1 text-[11px] text-ink-700"
-                  style={labelStyle}
+                    {subjectSelected} / {subjectTopicIds.length}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active subject panel */}
+          {activeSubject && (
+            <section className="rounded-[24px] border border-ink-200 bg-white p-7 soft-shadow">
+              <div className="mb-5 flex items-end justify-between gap-4">
+                <h2
+                  className="text-ink-900"
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "22px",
+                    lineHeight: "28px",
+                    fontWeight: 600,
+                  }}
                 >
-                  {subjectSelected} / {subjectTopicIds.length}
-                </span>
+                  {activeSubject.name}
+                </h2>
+                {activeSubject.chapters.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      toggleChapter(
+                        activeSubject.chapters.flatMap((c) =>
+                          c.topics.map((t) => t.id)
+                        )
+                      )
+                    }
+                    className="rounded-full border border-ink-200 bg-paper px-3 py-1.5 text-[11px] font-semibold text-ink-700 transition-colors hover:border-primary-300 hover:text-primary-700"
+                    style={labelStyle}
+                  >
+                    Select all in subject
+                  </button>
+                )}
               </div>
 
               <div className="flex flex-col gap-5">
-                {subject.chapters.map((ch) => {
+                {activeSubject.chapters.length === 0 && (
+                  <p className="text-[13px] text-ink-500">
+                    No chapters published in this subject yet.
+                  </p>
+                )}
+                {activeSubject.chapters.map((ch) => {
                   const chapterTopicIds = ch.topics.map((t) => t.id);
                   const allOn =
                     chapterTopicIds.length > 0 &&
@@ -284,7 +329,7 @@ export function InterviewSetup({
                           <button
                             type="button"
                             onClick={() => toggleChapter(chapterTopicIds)}
-                            className="text-[10px] uppercase text-primary-700 transition-colors hover:text-coral-700"
+                            className="text-[10px] text-primary-700 transition-colors hover:text-coral-700"
                             style={labelStyle}
                           >
                             {allOn ? "Deselect all" : "Select all"}
@@ -339,9 +384,9 @@ export function InterviewSetup({
                 })}
               </div>
             </section>
-          );
-        })}
-      </div>
+          )}
+        </div>
+      )}
 
       {error && (
         <div className="rounded-[14px] border border-danger/30 bg-coral-100 px-4 py-3 text-[13px] text-coral-700">
@@ -354,7 +399,7 @@ export function InterviewSetup({
         <div className="flex w-full max-w-2xl items-center justify-between gap-4 rounded-full border border-ink-200 bg-white/80 px-5 py-3 pop-shadow backdrop-blur-xl">
           <div className="flex flex-col">
             <span
-              className="text-[10px] uppercase text-ink-500"
+              className="text-[10px] text-ink-500"
               style={labelStyle}
             >
               Ready

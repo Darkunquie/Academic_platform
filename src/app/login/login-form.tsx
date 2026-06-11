@@ -3,23 +3,38 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 import { signIn, getSession } from "next-auth/react";
+
+const labelClass =
+  "block text-[11px] font-medium uppercase tracking-[0.05em] text-[#071e24]";
+const labelStyle = { fontFamily: "JetBrains Mono, monospace" } as const;
+
+const fieldClass =
+  "h-12 w-full rounded-lg border border-[#cbd5e1] bg-white px-4 text-[15px] text-[#071e24] outline-none transition-all placeholder:text-[#c1c8cb] focus:border-[#785a00] focus:ring-2 focus:ring-[#785a00]/20";
 
 export function LoginForm() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function submit(e: React.FormEvent) {
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
     const res = await signIn("credentials", {
-      email,
-      password,
+      email: formData.email,
+      password: formData.password,
       redirect: false,
     });
     setLoading(false);
@@ -36,91 +51,130 @@ export function LoginForm() {
     router.refresh();
   }
 
-  const labelClass =
-    "ml-1 text-[11px] font-medium uppercase text-ink-700";
-  const labelStyle = {
-    fontFamily: "var(--font-mono)",
-    letterSpacing: "0.12em",
-  } as const;
-  const inputClass =
-    "h-12 w-full rounded-[14px] border-[1.5px] border-ink-200 bg-white px-4 text-[15px] text-ink-900 outline-none transition-all placeholder:text-ink-300 focus:border-primary-500 focus:ring-4 focus:ring-primary-100";
-
   return (
-    <form onSubmit={submit} className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {error && (
-        <div className="rounded-[14px] border border-danger/30 bg-coral-100 px-4 py-3 text-[13px] text-coral-700">
+        <div
+          className="rounded-lg border px-4 py-3 text-[13px]"
+          style={{
+            borderColor: "rgba(186,26,26,0.3)",
+            backgroundColor: "#ffdad6",
+            color: "#93000a",
+            fontFamily: "Geist, sans-serif",
+          }}
+        >
           {error}
         </div>
       )}
 
-      <div className="flex flex-col gap-1.5">
+      {/* Email Field */}
+      <div className="flex flex-col gap-2">
         <label htmlFor="email" className={labelClass} style={labelStyle}>
-          Email address
+          Email Address
         </label>
         <input
-          id="email"
           type="email"
-          required
+          id="email"
+          name="email"
+          value={formData.email}
+          onChange={handleInputChange}
+          placeholder="a.turing@preplyfly.edu"
           autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="name@school.edu"
-          className={inputClass}
+          required
+          className={fieldClass}
+          style={{ fontFamily: "Geist, sans-serif" }}
         />
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <div className="mb-1 flex items-end justify-between">
-          <label
-            htmlFor="password"
-            className={labelClass}
-            style={labelStyle}
-          >
-            Password
+      {/* Password Field */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-end justify-between">
+          <label htmlFor="password" className={labelClass} style={labelStyle}>
+            Security Password
           </label>
           <Link
             href="#"
-            className="text-[13px] text-coral-700 underline decoration-coral-300 underline-offset-2 transition-colors hover:decoration-coral-700"
+            className="text-[11px] font-medium uppercase"
+            style={{
+              color: "#785a00",
+              fontFamily: "JetBrains Mono, monospace",
+              letterSpacing: "0.05em",
+            }}
           >
-            Forgot password?
+            Forgot?
           </Link>
         </div>
         <div className="relative">
           <input
-            id="password"
             type={showPassword ? "text" : "password"}
-            required
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleInputChange}
             placeholder="••••••••"
-            className={`${inputClass} pr-14`}
+            autoComplete="current-password"
+            required
+            className={`${fieldClass} pr-12`}
+            style={{ fontFamily: "Geist, sans-serif" }}
           />
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-[13px] font-medium text-ink-500 transition-colors hover:text-primary-700"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-pressed={showPassword}
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 transition-colors hover:bg-[#daf2fa]"
+            style={{ color: "#41484b" }}
           >
-            {showPassword ? "Hide" : "Show"}
+            {showPassword ? (
+              <EyeOff className="h-5 w-5" />
+            ) : (
+              <Eye className="h-5 w-5" />
+            )}
           </button>
         </div>
       </div>
 
+      {/* Submit */}
       <button
         type="submit"
         disabled={loading}
-        className="group mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-[14px] bg-primary-700 text-[15px] font-semibold text-white soft-shadow transition-all hover:-translate-y-0.5 hover:bg-primary-900 hover:pop-shadow disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-lg px-6 py-4 text-white shadow-sm transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+        style={{
+          backgroundColor: "#002028",
+          fontFamily: "Geist, sans-serif",
+          fontSize: "16px",
+          fontWeight: 700,
+          letterSpacing: "-0.01em",
+        }}
       >
-        {loading ? "Signing in…" : "Sign in"}
-        {!loading && (
-          <span
-            className="material-symbols-outlined transition-transform group-hover:translate-x-1"
-            style={{ fontSize: "20px" }}
-          >
-            arrow_forward
-          </span>
-        )}
+        {loading ? "Authenticating…" : "Sign in"}
       </button>
+
+      <p
+        className="text-center text-[11px] uppercase"
+        style={{
+          color: "#41484b",
+          fontFamily: "JetBrains Mono, monospace",
+          letterSpacing: "0.05em",
+        }}
+      >
+        By signing in you agree to our{" "}
+        <Link
+          href="#"
+          className="font-bold underline underline-offset-2"
+          style={{ color: "#785a00" }}
+        >
+          Terms
+        </Link>{" "}
+        &{" "}
+        <Link
+          href="#"
+          className="font-bold underline underline-offset-2"
+          style={{ color: "#785a00" }}
+        >
+          Privacy
+        </Link>
+      </p>
     </form>
   );
 }

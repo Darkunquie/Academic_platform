@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Academic Platform",
-  description: "Learn, practice, assess — School to Professional.",
+  title: "Preplyfly — Prep. Fly.",
+  description: "Prepare yourself — learn, practice, and assess from School to Professional.",
 };
 
 export default function RootLayout({

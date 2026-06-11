@@ -2,7 +2,6 @@ import "dotenv/config";
 import { and, eq } from "drizzle-orm";
 import { db } from "./index";
 import { sections, providers, grades, users } from "./schema";
-import { hashPassword } from "../modules/auth/password";
 
 type Kind = "board" | "university";
 type SectionCode =
@@ -52,27 +51,34 @@ async function upsertGrade(
     .onConflictDoNothing();
 }
 
-async function ensureSuperAdmin(): Promise<string> {
-  const email = "superadmin@academic.local";
-  const [existing] = await db.select().from(users).where(eq(users.email, email));
-  if (existing) return existing.id;
-
-  const passwordHash = await hashPassword("Admin@12345");
-  const [created] = await db
-    .insert(users)
-    .values({
-      name: "Super Admin",
-      email,
-      passwordHash,
-      role: "super_admin",
-      status: "approved",
-    })
-    .returning({ id: users.id });
-  return created.id;
+async function getCreatorId(): Promise<string> {
+  // Curriculum rows need a non-null createdBy. Use the first super_admin if one
+  // exists (bootstrap via `pnpm bootstrap:super-admin`). Otherwise fail with a
+  // clear message instead of silently inserting a dev account.
+  const [admin] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.role, "super_admin"))
+    .limit(1);
+  if (!admin) {
+    throw new Error(
+      "No super_admin found. Run `pnpm bootstrap:super-admin` first (sets " +
+        "SUPER_ADMIN_EMAIL and SUPER_ADMIN_PASSWORD env vars)."
+    );
+  }
+  return admin.id;
 }
 
 async function main() {
-  const adminId = await ensureSuperAdmin();
+  if (
+    process.env.NODE_ENV === "production" &&
+    process.env.ALLOW_PROD_SEED !== "1"
+  ) {
+    throw new Error(
+      "Refusing to run seed.ts in production. Set ALLOW_PROD_SEED=1 to override."
+    );
+  }
+  const adminId = await getCreatorId();
 
   const school = await upsertSection("school", "School", 1);
   const inter = await upsertSection("intermediate", "Intermediate", 2);
@@ -148,10 +154,8 @@ async function main() {
   await upsertGrade(profP.id, "Foundation", 1, adminId);
   await upsertGrade(profP.id, "Advanced", 2, adminId);
 
-  console.log("\n✅ Seed complete.");
-  console.log("   Super admin login:");
-  console.log("     email:    superadmin@academic.local");
-  console.log("     password: Admin@12345\n");
+  console.log("\nSeed complete. Curriculum tree (sections + boards + universities + grades) loaded.");
+  console.log("Add subjects/chapters/topics via the admin UI.\n");
 }
 
 main()

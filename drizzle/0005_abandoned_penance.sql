@@ -1,0 +1,1 @@
+ALTER TABLE "topic_content" ADD COLUMN "video_url" text;
