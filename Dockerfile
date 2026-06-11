@@ -1,14 +1,15 @@
 # --- deps ---
 FROM node:22-alpine AS deps
 WORKDIR /app
-RUN corepack enable
+# npm-installed pnpm (corepack's signature checks break in CI/containers)
+RUN npm install -g pnpm@10.4.1
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 # --- build ---
 FROM node:22-alpine AS build
 WORKDIR /app
-RUN corepack enable
+RUN npm install -g pnpm@10.4.1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm build
