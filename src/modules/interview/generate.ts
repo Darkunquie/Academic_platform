@@ -18,6 +18,12 @@ export type GenInterviewQ = { question: string; idealAnswer: string };
 const PER_TOPIC_CHARS = 3000;
 const MAX_CTX_CHARS = 12000;
 
+function describeScope(label: string, values: string[]): string {
+  if (values.length === 0) return "";
+  if (values.length === 1) return `${label} ${values[0]}`.trim();
+  return `${label} ${values.join(" / ")}`.trim();
+}
+
 /**
  * Generate interview questions spanning a SET of topics. Cached by the sorted
  * topic-id set + difficulty + count + content hash (so edits bust the cache).
@@ -47,6 +53,17 @@ export async function generateInterviewQuestions(
     .innerJoin(providers, eq(grades.providerId, providers.id))
     .where(inArray(topics.id, sorted));
 
+  // FK cascade guarantees no orphans in production, but the caller may pass
+  // IDs that were deleted between selection and submit, or simply wrong. Fail
+  // loud instead of silently generating fewer questions than requested.
+  if (ts.length !== sorted.length) {
+    const found = new Set(ts.map((t) => t.id));
+    const missing = sorted.filter((id) => !found.has(id));
+    throw new Error(
+      `Topics not found: ${missing.join(", ")}. They may have been deleted.`
+    );
+  }
+
   const contents = await db
     .select()
     .from(topicContent)
@@ -72,11 +89,34 @@ export async function generateInterviewQuestions(
     return { questions: payload.questions ?? [], cached: true };
   }
 
-  const first = ts[0];
-  const framing = first
-    ? `Scope: ${first.providerName} ${first.gradeName} ${first.subjectName}.`
-    : "";
-  const topicNames = ts.map((t) => `"${t.name}"`).join(", ");
+  if (!ctx.trim()) {
+    throw new Error(
+      "No study material available for the selected topics. Add content to the topics before starting an interview."
+    );
+  }
+
+  // Aggregate unique curriculum scopes. A single interview may cross subjects
+  // (and rarely grades/providers, e.g. if the caller pre-filters cross-grade
+  // topics). Frame what is actually shared; list what differs.
+  const uniq = <T,>(xs: T[]): T[] => Array.from(new Set(xs));
+  const providersUniq = uniq(ts.map((t) => t.providerName));
+  const gradesUniq = uniq(ts.map((t) => t.gradeName));
+  const subjectsUniq = uniq(ts.map((t) => t.subjectName));
+
+  const parts = [
+    describeScope("", providersUniq),
+    describeScope("", gradesUniq),
+    describeScope("across", subjectsUniq),
+  ].filter(Boolean);
+  const framing = parts.length > 0 ? `Scope: ${parts.join(" ")}.` : "";
+
+  const topicNames = ts
+    .map((t) =>
+      subjectsUniq.length > 1
+        ? `"${t.name}" (${t.subjectName})`
+        : `"${t.name}"`
+    )
+    .join(", ");
 
   const system =
     "You are a friendly but rigorous academic interviewer. Generate questions grounded strictly in the provided material — do NOT invent topics outside it. Respond with strict JSON only.";
@@ -86,7 +126,7 @@ Create ${count} interview questions (difficulty: ${difficulty}) that test unders
 The material below is authoritative. Base each question on a specific concept, definition, example, or formula from this material. Do not ask about anything that is not present below.
 
 """
-${ctx || "(no material — use standard curriculum knowledge for these topics)"}
+${ctx}
 """
 
 Mix conceptual ("what is", "explain", "why"), applied ("how would you", "give an example", "compare"), and short-answer questions. Each idealAnswer must be a 2-4 sentence model response drawn from the material above. Return strict JSON:
