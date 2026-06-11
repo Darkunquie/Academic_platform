@@ -84,6 +84,8 @@ const EXPRESSION_BLOCKLIST = [
   "Function(",
   "constructor.constructor",
   "<script",
+  "setTimeout",
+  "setInterval",
 ];
 
 function validateExpression(expr: string): string | null {

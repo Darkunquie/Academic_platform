@@ -4,7 +4,8 @@ export type UpstreamService =
   | "judge0"
   | "r2"
   | "resend"
-  | "stt";
+  | "stt"
+  | "local";
 
 export class UpstreamError extends Error {
   readonly service: UpstreamService;

@@ -19,7 +19,7 @@ mkdir -p "$BACKUP_DIR"
 STAMP="$(date +%F)"
 OUT="$BACKUP_DIR/preplyfly-$STAMP.sql.gz"
 
-docker exec "$PG_CONTAINER" pg_dump -U "$DB_USER" "$DB_NAME" | gzip > "$OUT"
+docker exec "$PG_CONTAINER" pg_dump -U "$DB_USER" --no-owner --no-acl "$DB_NAME" | gzip > "$OUT"
 
 # Sanity: a real dump is never tiny.
 if [ "$(stat -c%s "$OUT")" -lt 10000 ]; then

@@ -35,7 +35,9 @@ export default async function ReplayPage({
             typeof o === "object" &&
             o !== null &&
             "text" in o &&
-            "isCorrect" in o
+            "isCorrect" in o &&
+            typeof o.text === "string" &&
+            typeof o.isCorrect === "boolean"
         )
       : [],
     explanation: q.explanation ?? undefined,

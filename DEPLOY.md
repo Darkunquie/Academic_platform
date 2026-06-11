@@ -64,11 +64,20 @@ PISTON_URL=http://piston:2000
 ## 4. First boot — run ONCE, in order
 Shell into the **app** container (Coolify → Terminal):
 ```bash
-pnpm db:migrate     # create all tables
-pnpm db:seed        # sections, boards, grades, super admin
-pnpm db:seed:demo   # (optional) demo content for CBSE Class 5
+pnpm db:migrate                              # create all tables
+
+# Create the one super admin from env vars (idempotent).
+SUPER_ADMIN_EMAIL=you@yourdomain.com \
+SUPER_ADMIN_PASSWORD='<24+ char random>' \
+SUPER_ADMIN_NAME='Your Name' \
+  pnpm bootstrap:super-admin
+
+ALLOW_PROD_SEED=1 pnpm db:seed               # (optional) sections + boards + classes
+ALLOW_PROD_SEED=1 pnpm db:seed:universities  # (optional) UGC universities CSV
 ```
-Install sandbox languages (from the host or any container on the network):
+Install sandbox languages (from inside the app container or any container on
+the Docker network — `piston` resolves only inside the compose network, not
+from the VPS host):
 ```bash
 for L in '{"language":"python","version":"3.12.0"}' \
          '{"language":"node","version":"20.11.1"}' \
@@ -77,8 +86,8 @@ for L in '{"language":"python","version":"3.12.0"}' \
     -H 'content-type: application/json' -d "$L"
 done
 ```
-Then **log in as the super admin and change the password immediately**
-(seed default is public knowledge: `superadmin@academic.local`).
+Log in as the super admin with the email + password you passed to
+`bootstrap:super-admin`. No default credentials exist in this build.
 
 ## 5. Backups — night one, not later
 ```bash

@@ -35,6 +35,6 @@ export async function saveCached(
     .values({ cacheKey: key, type, payload, model })
     .onConflictDoUpdate({
       target: generatedContent.cacheKey,
-      set: { payload, model, createdAt: new Date() },
+      set: { payload, model, createdAt: new Date(), hits: 0 },
     });
 }

@@ -117,7 +117,7 @@ export async function saveFile(
     const freeBytes = Number(stat.bavail) * Number(stat.bsize);
     if (freeBytes < 5 * 1024 ** 3) {
       throw new UpstreamError(
-        "r2",
+        "local",
         0,
         "Storage is almost full. Contact the administrator.",
         `local disk low: ${(freeBytes / 1024 ** 3).toFixed(1)}GB free`

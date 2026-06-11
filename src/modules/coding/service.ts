@@ -143,6 +143,116 @@ export type RunResult = {
   }[];
 };
 
+type SampleRow = RunResult["samples"][number];
+
+type CaseRow = {
+  stdin: string;
+  expectedOutput: string;
+  isSample: boolean;
+};
+
+type CaseOutcome = { ok: boolean; compileOutput: string | null };
+
+function failureSample(tc: CaseRow, reason: unknown): SampleRow {
+  const message =
+    reason instanceof Error ? reason.message : String(reason);
+  return {
+    stdin: tc.stdin,
+    expected: tc.expectedOutput.trim(),
+    got: `[Error: ${message.slice(0, 300)}]`,
+    ok: false,
+  };
+}
+
+function evaluateRun(
+  tc: CaseRow,
+  r: { stdout: string | null; compileOutput: string | null },
+  samples: SampleRow[]
+): CaseOutcome {
+  const got = (r.stdout ?? "").trimEnd();
+  const ok = got.trim() === tc.expectedOutput.trim();
+  if (tc.isSample) {
+    samples.push({
+      stdin: tc.stdin,
+      expected: tc.expectedOutput.trim(),
+      got: got.trim(),
+      ok,
+    });
+  }
+  return { ok, compileOutput: r.compileOutput };
+}
+
+async function runAllCases(
+  cases: CaseRow[],
+  language: string,
+  source: string
+): Promise<{ passed: number; compileError: string | null; samples: SampleRow[] }> {
+  const BATCH = 5;
+  const samples: SampleRow[] = [];
+  let passed = 0;
+  let compileError: string | null = null;
+
+  for (let i = 0; i < cases.length; i += BATCH) {
+    const batch = cases.slice(i, i + BATCH);
+    const results = await Promise.allSettled(
+      batch.map((tc) => runCode({ language, source, stdin: tc.stdin }))
+    );
+    for (let j = 0; j < batch.length; j++) {
+      const tc = batch[j];
+      const settled = results[j];
+      if (settled.status === "rejected") {
+        if (tc.isSample) samples.push(failureSample(tc, settled.reason));
+        continue;
+      }
+      const outcome = evaluateRun(tc, settled.value, samples);
+      if (outcome.ok) passed += 1;
+      if (!compileError && outcome.compileOutput) {
+        compileError = outcome.compileOutput;
+      }
+    }
+  }
+
+  return { passed, compileError, samples };
+}
+
+function computeStatus(
+  passed: number,
+  total: number,
+  compileError: string | null
+): RunResult["status"] {
+  if (total > 0 && passed === total) return "accepted";
+  if (compileError) return "error";
+  return "wrong";
+}
+
+async function bumpFirstSolveProgress(
+  studentId: string,
+  topicId: string,
+  questionId: string
+): Promise<void> {
+  const [row] = await db
+    .select({ n: sql<number>`count(*)::int` })
+    .from(codingSubmissions)
+    .where(
+      and(
+        eq(codingSubmissions.studentId, studentId),
+        eq(codingSubmissions.codingQuestionId, questionId),
+        eq(codingSubmissions.status, "accepted")
+      )
+    );
+  if ((row?.n ?? 0) !== 1) return;
+  await db
+    .insert(progress)
+    .values({ studentId, topicId, codingSolved: 1 })
+    .onConflictDoUpdate({
+      target: [progress.studentId, progress.topicId],
+      set: {
+        codingSolved: sql`${progress.codingSolved} + 1`,
+        updatedAt: new Date(),
+      },
+    });
+}
+
 export async function runAndStore(
   studentId: string,
   questionId: string,
@@ -151,101 +261,35 @@ export async function runAndStore(
 ): Promise<RunResult> {
   const q = await getCodingQuestion(questionId);
   if (!q) throw new Error("Question not found");
-
   if (!(language in LANGUAGES)) throw new Error("Unsupported language");
 
   const cases = await db
     .select()
     .from(codingTestCases)
     .where(eq(codingTestCases.codingQuestionId, questionId));
-
-  let passed = 0;
   const total = cases.length;
-  let compileError: string | null = null;
-  const samples: RunResult["samples"] = [];
 
-  // Run cases in parallel batches of 5 — wall time drops from
-  // sum(case timeouts) to roughly one batch, without flooding the sandbox.
-  const BATCH = 5;
-  for (let i = 0; i < cases.length; i += BATCH) {
-    const batch = cases.slice(i, i + BATCH);
-    const results = await Promise.all(
-      batch.map((tc) => runCode({ language, source, stdin: tc.stdin }))
-    );
-    for (let j = 0; j < batch.length; j++) {
-      const tc = batch[j];
-      const r = results[j];
-      const got = (r.stdout ?? "").trimEnd();
-      const ok = got.trim() === tc.expectedOutput.trim();
-      if (ok) passed += 1;
-      if (!compileError && r.compileOutput) compileError = r.compileOutput;
-      if (tc.isSample) {
-        samples.push({
-          stdin: tc.stdin,
-          expected: tc.expectedOutput.trim(),
-          got,
-          ok,
-        });
-      }
-    }
-  }
-
-  const status: RunResult["status"] =
-    total > 0 && passed === total
-      ? "accepted"
-      : compileError
-        ? "error"
-        : "wrong";
-
+  const { passed, compileError, samples } = await runAllCases(
+    cases,
+    language,
+    source
+  );
+  const status = computeStatus(passed, total, compileError);
   const pct = total ? Math.round((passed / total) * 100) : 0;
+
   await db.insert(codingSubmissions).values({
     studentId,
     codingQuestionId: questionId,
     language,
     sourceCode: source,
-    status: status === "accepted" ? "accepted" : status === "error" ? "error" : "wrong",
+    status,
     passed,
     total,
     score: pct.toString(),
   });
 
-  // First accepted solve → bump coding_solved for the topic.
   if (status === "accepted") {
-    const [prior] = await db
-      .select({ id: codingSubmissions.id })
-      .from(codingSubmissions)
-      .where(
-        and(
-          eq(codingSubmissions.studentId, studentId),
-          eq(codingSubmissions.codingQuestionId, questionId),
-          eq(codingSubmissions.status, "accepted")
-        )
-      )
-      .limit(2);
-    // The row we just inserted is one; if it's the only accepted one, count it.
-    const acceptedCount = await db
-      .select({ n: sql<number>`count(*)::int` })
-      .from(codingSubmissions)
-      .where(
-        and(
-          eq(codingSubmissions.studentId, studentId),
-          eq(codingSubmissions.codingQuestionId, questionId),
-          eq(codingSubmissions.status, "accepted")
-        )
-      );
-    if ((acceptedCount[0]?.n ?? 0) === 1) {
-      await db
-        .insert(progress)
-        .values({ studentId, topicId: q.topicId, codingSolved: 1 })
-        .onConflictDoUpdate({
-          target: [progress.studentId, progress.topicId],
-          set: {
-            codingSolved: sql`${progress.codingSolved} + 1`,
-            updatedAt: new Date(),
-          },
-        });
-    }
-    void prior;
+    await bumpFirstSolveProgress(studentId, q.topicId, questionId);
   }
 
   return { status, passed, total, compileError, samples };
