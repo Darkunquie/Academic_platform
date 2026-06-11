@@ -29,8 +29,12 @@ export async function saveCached(
   payload: unknown,
   model: string
 ) {
+  // Upsert: a forced regeneration overwrites a stale/poisoned cached set.
   await db
     .insert(generatedContent)
     .values({ cacheKey: key, type, payload, model })
-    .onConflictDoNothing();
+    .onConflictDoUpdate({
+      target: generatedContent.cacheKey,
+      set: { payload, model, createdAt: new Date() },
+    });
 }

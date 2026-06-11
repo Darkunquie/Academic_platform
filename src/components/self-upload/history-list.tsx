@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { deleteSelfAttemptAction } from "@/modules/self-upload/actions";
+import { DeleteAttemptButton } from "./delete-attempt-button";
 
 type Attempt = {
   id: string;
@@ -68,15 +68,10 @@ export function HistoryList({ items }: Readonly<{ items: Attempt[] }>) {
           >
             Replay
           </Link>
-          <form action={deleteSelfAttemptAction}>
-            <input type="hidden" name="id" value={a.id} />
-            <button
-              type="submit"
-              className="rounded-xl border border-solar-orange/40 bg-white px-3 py-1.5 text-[11px] font-black uppercase tracking-widest text-solar-orange transition-colors hover:bg-solar-orange/10"
-            >
-              Delete
-            </button>
-          </form>
+          <DeleteAttemptButton
+            attemptId={a.id}
+            label={`${a.subject} · ${a.topic}`}
+          />
         </div>
       ))}
     </div>

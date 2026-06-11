@@ -29,7 +29,15 @@ export default async function ReplayPage({
 
   const presetTest: SelfMcq[] = questions.map((q) => ({
     prompt: q.prompt,
-    options: (q.options as Option[]) ?? [],
+    options: Array.isArray(q.options)
+      ? q.options.filter(
+          (o): o is Option =>
+            typeof o === "object" &&
+            o !== null &&
+            "text" in o &&
+            "isCorrect" in o
+        )
+      : [],
     explanation: q.explanation ?? undefined,
   }));
   const presetInterview: SelfInterviewQ[] = questions.map((q) => ({

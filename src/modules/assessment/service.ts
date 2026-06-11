@@ -1,5 +1,8 @@
-import { asc, desc, eq, inArray, sql } from "drizzle-orm";
+import { asc, desc, eq, inArray, sql, type ExtractTablesWithRelations } from "drizzle-orm";
+import type { PgTransaction } from "drizzle-orm/pg-core";
+import type { PostgresJsQueryResultHKT } from "drizzle-orm/postgres-js";
 import { db } from "@/db";
+import * as schema from "@/db/schema";
 import {
   questions,
   questionOptions,
@@ -7,6 +10,13 @@ import {
   testAnswers,
   progress,
 } from "@/db/schema";
+
+type Tx = PgTransaction<
+  PostgresJsQueryResultHKT,
+  typeof schema,
+  ExtractTablesWithRelations<typeof schema>
+>;
+export type DbExecutor = typeof db | Tx;
 
 export type OptionInput = { text: string; isCorrect: boolean };
 
@@ -33,15 +43,18 @@ export async function listQuestionsWithOptions(topicId: string) {
   }));
 }
 
-export async function createMcqQuestion(args: {
-  topicId: string;
-  prompt: string;
-  options: OptionInput[];
-  difficulty: "easy" | "medium" | "hard";
-  source: "human" | "ai";
-  explanation?: string;
-  createdBy?: string;
-}) {
+export async function createMcqQuestion(
+  args: {
+    topicId: string;
+    prompt: string;
+    options: OptionInput[];
+    difficulty: "easy" | "medium" | "hard";
+    source: "human" | "ai";
+    explanation?: string;
+    createdBy?: string;
+  },
+  executor: DbExecutor = db
+) {
   // Sanitize: keep options with text, ensure exactly one correct.
   let opts = args.options.filter((o) => o.text.trim().length > 0);
   if (opts.length < 2) return;
@@ -54,7 +67,7 @@ export async function createMcqQuestion(args: {
     return { ...o, isCorrect: keep };
   });
 
-  const [q] = await db
+  const [q] = await executor
     .insert(questions)
     .values({
       topicId: args.topicId,
@@ -67,7 +80,7 @@ export async function createMcqQuestion(args: {
     })
     .returning({ id: questions.id });
 
-  await db.insert(questionOptions).values(
+  await executor.insert(questionOptions).values(
     opts.map((o, i) => ({
       questionId: q.id,
       text: o.text,

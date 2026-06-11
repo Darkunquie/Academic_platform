@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { Readable } from "stream";
 import { randomUUID } from "crypto";
 import {
   S3Client,
@@ -50,23 +51,32 @@ function r2Client(cfg: R2Config): S3Client {
   return cachedClient;
 }
 
-async function streamToBuffer(
-  body: AsyncIterable<Uint8Array> | ReadableStream<Uint8Array>
-): Promise<Buffer> {
+async function streamToBuffer(body: unknown): Promise<Buffer> {
+  if (body instanceof Readable) {
+    return new Promise((resolve, reject) => {
+      const chunks: Buffer[] = [];
+      body.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+      body.on("end", () => resolve(Buffer.concat(chunks)));
+      body.on("error", reject);
+    });
+  }
   const chunks: Uint8Array[] = [];
-  if (Symbol.asyncIterator in body) {
+  if (body && typeof body === "object" && Symbol.asyncIterator in body) {
     for await (const chunk of body as AsyncIterable<Uint8Array>) {
       chunks.push(chunk);
     }
-  } else {
+    return Buffer.concat(chunks);
+  }
+  if (body && typeof body === "object" && "getReader" in body) {
     const reader = (body as ReadableStream<Uint8Array>).getReader();
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
       if (value) chunks.push(value);
     }
+    return Buffer.concat(chunks);
   }
-  return Buffer.concat(chunks);
+  throw new Error("Unsupported stream type");
 }
 
 export async function saveFile(
@@ -100,6 +110,23 @@ export async function saveFile(
   }
 
   await fs.mkdir(STORAGE_DIR, { recursive: true });
+  // Disk guard: refuse uploads when free space < 5GB so a full disk can't
+  // take Postgres down with it (local-disk mode only).
+  try {
+    const stat = await fs.statfs(STORAGE_DIR);
+    const freeBytes = Number(stat.bavail) * Number(stat.bsize);
+    if (freeBytes < 5 * 1024 ** 3) {
+      throw new UpstreamError(
+        "r2",
+        0,
+        "Storage is almost full. Contact the administrator.",
+        `local disk low: ${(freeBytes / 1024 ** 3).toFixed(1)}GB free`
+      );
+    }
+  } catch (e) {
+    if (e instanceof UpstreamError) throw e;
+    // statfs unsupported on this platform — skip the guard.
+  }
   await fs.writeFile(path.join(STORAGE_DIR, key), buf);
   return { key, size: buf.length, mime };
 }
@@ -113,9 +140,7 @@ export async function readFile(key: string): Promise<Buffer> {
         new GetObjectCommand({ Bucket: cfg.bucket, Key: safe })
       );
       if (!res.Body) throw new Error("R2 returned empty body");
-      return streamToBuffer(
-        res.Body as AsyncIterable<Uint8Array> | ReadableStream<Uint8Array>
-      );
+      return streamToBuffer(res.Body);
     } catch (e) {
       throw new UpstreamError(
         "r2",

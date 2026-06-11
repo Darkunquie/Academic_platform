@@ -1,13 +1,16 @@
 "use client";
 
-type SpeechRecognitionResult = {
+type SpeechRecognitionAlternative = {
   transcript: string;
+};
+
+type SpeechRecognitionResult = ArrayLike<SpeechRecognitionAlternative> & {
   isFinal: boolean;
 };
 
 type SpeechRecognitionEventLike = {
   resultIndex: number;
-  results: ArrayLike<ArrayLike<SpeechRecognitionResult>>;
+  results: ArrayLike<SpeechRecognitionResult>;
 };
 
 type SpeechRecognitionLike = {
@@ -70,9 +73,9 @@ export function startWebSpeech(opts: {
   rec.onresult = (e) => {
     for (let i = e.resultIndex; i < e.results.length; i += 1) {
       const result = e.results[i];
-      const alt = result[0];
-      if (alt && result[0] && (result as unknown as { isFinal?: boolean }).isFinal !== false) {
-        finalText += (finalText ? " " : "") + alt.transcript.trim();
+      if (result.isFinal === true) {
+        const alt = result[0];
+        if (alt) finalText += (finalText ? " " : "") + alt.transcript.trim();
       }
     }
     opts.onTranscript(finalText);

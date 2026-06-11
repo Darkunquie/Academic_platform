@@ -53,8 +53,18 @@ async function main() {
   console.log(`[backup] starting pg_dump → r2://${bucket}/${key}`);
   const startedAt = Date.now();
 
-  const dump = spawn("pg_dump", [dbUrl, "--no-owner", "--no-acl", "--format=plain"], {
+  const dbUrlParsed = new URL(dbUrl);
+  const pgEnv = {
+    PGHOST: dbUrlParsed.hostname,
+    PGPORT: dbUrlParsed.port || "5432",
+    PGDATABASE: decodeURIComponent(dbUrlParsed.pathname.slice(1)),
+    PGUSER: decodeURIComponent(dbUrlParsed.username),
+    PGPASSWORD: decodeURIComponent(dbUrlParsed.password),
+  };
+
+  const dump = spawn("pg_dump", ["--no-owner", "--no-acl", "--format=plain"], {
     stdio: ["ignore", "pipe", "pipe"],
+    env: { ...process.env, ...pgEnv },
   });
 
   let stderrBuf = "";

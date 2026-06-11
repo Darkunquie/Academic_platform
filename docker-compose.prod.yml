@@ -10,6 +10,19 @@ services:
     volumes:
       # Persist uploaded PDFs/images across redeploys (local-disk storage).
       - app_storage:/app/storage
+    healthcheck:
+      # Auto-restart on hang, not just crash.
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     depends_on:
       postgres:
         condition: service_healthy
@@ -23,18 +36,20 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER must be set}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
       POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB must be set}
+    # Tuned for a 4GB CPX21 shared with the app + Piston + Coolify.
+    # (shared_buffers must NEVER exceed ~25% of box RAM — 4GB here = OOM.)
     command:
       - "postgres"
       - "-c"
-      - "shared_buffers=4GB"
+      - "shared_buffers=512MB"
       - "-c"
-      - "effective_cache_size=10GB"
+      - "effective_cache_size=1536MB"
       - "-c"
-      - "work_mem=16MB"
+      - "work_mem=8MB"
       - "-c"
-      - "maintenance_work_mem=512MB"
+      - "maintenance_work_mem=128MB"
       - "-c"
-      - "max_connections=100"
+      - "max_connections=50"
       - "-c"
       - "log_min_duration_statement=500"
     volumes:

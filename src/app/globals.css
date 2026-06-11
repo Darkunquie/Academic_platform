@@ -50,7 +50,10 @@
   --radius-md: 14px;
   --radius-lg: 20px;
   --radius-xl: 28px;
-  --radius-xxl: 24px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-xxl: 32px;
 
   /* Solar Command palette (student dashboard) */
   --color-solar-amber: #b58900;

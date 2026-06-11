@@ -32,6 +32,7 @@ export function SelfMockTest({
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     if (presetQuestions) return;
@@ -73,6 +74,7 @@ export function SelfMockTest({
         })),
       });
       if (res.ok) setSaved(true);
+      else setSaveError(res.error ?? "Failed to save test attempt.");
     }
   }
 
@@ -266,6 +268,12 @@ export function SelfMockTest({
           );
         })}
       </ol>
+
+      {saveError && (
+        <div className="rounded-xl border border-solar-orange/40 bg-solar-orange/10 px-4 py-3 text-[13px] font-semibold text-solar-orange">
+          Save failed: {saveError}
+        </div>
+      )}
 
       {!submitted ? (
         <button

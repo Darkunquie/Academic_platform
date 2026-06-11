@@ -62,6 +62,12 @@ export function updateCodingConstraints(
   id: string,
   args: { constraints: string; timeLimitMs: number; memLimitKb: number }
 ) {
+  if (args.timeLimitMs <= 0 || args.timeLimitMs > 30000) {
+    throw new Error("timeLimitMs must be between 1 and 30000");
+  }
+  if (args.memLimitKb <= 0 || args.memLimitKb > 2048000) {
+    throw new Error("memLimitKb must be between 1 and 2048000");
+  }
   return db.update(codingQuestions).set(args).where(eq(codingQuestions.id, id));
 }
 
@@ -70,6 +76,13 @@ export function deleteCodingQuestion(id: string) {
 }
 
 export function updateCodingLanguages(id: string, languages: string[]) {
+  if (languages.length === 0) {
+    throw new Error("At least one language must be provided");
+  }
+  const invalidLangs = languages.filter((lang) => !(lang in LANGUAGES));
+  if (invalidLangs.length > 0) {
+    throw new Error(`Invalid languages: ${invalidLangs.join(", ")}`);
+  }
   return db
     .update(codingQuestions)
     .set({ languages })
@@ -147,24 +160,33 @@ export async function runAndStore(
     .where(eq(codingTestCases.codingQuestionId, questionId));
 
   let passed = 0;
-  let total = 0;
+  const total = cases.length;
   let compileError: string | null = null;
   const samples: RunResult["samples"] = [];
 
-  for (const tc of cases) {
-    total += 1;
-    const r = await runCode({ language, source, stdin: tc.stdin });
-    const got = (r.stdout ?? "").trimEnd();
-    const ok = got.trim() === tc.expectedOutput.trim();
-    if (ok) passed += 1;
-    if (!compileError && r.compileOutput) compileError = r.compileOutput;
-    if (tc.isSample) {
-      samples.push({
-        stdin: tc.stdin,
-        expected: tc.expectedOutput.trim(),
-        got,
-        ok,
-      });
+  // Run cases in parallel batches of 5 — wall time drops from
+  // sum(case timeouts) to roughly one batch, without flooding the sandbox.
+  const BATCH = 5;
+  for (let i = 0; i < cases.length; i += BATCH) {
+    const batch = cases.slice(i, i + BATCH);
+    const results = await Promise.all(
+      batch.map((tc) => runCode({ language, source, stdin: tc.stdin }))
+    );
+    for (let j = 0; j < batch.length; j++) {
+      const tc = batch[j];
+      const r = results[j];
+      const got = (r.stdout ?? "").trimEnd();
+      const ok = got.trim() === tc.expectedOutput.trim();
+      if (ok) passed += 1;
+      if (!compileError && r.compileOutput) compileError = r.compileOutput;
+      if (tc.isSample) {
+        samples.push({
+          stdin: tc.stdin,
+          expected: tc.expectedOutput.trim(),
+          got,
+          ok,
+        });
+      }
     }
   }
 

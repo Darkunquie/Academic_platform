@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { LoginForm } from "./login-form";
@@ -14,10 +15,11 @@ export default function LoginPage() {
         style={{ backgroundColor: "#002028" }}
       >
         <div className="absolute inset-0 z-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1400&q=80"
             alt="Open books in a sunlit library"
+            fill
+            priority
             className="h-full w-full object-cover opacity-60 mix-blend-overlay"
           />
           <div

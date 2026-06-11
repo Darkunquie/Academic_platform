@@ -13,7 +13,7 @@ export default function SignupPage() {
         <div className="absolute inset-0 z-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1400&q=80"
+            src="/images/signup-bg.webp"
             alt="Students collaborating in a study space"
             className="h-full w-full object-cover opacity-60 mix-blend-overlay"
           />

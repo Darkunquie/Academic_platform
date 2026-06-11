@@ -48,29 +48,43 @@ export type PrewarmJob = {
 
 /**
  * Atomically claim the next pending job. Returns null if queue is empty.
- * Uses SELECT FOR UPDATE SKIP LOCKED semantics via a CTE so multiple workers
- * can run concurrently without double-claiming.
+ * SELECT ... FOR UPDATE SKIP LOCKED inside a transaction lets multiple
+ * workers run concurrently without double-claiming.
  */
 export async function claimNextPrewarmJob(): Promise<PrewarmJob | null> {
-  const res = await db.execute(sql`
-    WITH next AS (
-      SELECT id FROM ${groqPrewarmQueue}
-      WHERE status = 'pending' AND attempts < 3
-      ORDER BY enqueued_at ASC
-      FOR UPDATE SKIP LOCKED
-      LIMIT 1
-    )
-    UPDATE ${groqPrewarmQueue}
-    SET status = 'running', started_at = now(), attempts = attempts + 1
-    FROM next
-    WHERE ${groqPrewarmQueue.id} = next.id
-    RETURNING ${groqPrewarmQueue.id}, ${groqPrewarmQueue.topicId},
-              ${groqPrewarmQueue.kind}, ${groqPrewarmQueue.difficulty},
-              ${groqPrewarmQueue.count}
-  `);
-  const row = (res as unknown as { rows?: PrewarmJob[] }).rows?.[0];
-  if (!row) return null;
-  return row;
+  return db.transaction(async (tx) => {
+    const [job] = await tx
+      .select({
+        id: groqPrewarmQueue.id,
+        topicId: groqPrewarmQueue.topicId,
+        kind: groqPrewarmQueue.kind,
+        difficulty: groqPrewarmQueue.difficulty,
+        count: groqPrewarmQueue.count,
+      })
+      .from(groqPrewarmQueue)
+      .where(
+        and(
+          eq(groqPrewarmQueue.status, "pending"),
+          sql`${groqPrewarmQueue.attempts} < 3`
+        )
+      )
+      .orderBy(asc(groqPrewarmQueue.enqueuedAt))
+      .limit(1)
+      .for("update", { skipLocked: true });
+
+    if (!job) return null;
+
+    await tx
+      .update(groqPrewarmQueue)
+      .set({
+        status: "running",
+        startedAt: new Date(),
+        attempts: sql`${groqPrewarmQueue.attempts} + 1`,
+      })
+      .where(eq(groqPrewarmQueue.id, job.id));
+
+    return job as PrewarmJob;
+  });
 }
 
 export async function markPrewarmDone(id: string): Promise<void> {

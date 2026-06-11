@@ -192,9 +192,16 @@ export async function scoreSelfAnswerAction(input: {
 export async function transcribeSelfAudioAction(
   fd: FormData
 ): Promise<{ ok: true; text: string } | { ok: false; error: string }> {
-  await requireStudent();
+  const user = await requireStudent();
+  if (!rateLimit(`stt:${user.id}`, 60, 60_000)) {
+    return { ok: false, error: "Rate limit hit. Wait a minute and retry." };
+  }
   const audio = fd.get("audio");
   if (!(audio instanceof File)) return { ok: false, error: "No audio" };
+  // Whisper API has a 25 MB limit; enforce 20 MB to stay under.
+  if (audio.size > 20 * 1024 * 1024) {
+    return { ok: false, error: "Audio file too large (max 20 MB)" };
+  }
   try {
     const text = await groqTranscribe(audio);
     return { ok: true, text };

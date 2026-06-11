@@ -107,15 +107,37 @@ export async function cacheDel(key: string): Promise<void> {
   }
 }
 
+const INCRBY_EXPIRE_SCRIPT = `
+local n = redis.call('INCRBY', KEYS[1], ARGV[1])
+if n == tonumber(ARGV[1]) then
+  redis.call('EXPIRE', KEYS[1], ARGV[2])
+end
+return n
+`;
+
 export async function cacheIncr(
   key: string,
+  ttlSeconds: number
+): Promise<number> {
+  return cacheIncrBy(key, 1, ttlSeconds);
+}
+
+export async function cacheIncrBy(
+  key: string,
+  delta: number,
   ttlSeconds: number
 ): Promise<number> {
   const c = client();
   if (!c || circuitOpen()) return 0;
   try {
-    const n = await withTimeout(c.incr(k(key)), 0);
-    if (n === 1) await withTimeout(c.expire(k(key), ttlSeconds), 0);
+    const n = await withTimeout(
+      c.eval(
+        INCRBY_EXPIRE_SCRIPT,
+        [k(key)],
+        [delta, ttlSeconds]
+      ) as Promise<number>,
+      0
+    );
     recordSuccess();
     return n;
   } catch {

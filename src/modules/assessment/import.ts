@@ -78,6 +78,9 @@ function finalizeBlock(
   const correctCount = cleanedOpts.filter((o) => o.isCorrect).length;
   if (correctCount === 0) {
     warnings.push("No correct option marked — defaults to first option.");
+    if (cleanedOpts.length > 0) {
+      cleanedOpts[0].isCorrect = true;
+    }
   } else if (correctCount > 1) {
     warnings.push("Multiple correct options marked — only first is kept.");
   }

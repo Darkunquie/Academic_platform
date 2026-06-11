@@ -199,7 +199,7 @@ export default async function StudentCodingSolvePage({
                 </li>
                 <li>
                   Languages:{" "}
-                  <span>{(question.languages as string[]).join(", ")}</span>
+                  <span>{((question.languages as string[] | null) ?? []).join(", ")}</span>
                 </li>
               </ul>
             </section>

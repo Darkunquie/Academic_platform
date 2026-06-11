@@ -14,13 +14,22 @@ export function GenerateButton({ topicId }: { topicId: string }) {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
-  async function run() {
+  async function run(fresh = false) {
     setLoading(true);
     setMsg(null);
-    const res = await generateQuestionsAction({ topicId, count, difficulty });
+    const res = await generateQuestionsAction({
+      topicId,
+      count,
+      difficulty,
+      fresh,
+    });
     setLoading(false);
     if (res.ok) {
-      setMsg(`✅ Generated ${res.count} question(s).`);
+      setMsg(
+        fresh
+          ? `✅ Regenerated ${res.count} fresh question(s).`
+          : `✅ Generated ${res.count} question(s).`
+      );
       router.refresh();
     } else {
       setMsg(`⚠ ${res.error}`);
@@ -57,13 +66,22 @@ export function GenerateButton({ topicId }: { topicId: string }) {
             <option value="hard">hard</option>
           </select>
         </div>
-        <Button onClick={run} disabled={loading}>
+        <Button onClick={() => run(false)} disabled={loading}>
           {loading ? "Generating…" : "✨ Generate with AI"}
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => run(true)}
+          disabled={loading}
+          title="Ignore the cached set and generate brand-new questions"
+        >
+          ♻ Regenerate fresh
         </Button>
       </div>
       {msg && <p className="mt-2 text-sm text-gray-700">{msg}</p>}
       <p className="mt-1 text-xs text-gray-500">
-        Cached per topic+difficulty+count — regenerating the same combo is free.
+        Generate reuses the cached set (free). Regenerate fresh replaces it with
+        new questions.
       </p>
     </div>
   );

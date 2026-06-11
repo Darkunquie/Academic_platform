@@ -1,10 +1,28 @@
 import { UpstreamError } from "./errors";
-import { isOverCap, recordGroqError, recordTokensFast } from "./groq-cost";
+import { isOverCap, recordGroqError, recordTokens } from "./groq-cost";
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-export const GROQ_MODEL = "llama-3.3-70b-versatile";
-export const GROQ_FAST_MODEL = "llama-3.1-8b-instant";
+// Env-overridable so a retired/renamed model is a config change, not a deploy.
+export const GROQ_MODEL =
+  process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+export const GROQ_FAST_MODEL =
+  process.env.GROQ_FAST_MODEL || "llama-3.1-8b-instant";
+
+/** Retry transient upstream failures (429/5xx) with short backoff. */
+async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
+  const delays = [1000, 3000];
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await fn();
+    } catch (e) {
+      const status = e instanceof UpstreamError ? e.status : 0;
+      const retriable = status === 429 || (status >= 500 && status < 600);
+      if (!retriable || attempt >= delays.length) throw e;
+      await new Promise((r) => setTimeout(r, delays[attempt]));
+    }
+  }
+}
 
 type GroqArgs = {
   system: string;
@@ -34,38 +52,40 @@ export async function groqChat({
     );
   }
 
-  const res = await fetch(GROQ_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${key}`,
-    },
-    body: JSON.stringify({
-      model,
-      temperature,
-      ...(json ? { response_format: { type: "json_object" } } : {}),
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-    }),
+  return withRetry(async () => {
+    const res = await fetch(GROQ_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${key}`,
+      },
+      body: JSON.stringify({
+        model,
+        temperature,
+        ...(json ? { response_format: { type: "json_object" } } : {}),
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+      }),
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      void recordGroqError();
+      throw new UpstreamError(
+        "groq",
+        res.status,
+        "AI service unavailable. Please retry shortly.",
+        text.slice(0, 1000)
+      );
+    }
+
+    const data = await res.json();
+    const tokens = Number(data.usage?.total_tokens) || 0;
+    if (tokens > 0) void recordTokens(tokens);
+    return data.choices?.[0]?.message?.content ?? "";
   });
-
-  if (!res.ok) {
-    const text = await res.text();
-    void recordGroqError();
-    throw new UpstreamError(
-      "groq",
-      res.status,
-      "AI service unavailable. Please retry shortly.",
-      text.slice(0, 1000)
-    );
-  }
-
-  const data = await res.json();
-  const tokens = Number(data.usage?.total_tokens) || 0;
-  if (tokens > 0) void recordTokensFast(tokens);
-  return data.choices?.[0]?.message?.content ?? "";
 }
 
 /** Groq call that returns parsed JSON (forces JSON response mode). */
@@ -75,7 +95,8 @@ export async function groqJson<T = unknown>(args: GroqArgs): Promise<T> {
 }
 
 const GROQ_STT_URL = "https://api.groq.com/openai/v1/audio/transcriptions";
-export const GROQ_STT_MODEL = "whisper-large-v3-turbo";
+export const GROQ_STT_MODEL =
+  process.env.GROQ_STT_MODEL || "whisper-large-v3-turbo";
 
 /** Transcribe an audio file with Groq Whisper. Returns the text. */
 export async function groqTranscribe(
@@ -90,20 +111,22 @@ export async function groqTranscribe(
   form.append("model", model);
   form.append("response_format", "json");
 
-  const res = await fetch(GROQ_STT_URL, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}` },
-    body: form,
+  return withRetry(async () => {
+    const res = await fetch(GROQ_STT_URL, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}` },
+      body: form,
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new UpstreamError(
+        "stt",
+        res.status,
+        "Voice transcription unavailable. Please retry shortly.",
+        text.slice(0, 1000)
+      );
+    }
+    const data = await res.json();
+    return data.text ?? "";
   });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new UpstreamError(
-      "stt",
-      res.status,
-      "Voice transcription unavailable. Please retry shortly.",
-      text.slice(0, 1000)
-    );
-  }
-  const data = await res.json();
-  return data.text ?? "";
 }

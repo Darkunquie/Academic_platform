@@ -429,7 +429,9 @@ export function SignupForm() {
         >
           I acknowledge the{" "}
           <a
-            href="#"
+            href="/terms"
+            target="_blank"
+            rel="noopener noreferrer"
             className="font-medium underline underline-offset-4"
             style={{ color: "#785a00" }}
           >

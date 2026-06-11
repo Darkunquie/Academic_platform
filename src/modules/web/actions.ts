@@ -2,6 +2,7 @@
 import { safeErrorMessage } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
 import { requireAdmin, requireStudent } from "@/modules/auth/guard";
+import { rateLimit } from "@/lib/rate-limit";
 import * as svc from "./service";
 
 function str(fd: FormData, key: string) {
@@ -15,10 +16,11 @@ export async function createWebQuestionAction(fd: FormData) {
   const topicId = str(fd, "topicId");
   const title = str(fd, "title");
   const prompt = str(fd, "prompt");
-  const difficulty = (str(fd, "difficulty") || "easy") as
-    | "easy"
-    | "medium"
-    | "hard";
+  const rawDifficulty = str(fd, "difficulty") || "easy";
+  const difficulty: "easy" | "medium" | "hard" =
+    ["easy", "medium", "hard"].includes(rawDifficulty)
+      ? (rawDifficulty as "easy" | "medium" | "hard")
+      : "easy";
   const htmlStarter = String(fd.get("htmlStarter") ?? "");
   const cssStarter = String(fd.get("cssStarter") ?? "");
   const jsStarter = String(fd.get("jsStarter") ?? "");
@@ -61,6 +63,42 @@ export async function updateWebStartersAction(fd: FormData) {
   if (path) revalidatePath(path);
 }
 
+const EXPRESSION_MAX_LEN = 500;
+const EXPRESSION_BLOCKLIST = [
+  "import(",
+  "import ",
+  "fetch(",
+  "XMLHttpRequest",
+  "WebSocket",
+  "document.cookie",
+  "localStorage",
+  "sessionStorage",
+  "indexedDB",
+  "navigator.sendBeacon",
+  "navigator.credentials",
+  "parent.",
+  "top.",
+  "opener.",
+  "postMessage",
+  "eval(",
+  "Function(",
+  "constructor.constructor",
+  "<script",
+];
+
+function validateExpression(expr: string): string | null {
+  if (expr.length > EXPRESSION_MAX_LEN) {
+    return `Expression exceeds ${EXPRESSION_MAX_LEN} characters`;
+  }
+  const lower = expr.toLowerCase();
+  for (const tok of EXPRESSION_BLOCKLIST) {
+    if (lower.includes(tok.toLowerCase())) {
+      return `Expression contains disallowed token: ${tok}`;
+    }
+  }
+  return null;
+}
+
 export async function addWebCheckAction(fd: FormData) {
   await requireAdmin();
   const webQuestionId = str(fd, "questionId");
@@ -69,6 +107,8 @@ export async function addWebCheckAction(fd: FormData) {
   const weight = Number(str(fd, "weight")) || 1;
   const sortOrder = Number(str(fd, "sortOrder")) || 0;
   if (webQuestionId && label && expression) {
+    const reason = validateExpression(expression);
+    if (reason) throw new Error(reason);
     await svc.addWebCheck({
       webQuestionId,
       label,
@@ -120,6 +160,9 @@ export async function submitWebAction(input: {
   | { ok: false; error: string }
 > {
   const user = await requireStudent();
+  if (!rateLimit(`web:${user.id}`, 20, 60_000)) {
+    return { ok: false, error: "Rate limit hit. Slow down a moment." };
+  }
   try {
     const result = await svc.storeWebSubmission({
       studentId: user.id,

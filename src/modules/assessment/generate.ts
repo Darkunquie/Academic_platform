@@ -17,7 +17,8 @@ export type GenMcq = {
 export async function generateMcqs(
   topicId: string,
   count: number,
-  difficulty: "easy" | "medium" | "hard"
+  difficulty: "easy" | "medium" | "hard",
+  fresh = false
 ): Promise<GenMcq[]> {
   const topic = await getTopicChain(topicId);
   if (!topic) throw new Error("Topic not found");
@@ -32,10 +33,13 @@ export async function generateMcqs(
     count,
   ]);
 
-  const cached = await getCached(key);
-  if (cached) {
-    const payload = cached.payload as { questions: GenMcq[] };
-    return payload.questions ?? [];
+  // fresh = force regeneration; new result overwrites the cached set.
+  if (!fresh) {
+    const cached = await getCached(key);
+    if (cached) {
+      const payload = cached.payload as { questions: GenMcq[] };
+      return payload.questions ?? [];
+    }
   }
 
   const content = await getTopicContent(topicId);

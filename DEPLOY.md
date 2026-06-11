@@ -1,58 +1,110 @@
-# Deployment guide (Hetzner + Coolify)
+# Preplyfly — Deployment guide (Hetzner CPX21 + Coolify)
 
-Solo-friendly, ~€8/mo. Coolify gives Vercel-like git-push deploys on your own VPS.
+Single VPS, ~€8/mo. Everything runs on one box: app + Postgres + Piston
+sandbox + uploads. Only external dependency: Groq (AI).
 
-## 1. Provision the server
-- Create a **Hetzner Cloud CPX21** (or larger) — Ubuntu 24.04.
-- Install **Coolify**:
-  ```bash
-  curl -fsSL https://cdn.coolify.io/v4/install.sh | bash
-  ```
-- Open Coolify at `https://<server-ip>:8000`, create an account.
+---
+
+## 0. Pre-flight (do BEFORE the first deploy)
+
+### 0.1 Server
+- Hetzner Cloud **CPX21** (3 vCPU / 4GB), **Ubuntu 24.04**. Note the public IP.
+
+### 0.2 Swap — REQUIRED on 4GB
+`next build` needs 1.5–3GB on top of the running stack. Without swap the
+first Coolify build **OOM-kills** (possibly taking Postgres with it):
+```bash
+fallocate -l 4G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+```
+
+### 0.3 DNS
+A-record `@` (and `www`) → server IP. Coolify auto-issues HTTPS.
+
+### 0.4 Groq
+Add a card at console.groq.com (stays free) → **10× rate limits**. Without it,
+~3 simultaneous interviews exhaust the 30 req/min free tier.
+
+---
+
+## 1. Install Coolify
+```bash
+curl -fsSL https://cdn.coolify.io/v4/install.sh | bash
+```
+Open `http://<ip>:8000`, create the admin account.
 
 ## 2. Add the app
-- New Resource → **Docker Compose** (or connect this Git repo).
-- Point it at `docker-compose.prod.yml`.
-- Set a domain; Coolify provisions HTTPS automatically.
+New Resource → **Docker Compose** → connect the GitHub repo →
+compose file: `docker-compose.prod.yml`. Set the domain on the app service.
 
-## 3. Environment (`.env.production`)
-Copy from `.env.example` and fill:
-```
-DATABASE_URL=postgresql://app:STRONGPASS@postgres:5432/academic
-AUTH_SECRET=<openssl rand -hex 32>
+## 3. Environment — HARD CHECKLIST
+Every one of these is required. Missing `AUTH_TRUST_HOST` = login redirect
+loop. Missing `DATABASE_URL` = app boots but 500s on first query.
+
+```bash
+DATABASE_URL=postgresql://app:<STRONG_PASS>@postgres:5432/academic
+POSTGRES_USER=app
+POSTGRES_PASSWORD=<STRONG_PASS>          # must match DATABASE_URL
+POSTGRES_DB=academic
+AUTH_SECRET=<openssl rand -hex 32>       # NEW value, never the dev one
+AUTH_TRUST_HOST=true                     # REQUIRED behind Coolify's proxy
+AUTH_URL=https://preplyfly.com
 GROQ_API_KEY=gsk_...
 PISTON_URL=http://piston:2000
-# storage: switch local disk → Cloudflare R2 (see below)
-R2_ACCOUNT_ID=...
-R2_ACCESS_KEY_ID=...
-R2_SECRET_ACCESS_KEY=...
-R2_BUCKET=academic-content
-```
-Set `POSTGRES_PASSWORD` to match `DATABASE_URL`.
 
-## 4. First boot
+# Optional — model overrides (change here if Groq retires a model; no redeploy)
+# GROQ_MODEL=llama-3.3-70b-versatile
+# GROQ_FAST_MODEL=llama-3.1-8b-instant
+# GROQ_STT_MODEL=whisper-large-v3-turbo
+
+# Optional — Cloudflare R2 (otherwise uploads use the local volume)
+# R2_ENDPOINT=...  R2_ACCESS_KEY_ID=...  R2_SECRET_ACCESS_KEY=...  R2_BUCKET=...
+```
+
+## 4. First boot — run ONCE, in order
+Shell into the **app** container (Coolify → Terminal):
 ```bash
-# run migrations against the prod DB
-pnpm db:migrate
-# seed sections/boards + super admin
-pnpm db:seed
-# install sandbox languages (once)
-curl -X POST http://piston:2000/api/v2/packages -H 'content-type: application/json' -d '{"language":"python","version":"3.12.0"}'
-curl -X POST http://piston:2000/api/v2/packages -H 'content-type: application/json' -d '{"language":"node","version":"20.11.1"}'
-curl -X POST http://piston:2000/api/v2/packages -H 'content-type: application/json' -d '{"language":"gcc","version":"10.2.0"}'
+pnpm db:migrate     # create all tables
+pnpm db:seed        # sections, boards, grades, super admin
+pnpm db:seed:demo   # (optional) demo content for CBSE Class 5
 ```
-Then change the super-admin password.
+Install sandbox languages (from the host or any container on the network):
+```bash
+for L in '{"language":"python","version":"3.12.0"}' \
+         '{"language":"node","version":"20.11.1"}' \
+         '{"language":"gcc","version":"10.2.0"}'; do
+  curl -s -X POST http://piston:2000/api/v2/packages \
+    -H 'content-type: application/json' -d "$L"
+done
+```
+Then **log in as the super admin and change the password immediately**
+(seed default is public knowledge: `superadmin@academic.local`).
 
-## 5. Production hardening checklist
-- [ ] Switch storage from local disk (`src/lib/storage.ts`) to **Cloudflare R2** (S3 client). Local disk is dev-only.
-- [ ] Set a strong `AUTH_SECRET` and DB password.
-- [ ] Daily `pg_dump` backup cron → off-box (R2/B2).
-- [ ] Restrict Piston to the internal Docker network (no public port — already the case in `docker-compose.prod.yml`).
-- [ ] Sanitize admin Markdown if you ever allow non-trusted authors (add `rehype-sanitize`).
-- [ ] Move the in-memory rate limiter (`src/lib/rate-limit.ts`) to Redis if you run >1 app instance.
-- [ ] Add error monitoring (Sentry) and uptime checks on `/api/health`.
+## 5. Backups — night one, not later
+```bash
+mkdir -p /opt/preplyfly/scripts /backups
+# copy scripts/backup.sh to the server, then:
+chmod +x /opt/preplyfly/scripts/backup.sh
+crontab -e   # add:
+# 0 3 * * * /opt/preplyfly/scripts/backup.sh >> /var/log/preplyfly-backup.log 2>&1
+```
+Also enable Hetzner snapshot backups (+20% server cost) for whole-disk
+recovery. Periodically copy `/backups` off-box (Hetzner Storage Box / R2).
 
-## Notes
-- The Dockerfile uses Next.js **standalone** output (`output: "standalone"`), so the image is small.
-- Piston needs `privileged: true` to sandbox code; that's expected and isolated to that container.
-- Phase roadmap & architecture: `ARCHITECTURE-RECOMMENDATION.md`, `docs/PHASE-PLAN.md`.
+## 6. Post-deploy smoke test
+1. `https://domain/api/health` → `{"database":"up"}`
+2. Login super admin → Approvals/Curriculum/Analytics load
+3. Signup a student (state filter works) → approve → student login
+4. Topic: content + read-aloud + video render
+5. Mock test: take + AI generate (cached on second run)
+6. Interview: text mode, then voice (mic needs HTTPS — use the domain)
+7. Coding: run the seeded "Sum Two Numbers" → 3/3 accepted
+
+## Operational notes
+- Postgres is tuned for this 4GB box in `docker-compose.prod.yml`
+  (`shared_buffers=512MB`). If you resize the server, retune.
+- App container has a healthcheck on `/api/health` → restarts on hang.
+- Local uploads refuse writes when free disk < 5GB (guard in `storage.ts`).
+- Groq calls retry 429/5xx twice with backoff (`lib/groq.ts`).
+- Upgrade path: CPX21 → CPX31 (8GB) is a 2-minute Hetzner resize when
+  concurrent users grow.

@@ -3,6 +3,7 @@ import { safeErrorMessage } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
 import { requireAdmin, requireStudent } from "@/modules/auth/guard";
 import { rateLimit } from "@/lib/rate-limit";
+import { db } from "@/db";
 import * as svc from "./service";
 import { generateMcqs } from "./generate";
 import {
@@ -63,7 +64,10 @@ export async function parseMcqUploadAction(
   | { ok: true; items: ParsedMcq[] }
   | { ok: false; error: string }
 > {
-  await requireAdmin();
+  const user = await requireAdmin();
+  if (!rateLimit(`parse-mcq:${user.id}`, 5, 60_000)) {
+    return { ok: false, error: "Rate limit hit. Wait a minute and retry." };
+  }
   const file = fd.get("file");
   if (!(file instanceof File)) return { ok: false, error: "No file" };
   if (file.size > 5 * 1024 * 1024) {
@@ -105,26 +109,32 @@ export async function bulkImportMcqsAction(input: {
 }): Promise<{ ok: boolean; inserted?: number; skipped?: number; error?: string }> {
   const user = await requireAdmin();
   if (!input.topicId) return { ok: false, error: "Missing topicId" };
-  let inserted = 0;
-  let skipped = 0;
   try {
-    for (const item of input.items) {
-      const opts = item.options.filter((o) => o.text.trim().length > 0);
-      if (!item.prompt.trim() || opts.length < 2) {
-        skipped += 1;
-        continue;
+    const { inserted, skipped } = await db.transaction(async (tx) => {
+      let inserted = 0;
+      let skipped = 0;
+      for (const item of input.items) {
+        const opts = item.options.filter((o) => o.text.trim().length > 0);
+        if (!item.prompt.trim() || opts.length < 2) {
+          skipped += 1;
+          continue;
+        }
+        await svc.createMcqQuestion(
+          {
+            topicId: input.topicId,
+            prompt: item.prompt,
+            options: opts,
+            difficulty: item.difficulty,
+            source: "human",
+            explanation: item.explanation,
+            createdBy: user.id,
+          },
+          tx
+        );
+        inserted += 1;
       }
-      await svc.createMcqQuestion({
-        topicId: input.topicId,
-        prompt: item.prompt,
-        options: opts,
-        difficulty: item.difficulty,
-        source: "human",
-        explanation: item.explanation,
-        createdBy: user.id,
-      });
-      inserted += 1;
-    }
+      return { inserted, skipped };
+    });
     revalidatePath(`/admin/curriculum/topic/${input.topicId}/test`);
     return { ok: true, inserted, skipped };
   } catch (e) {
@@ -136,6 +146,7 @@ export async function generateQuestionsAction(input: {
   topicId: string;
   count: number;
   difficulty: "easy" | "medium" | "hard";
+  fresh?: boolean;
 }): Promise<{ ok: boolean; count?: number; error?: string }> {
   const user = await requireAdmin();
   if (!rateLimit(`gen:${user.id}`, 20, 60_000)) {
@@ -145,7 +156,8 @@ export async function generateQuestionsAction(input: {
     const gen = await generateMcqs(
       input.topicId,
       Math.min(Math.max(input.count, 1), 15),
-      input.difficulty
+      input.difficulty,
+      input.fresh ?? false
     );
     for (const q of gen) {
       await svc.createMcqQuestion({

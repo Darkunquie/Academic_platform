@@ -21,6 +21,7 @@ type Result = {
   answer: string;
   score: number;
   feedback: string;
+  idealAnswer: string;
 };
 
 export function SelfMockInterview({
@@ -59,8 +60,8 @@ export function SelfMockInterview({
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const speechRef = useRef<WebSpeechSession | null>(null);
-
   useEffect(() => {
+    if (presetQuestions) return;
     let cancelled = false;
     (async () => {
       const res = await generateSelfInterviewAction({
@@ -76,7 +77,7 @@ export function SelfMockInterview({
     return () => {
       cancelled = true;
     };
-  }, [text, difficulty]);
+  }, [text, difficulty, presetQuestions]);
 
   const q = questions[idx];
 
@@ -172,6 +173,7 @@ export function SelfMockInterview({
         answer: draft,
         score: res.score,
         feedback: res.feedback,
+        idealAnswer: q.idealAnswer,
       },
     ];
     setResults(next);
@@ -188,9 +190,7 @@ export function SelfMockInterview({
           pdfHash: pdfHash ?? null,
           questions: next.map((r) => ({
             prompt: r.question,
-            idealAnswer:
-              questions.find((qq) => qq.question === r.question)?.idealAnswer ??
-              "",
+            idealAnswer: r.idealAnswer,
             studentAnswer: r.answer,
             score: r.score,
             feedback: r.feedback,

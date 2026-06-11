@@ -31,37 +31,39 @@ export async function createTestAttempt(args: {
   const correct = args.questions.filter((q) => q.isCorrect).length;
   const scorePct = total ? Math.round((correct / total) * 100) : 0;
 
-  const [row] = await db
-    .insert(selfAttempts)
-    .values({
-      studentId: args.studentId,
-      subject: args.subject,
-      topic: args.topic,
-      mode: "test",
-      difficulty: args.difficulty,
-      pdfHash: args.pdfHash,
-      totalQuestions: total,
-      correctCount: correct,
-      scorePct,
-    })
-    .returning({ id: selfAttempts.id });
+  return db.transaction(async (tx) => {
+    const [row] = await tx
+      .insert(selfAttempts)
+      .values({
+        studentId: args.studentId,
+        subject: args.subject,
+        topic: args.topic,
+        mode: "test",
+        difficulty: args.difficulty,
+        pdfHash: args.pdfHash,
+        totalQuestions: total,
+        correctCount: correct,
+        scorePct,
+      })
+      .returning({ id: selfAttempts.id });
 
-  if (args.questions.length > 0) {
-    await db.insert(selfAttemptQuestions).values(
-      args.questions.map((q, i) => ({
-        attemptId: row.id,
-        seq: i,
-        prompt: q.prompt,
-        options: q.options,
-        correctIndex: q.correctIndex,
-        explanation: q.explanation ?? null,
-        studentChoice: q.studentChoice,
-        isCorrect: q.isCorrect,
-      }))
-    );
-  }
+    if (args.questions.length > 0) {
+      await tx.insert(selfAttemptQuestions).values(
+        args.questions.map((q, i) => ({
+          attemptId: row.id,
+          seq: i,
+          prompt: q.prompt,
+          options: q.options,
+          correctIndex: q.correctIndex,
+          explanation: q.explanation ?? null,
+          studentChoice: q.studentChoice,
+          isCorrect: q.isCorrect,
+        }))
+      );
+    }
 
-  return row.id;
+    return row.id;
+  });
 }
 
 export async function createInterviewAttempt(args: {
@@ -76,36 +78,38 @@ export async function createInterviewAttempt(args: {
   const totalScore = args.questions.reduce((s, q) => s + q.score, 0);
   const scorePct = total ? Math.round((totalScore / (total * 10)) * 100) : 0;
 
-  const [row] = await db
-    .insert(selfAttempts)
-    .values({
-      studentId: args.studentId,
-      subject: args.subject,
-      topic: args.topic,
-      mode: "interview",
-      difficulty: args.difficulty,
-      pdfHash: args.pdfHash,
-      totalQuestions: total,
-      correctCount: 0,
-      scorePct,
-    })
-    .returning({ id: selfAttempts.id });
+  return db.transaction(async (tx) => {
+    const [row] = await tx
+      .insert(selfAttempts)
+      .values({
+        studentId: args.studentId,
+        subject: args.subject,
+        topic: args.topic,
+        mode: "interview",
+        difficulty: args.difficulty,
+        pdfHash: args.pdfHash,
+        totalQuestions: total,
+        correctCount: 0,
+        scorePct,
+      })
+      .returning({ id: selfAttempts.id });
 
-  if (args.questions.length > 0) {
-    await db.insert(selfAttemptQuestions).values(
-      args.questions.map((q, i) => ({
-        attemptId: row.id,
-        seq: i,
-        prompt: q.prompt,
-        idealAnswer: q.idealAnswer,
-        studentAnswer: q.studentAnswer,
-        score: q.score,
-        feedback: q.feedback,
-      }))
-    );
-  }
+    if (args.questions.length > 0) {
+      await tx.insert(selfAttemptQuestions).values(
+        args.questions.map((q, i) => ({
+          attemptId: row.id,
+          seq: i,
+          prompt: q.prompt,
+          idealAnswer: q.idealAnswer,
+          studentAnswer: q.studentAnswer,
+          score: q.score,
+          feedback: q.feedback,
+        }))
+      );
+    }
 
-  return row.id;
+    return row.id;
+  });
 }
 
 export function listSelfAttempts(studentId: string) {

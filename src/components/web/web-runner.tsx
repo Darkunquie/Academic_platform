@@ -357,10 +357,25 @@ function TabBtn({
 }
 
 function buildDoc(html: string, css: string, js: string, harness?: string): string {
+  // CSP blocks network exfil (fetch/XHR/WebSocket/beacon) and external resources
+  // from inside the sandboxed preview. Inline script/style still allowed so
+  // student demos + harness can run. Defense-in-depth on top of admin-authored
+  // expression validation in addWebCheckAction.
+  const csp =
+    "default-src 'none'; " +
+    "script-src 'unsafe-inline'; " +
+    "style-src 'unsafe-inline'; " +
+    "img-src data: blob:; " +
+    "font-src data:; " +
+    "connect-src 'none'; " +
+    "frame-src 'none'; " +
+    "base-uri 'none'; " +
+    "form-action 'none'";
   return `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8" />
+<meta http-equiv="Content-Security-Policy" content="${csp}" />
 <style>${css}</style>
 </head>
 <body>
