@@ -6,7 +6,13 @@ import { cacheExists } from "@/lib/cache";
 const { auth } = NextAuth(authConfig);
 
 const PUBLIC_PATHS = ["/", "/login", "/signup"];
-const PUBLIC_PREFIXES = ["/api/auth", "/api/health", "/api/signup"];
+const PUBLIC_PREFIXES = [
+  "/api/auth",
+  "/api/health",
+  "/api/signup",
+  // signup form dropdowns (sections/boards/grades) load pre-auth
+  "/api/curriculum",
+];
 
 function isPublic(pathname: string): boolean {
   if (PUBLIC_PATHS.includes(pathname)) return true;
@@ -57,6 +63,6 @@ export const config = {
      * - _next/static, _next/image, favicon.ico, public/
      * - api routes already protected at handler level
      */
-    "/((?!_next/static|_next/image|favicon.ico|public/).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon|opengraph-image|twitter-image|robots.txt|sitemap.xml|public/).*)",
   ],
 };
