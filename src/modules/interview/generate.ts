@@ -1,14 +1,26 @@
-import { inArray } from "drizzle-orm";
+import { createHash } from "node:crypto";
+import { eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
-import { topics, topicContent } from "@/db/schema";
-import { groqJson, GROQ_MODEL, GROQ_FAST_MODEL } from "@/lib/groq";
+import {
+  topics,
+  topicContent,
+  chapters,
+  subjects,
+  grades,
+  providers,
+} from "@/db/schema";
+import { groqJson, GROQ_MODEL } from "@/lib/groq";
+import { toPlainText } from "@/lib/markdown";
 import { cacheKey, getCached, saveCached } from "@/modules/assessment/cache";
 
 export type GenInterviewQ = { question: string; idealAnswer: string };
 
+const PER_TOPIC_CHARS = 3000;
+const MAX_CTX_CHARS = 12000;
+
 /**
  * Generate interview questions spanning a SET of topics. Cached by the sorted
- * topic-id set + difficulty + count, so the same selection reuses questions.
+ * topic-id set + difficulty + count + content hash (so edits bust the cache).
  */
 export async function generateInterviewQuestions(
   topicIds: string[],
@@ -16,7 +28,43 @@ export async function generateInterviewQuestions(
   difficulty: "easy" | "medium" | "hard"
 ): Promise<{ questions: GenInterviewQ[]; cached: boolean }> {
   const sorted = [...topicIds].sort((a, b) => a.localeCompare(b));
-  const key = cacheKey([...sorted, "interview", difficulty, count]);
+
+  // Pull topics joined with parent chapter / subject / grade / provider so the
+  // prompt can frame questions to the right curriculum scope.
+  const ts = await db
+    .select({
+      id: topics.id,
+      name: topics.name,
+      chapterName: chapters.name,
+      subjectName: subjects.name,
+      gradeName: grades.name,
+      providerName: providers.name,
+    })
+    .from(topics)
+    .innerJoin(chapters, eq(topics.chapterId, chapters.id))
+    .innerJoin(subjects, eq(chapters.subjectId, subjects.id))
+    .innerJoin(grades, eq(subjects.gradeId, grades.id))
+    .innerJoin(providers, eq(grades.providerId, providers.id))
+    .where(inArray(topics.id, sorted));
+
+  const contents = await db
+    .select()
+    .from(topicContent)
+    .where(inArray(topicContent.topicId, sorted));
+  const contentMap = new Map(contents.map((c) => [c.topicId, c.bodyHtml]));
+
+  // Strip markdown to plain text for cleaner token budget + group blocks per
+  // topic. Concatenate, then cap.
+  const blocks = ts.map((t) => {
+    const raw = contentMap.get(t.id) ?? "";
+    const plain = toPlainText(raw).slice(0, PER_TOPIC_CHARS);
+    return `## ${t.chapterName} › ${t.name}\n${plain || "(no body content)"}`;
+  });
+  const ctx = blocks.join("\n\n").slice(0, MAX_CTX_CHARS);
+
+  // Cache key now includes content hash so edits invalidate cached questions.
+  const contentHash = createHash("sha256").update(ctx).digest("hex").slice(0, 16);
+  const key = cacheKey([...sorted, "interview", difficulty, count, contentHash]);
 
   const hit = await getCached(key);
   if (hit) {
@@ -24,41 +72,35 @@ export async function generateInterviewQuestions(
     return { questions: payload.questions ?? [], cached: true };
   }
 
-  const ts = await db.select().from(topics).where(inArray(topics.id, sorted));
-  const contents = await db
-    .select()
-    .from(topicContent)
-    .where(inArray(topicContent.topicId, sorted));
-  const contentMap = new Map(contents.map((c) => [c.topicId, c.bodyHtml]));
-
-  const topicNames = ts.map((t) => t.name).join(", ");
-  let ctx = ts
-    .map((t) => {
-      const body = (contentMap.get(t.id) ?? "").slice(0, 500);
-      return `## ${t.name}\n${body}`;
-    })
-    .join("\n\n")
-    .slice(0, 2000);
+  const first = ts[0];
+  const framing = first
+    ? `Scope: ${first.providerName} ${first.gradeName} ${first.subjectName}.`
+    : "";
+  const topicNames = ts.map((t) => `"${t.name}"`).join(", ");
 
   const system =
-    "You are a friendly but rigorous technical/academic interviewer. Respond with strict JSON only.";
-  const user = `Create ${count} interview questions (difficulty: ${difficulty}) that span these topics: ${topicNames}.
-Use this material when present:
+    "You are a friendly but rigorous academic interviewer. Generate questions grounded strictly in the provided material — do NOT invent topics outside it. Respond with strict JSON only.";
+  const user = `${framing}
+Create ${count} interview questions (difficulty: ${difficulty}) that test understanding of these topics: ${topicNames}.
+
+The material below is authoritative. Base each question on a specific concept, definition, example, or formula from this material. Do not ask about anything that is not present below.
+
 """
 ${ctx || "(no material — use standard curriculum knowledge for these topics)"}
 """
-Mix conceptual and applied questions. Return JSON:
-{"questions":[{"question":"...","idealAnswer":"a concise model answer"}]}`;
+
+Mix conceptual ("what is", "explain", "why"), applied ("how would you", "give an example", "compare"), and short-answer questions. Each idealAnswer must be a 2-4 sentence model response drawn from the material above. Return strict JSON:
+{"questions":[{"question":"...","idealAnswer":"..."}]}`;
 
   const json = await groqJson<{ questions?: GenInterviewQ[] }>({
     system,
     user,
-    model: GROQ_FAST_MODEL,
-    temperature: 0.5,
+    model: GROQ_MODEL,
+    temperature: 0.4,
   });
   const questions = Array.isArray(json.questions) ? json.questions : [];
 
-  await saveCached(key, "interview", { questions }, GROQ_FAST_MODEL);
+  await saveCached(key, "interview", { questions }, GROQ_MODEL);
   return { questions, cached: false };
 }
 
