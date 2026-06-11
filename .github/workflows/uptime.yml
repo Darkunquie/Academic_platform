@@ -1,0 +1,25 @@
+name: uptime
+
+on:
+  schedule:
+    - cron: "*/5 * * * *" # every 5 minutes (GitHub may delay a few min)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check https://preplyfly.com/api/health
+        run: |
+          set -e
+          for i in 1 2 3; do
+            BODY=$(curl -fsS -m 15 https://preplyfly.com/api/health) && break
+            echo "attempt $i failed; retrying in 20s"; sleep 20
+            [ "$i" = "3" ] && { echo "::error::preplyfly.com health check FAILED"; exit 1; }
+          done
+          echo "$BODY"
+          echo "$BODY" | grep -q '"database":"up"' || { echo "::error::site up but database DOWN"; exit 1; }
