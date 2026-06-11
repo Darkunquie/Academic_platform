@@ -28,9 +28,9 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/drizzle ./drizzle
 COPY --from=build /app/drizzle.config.ts ./drizzle.config.ts
 
-# Upload dir must be owned by the runtime user; a named volume mounted here
-# inherits this ownership on first creation (root-owned otherwise → EACCES).
-RUN mkdir -p /app/storage && chown app:app /app/storage
+# Writable dirs for the runtime user: uploads volume inherits this ownership
+# on first creation, and Next's image-optimizer cache lives in .next/cache.
+RUN mkdir -p /app/storage /app/.next/cache && chown -R app:app /app/storage /app/.next/cache
 
 USER app
 EXPOSE 3000
