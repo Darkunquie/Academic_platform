@@ -28,6 +28,10 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/drizzle ./drizzle
 COPY --from=build /app/drizzle.config.ts ./drizzle.config.ts
 
+# Upload dir must be owned by the runtime user; a named volume mounted here
+# inherits this ownership on first creation (root-owned otherwise → EACCES).
+RUN mkdir -p /app/storage && chown app:app /app/storage
+
 USER app
 EXPOSE 3000
 ENV PORT=3000 HOSTNAME=0.0.0.0
