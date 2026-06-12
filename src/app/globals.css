@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&family=Lora:ital,wght@0,400..700;1,400..700&family=Quicksand:wght@300..700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=block");
 @import url("https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css");
 @import "tailwindcss";
@@ -191,6 +191,29 @@ html, body {
   color: var(--color-ink-900);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Landing-page typography utilities */
+.font-serif-warm { font-family: "Lora", Georgia, serif; }
+.font-sans-rounded { font-family: "Quicksand", system-ui, sans-serif; }
+
+.compass-rose-pattern {
+  background-image: radial-gradient(#ad321a 1px, transparent 0.5px);
+  background-size: 30px 30px;
+  background-repeat: repeat;
+  opacity: 0.12;
+}
+
+.coral-accent-text { color: #EE6A47; }
+.bg-coral-accent { background-color: #EE6A47; }
+
+.landing-hero-gradient {
+  background:
+    linear-gradient(to bottom, rgba(28,28,23,0.45), rgba(11,61,46,0.85)),
+    radial-gradient(circle at 30% 40%, rgba(238,106,71,0.4), transparent 40%),
+    radial-gradient(circle at 70% 30%, rgba(168,220,197,0.3), transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(173,50,26,0.3), transparent 45%),
+    #0B3D2E;
 }
 
 /* Decorative utilities */

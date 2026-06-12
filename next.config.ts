@@ -8,7 +8,10 @@ const nextConfig: NextConfig = {
     serverActions: { bodySizeLimit: "20mb" },
   },
   images: {
-    remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }],
+    remotePatterns: [
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
+    ],
   },
 };
 
