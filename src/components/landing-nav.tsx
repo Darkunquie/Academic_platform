@@ -28,7 +28,7 @@ export function LandingNav() {
       <nav className={pillCls}>
         <Link
           href="/"
-          className="font-serif-warm shrink-0 text-xl font-bold tracking-tight"
+          className="shrink-0 text-xl font-bold tracking-tight"
         >
           <Logo size={26} withWordmark={true} />
         </Link>
@@ -40,13 +40,13 @@ export function LandingNav() {
         <div className="flex shrink-0 items-center gap-3">
           <Link
             href="/login"
-            className="font-sans-rounded hidden text-sm font-semibold transition-colors hover:text-coral-accent sm:inline"
+            className="hidden text-sm font-semibold transition-colors hover:text-coral-accent sm:inline"
           >
             Sign in
           </Link>
           <Link
             href="/signup"
-            className="font-sans-rounded inline-flex items-center rounded-full bg-coral-accent px-5 py-2 text-sm font-bold text-white shadow-md transition-all hover:shadow-lg active:scale-95"
+            className="inline-flex items-center rounded-full bg-paper px-5 py-2 text-sm font-bold text-ink-900 shadow-md transition-all hover:bg-white hover:shadow-lg active:scale-95"
           >
             Start for free
           </Link>
@@ -64,7 +64,7 @@ function NavItem({
   return (
     <Link
       href={href}
-      className="font-sans-rounded group inline-flex items-center gap-1.5 text-[13px] font-semibold transition-colors hover:text-coral-accent"
+      className="group inline-flex items-center gap-1.5 text-[13px] font-semibold transition-colors hover:text-coral-accent"
     >
       <span
         className="material-symbols-outlined opacity-80 transition-opacity group-hover:opacity-100"
