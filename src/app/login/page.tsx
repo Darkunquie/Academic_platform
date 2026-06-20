@@ -159,7 +159,7 @@ export default function LoginPage() {
                 fontWeight: 900,
               }}
             >
-              Access Command Center
+              Sign in
             </h2>
             <p
               style={{

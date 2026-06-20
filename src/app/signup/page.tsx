@@ -59,8 +59,8 @@ export default function SignupPage() {
               color: "#779fad",
             }}
           >
-            Join preplyfly to access our technical curriculum and command center
-            for academic excellence. Structured. Precise. Rigorous.
+            Join preplyfly to access our technical curriculum for academic
+            excellence. Structured. Precise. Rigorous.
           </p>
           <div className="mt-12 grid grid-cols-2 gap-6">
             <div className="border-l-2 pl-4" style={{ borderColor: "#785a00" }}>
@@ -184,7 +184,7 @@ export default function SignupPage() {
               className="font-bold hover:underline"
               style={{ color: "#785a00" }}
             >
-              Access Command Center
+              Sign in
             </Link>
           </p>
         </div>
