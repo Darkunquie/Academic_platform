@@ -1,0 +1,23 @@
+name: deploy
+
+# Auto-deploy to the VPS on every push to main.
+# Calls Coolify's deploy API (runs on GitHub's servers, so the campus
+# firewall is irrelevant). Needs repo secret COOLIFY_TOKEN.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  trigger-coolify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Coolify deploy
+        run: |
+          set -e
+          code=$(curl -s -o /tmp/resp.json -w '%{http_code}' -X GET \
+            "https://coolify.preplyfly.com/api/v1/deploy?uuid=lre11suzsjw47j1uenue9agn&force=false" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}")
+          echo "HTTP $code"; cat /tmp/resp.json; echo
+          [ "$code" = "200" ] || { echo "::error::Coolify deploy trigger failed ($code)"; exit 1; }
+          echo "Deploy queued on Coolify."
