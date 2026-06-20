@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { LandingNav } from "@/components/landing-nav";
+import {
+  TextHoverEffect,
+  FooterBackgroundGradient,
+} from "@/components/ui/hover-footer";
 
 export default function Home() {
   return (
-    <div className="bg-paper text-ink-900">
+    <div className="relative bg-paper text-ink-900">
       <LandingNav />
 
       <main className="relative">
@@ -12,8 +16,6 @@ export default function Home() {
         <ProductPreview />
         <SplitTestimonialsVisual />
         <HowItWorks />
-        <FAQSection />
-        <BetaBanner />
       </main>
 
       <SiteFooter />
@@ -31,7 +33,7 @@ function Hero() {
       className="relative flex h-screen min-h-[640px] w-full flex-col justify-center pt-20"
       style={{
         backgroundImage:
-          "linear-gradient(to bottom, rgba(28,28,23,0.3), rgba(28,28,23,0.6)), url('https://images.unsplash.com/photo-1491841573634-28140fc7ced7?q=80&w=2070&auto=format&fit=crop')",
+          "linear-gradient(to right, rgba(248,246,241,0.92) 0%, rgba(248,246,241,0.65) 35%, rgba(248,246,241,0.15) 60%, rgba(248,246,241,0) 100%), url('/hero-bg.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -40,20 +42,38 @@ function Hero() {
 
       <div className="relative mx-auto w-full max-w-[1440px] px-4 md:px-6 lg:px-8">
         <div className="max-w-5xl text-left">
-          <h1 className="mb-6 text-6xl font-bold leading-tight text-white md:text-7xl lg:text-8xl">
+          <div className="mb-6">
+            <span className="inline-flex items-center gap-2 rounded-full border border-coral-300/50 bg-white/80 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-coral-accent shadow-sm backdrop-blur-sm">
+              <span
+                className="material-symbols-outlined"
+                style={{ fontSize: "14px" }}
+              >
+                auto_awesome
+              </span>
+              <span>Free during beta · No credit card</span>
+            </span>
+          </div>
+          <h1 className="mb-8 text-5xl font-bold leading-tight text-ink-900 md:text-6xl lg:text-7xl">
             Nurturing India&apos;s <br />
             brightest minds.{" "}
-            <span className="text-[#4CBB17]">From step one</span> to
-            your <br />
-            dream career.
+           <br/> <span className="text-[#1F8765]">From step one</span><br/> to
+            your dream career. <br />
+           
           </h1>
-          <p className="mb-10 text-2xl text-coral-100 md:text-3xl">
+          <p className="mb-6 text-lg text-ink-700 md:text-xl">
             Compassionate mentoring · Stress-free tests · Supportive community…
           </p>
+          <div className="mb-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-ink-700">
+            <TrustItem icon="groups" label="12,000+ students" />
+            <span className="text-ink-300">·</span>
+            <TrustItem icon="school" label="50+ boards & exams" />
+            <span className="text-ink-300">·</span>
+            <TrustItem icon="lock" label="Private by default" />
+          </div>
           <div className="flex flex-col items-stretch gap-6 sm:flex-row sm:items-center">
             <Link
               href="/signup"
-              className="group inline-flex items-center justify-center gap-2 rounded-full bg-paper px-8 py-4 font-bold text-ink-900 shadow-xl transition-all hover:bg-white active:scale-95"
+              className="group inline-flex items-center justify-center gap-2 rounded-full bg-coral-accent px-8 py-4 font-bold text-white shadow-xl transition-all hover:opacity-95 active:scale-95"
             >
               Begin your journey
               <span
@@ -65,7 +85,7 @@ function Hero() {
             </Link>
             <Link
               href="#product"
-              className="group inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-white"
+              className="group inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-ink-900"
             >
               See how it works
               <span
@@ -78,42 +98,24 @@ function Hero() {
           </div>
         </div>
       </div>
-
-      {/* Stage strip floating bottom */}
-      <div className="relative z-10 mt-auto w-full border-t border-white/20 bg-white/10 py-4 backdrop-blur-md">
-        <div className="mx-auto flex max-w-[1440px] items-center gap-3 overflow-x-auto whitespace-nowrap px-4 md:px-6 lg:px-8">
-          <StageTab label="Foundation" active />
-          <StageTab label="Middle Years" />
-          <StageTab label="Senior School" />
-          <StageTab label="Undergrad" />
-          <StageTab label="Graduate Life" />
-        </div>
-      </div>
     </section>
   );
 }
 
-function StageTab({
+function TrustItem({
+  icon,
   label,
-  active,
-}: Readonly<{ label: string; active?: boolean }>) {
-  if (active) {
-    return (
-      <button
-        type="button"
-        className="flex-1 rounded-full bg-white px-6 py-3 text-sm font-bold text-ink-900 shadow-lg"
-      >
-        {label}
-      </button>
-    );
-  }
+}: Readonly<{ icon: string; label: string }>) {
   return (
-    <button
-      type="button"
-      className="flex-1 rounded-full border border-white/30 px-6 py-3 text-sm text-white transition-all hover:bg-white/20"
-    >
-      {label}
-    </button>
+    <span className="inline-flex items-center gap-1.5">
+      <span
+        className="material-symbols-outlined text-primary-700"
+        style={{ fontSize: "18px" }}
+      >
+        {icon}
+      </span>
+      <span className="font-semibold">{label}</span>
+    </span>
   );
 }
 
@@ -239,11 +241,10 @@ function SplitTestimonialsVisual() {
       <div className="relative min-h-[450px] overflow-hidden lg:h-auto">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          alt="Cozy home study environment with warm sunlight"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEaSsNPKgaLYsnQW6VBbyQVUqz0HQcxUFRDIJoJqkugEXmaAtJe-k8Zmq6T9up1bgY_Q79fcNufw5e0b8oHF_6HEEdinNS0yinK9CW8YXe64ydk-qqNeBKNPN8CbA3D9NsekbUyrMOmutmdIT0teByII-pVbY9ahtmrWkK2R5VSNFuNvMNZzNQ5RocWj3OC51CMjYRjB8-ULCb4I5mPnsWg2ZldIUTn2y1zUjujK2_SxvGaMGTOORqvEONz1lKatLG4Z4gx2lVJYDH"
+          alt="Young student preparing for exam at home study desk"
+          src="/student-study.png"
           className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-primary-900/10 backdrop-blur-[2px]" />
       </div>
 
       <div className="border-t border-ink-200 bg-ink-100 px-6 py-24 md:px-8 lg:border-l lg:border-t-0">
@@ -556,195 +557,198 @@ function TopicMockCard({
   );
 }
 
-/* -------------------- FAQ -------------------- */
+/* ---------------------- FOOTER --------------------- */
 
-function FAQSection() {
-  const items: { q: string; a: string }[] = [
+function SiteFooter() {
+  const footerLinks = [
     {
-      q: "Who is Preplyfly for?",
-      a: "Indian students from CBSE Class 1 all the way to graduate-level professional certifications. Pick your stage, board, and we tailor everything.",
+      title: "Product",
+      links: [
+        { label: "What's Inside", href: "#product" },
+        { label: "Philosophy", href: "#philosophy" },
+        { label: "How it works", href: "#how-it-works" },
+      ],
     },
     {
-      q: "Is it free to use?",
-      a: "Yes — early access is completely free during beta. Paid plans will roll out later with a generous free tier always preserved for students.",
+      title: "Learn",
+      links: [
+        { label: "Stories", href: "#stories" },
+        { label: "How it works", href: "#how-it-works" },
+        { label: "Sign up", href: "/signup" },
+      ],
+    },
+  ];
+
+  const contactInfo = [
+    {
+      icon: "mail",
+      text: "hello@preplyfly.com",
+      href: "mailto:hello@preplyfly.com",
     },
     {
-      q: "What makes Preplyfly different from other prep apps?",
-      a: "Three things: voice interview coach with real-time empathetic feedback, hands-on coding studio with LeetCode-style problems, and self-upload — drop your own PDFs and we generate quizzes from them.",
+      icon: "language",
+      text: "alphabetmobility.org",
+      href: "https://alphabetmobility.org/",
     },
     {
-      q: "Do I need a webcam or microphone?",
-      a: "Only for the voice interview feature, which uses your browser microphone. Everything else works on any device with a browser.",
-    },
-    {
-      q: "Is my data safe?",
-      a: "All uploads stay private to your account. We never share your study material, performance, or personal data with third parties.",
-    },
-    {
-      q: "Can I cancel any time?",
-      a: "Absolutely. No lock-in. Beta is free and any future paid plan is month-to-month.",
+      icon: "place",
+      text: "Made in India",
     },
   ];
 
   return (
-    <section id="faq" className="bg-ink-100 py-32">
-      <div className="mx-auto max-w-3xl px-6 md:px-8">
-        <div className="mb-14 text-center">
-          <span className="text-sm font-semibold uppercase tracking-widest text-coral-accent">
-            Honest Answers
-          </span>
-          <h2 className="mt-4 text-4xl font-bold leading-tight text-ink-900 md:text-5xl">
-            Questions, answered.
-          </h2>
-        </div>
-        <div className="space-y-4">
-          {items.map((it) => (
-            <details
-              key={it.q}
-              className="group rounded-2xl border border-ink-200 bg-white p-6 shadow-sm transition-shadow open:shadow-md"
+    <footer className="relative m-4 h-fit overflow-hidden rounded-2xl bg-primary-950 text-paper md:m-6">
+      <FooterBackgroundGradient />
+
+      <div className="relative z-40 mx-auto max-w-7xl p-6 md:p-8">
+        <div className="grid grid-cols-1 gap-8 pb-6 md:grid-cols-2 md:gap-6 lg:grid-cols-4 lg:gap-10">
+          <div className="flex flex-col space-y-3">
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl font-extrabold text-coral-accent">
+                ✦
+              </span>
+              <span className="text-2xl font-bold text-white">Preplyfly</span>
+            </div>
+            <p className="text-sm leading-relaxed text-paper/70">
+              Compassionate mentoring, stress-free tests, supportive community —
+              for every Indian learner.
+            </p>
+            <a
+              href="https://alphabetmobility.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-primary-200 hover:text-coral-accent"
             >
-              <summary className="flex cursor-pointer items-center justify-between gap-4 text-lg font-bold text-ink-900">
-                {it.q}
-                <span
-                  className="material-symbols-outlined text-coral-accent transition-transform group-open:rotate-45"
-                  style={{ fontSize: "24px" }}
-                >
-                  add
-                </span>
-              </summary>
-              <p className="mt-4 text-base leading-relaxed text-ink-700">
-                {it.a}
-              </p>
-            </details>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* -------------------- BETA BANNER -------------------- */
-
-function BetaBanner() {
-  return (
-    <section id="join" className="px-6 py-24 md:px-8">
-      <div className="relative mx-auto max-w-5xl overflow-hidden rounded-3xl bg-primary-900 p-12 text-center text-white shadow-2xl">
-        <div className="compass-rose-pattern pointer-events-none absolute inset-0 brightness-0 invert" />
-        <div className="relative z-10">
-          <h2 className="mb-4 text-5xl">
-            You&apos;re not alone.
-          </h2>
-          <p className="mb-10 text-2xl italic opacity-90">
-            Join our supportive community today. Early access is free.
-          </p>
-          <form
-            action="/signup"
-            method="get"
-            className="mx-auto flex max-w-xl flex-col items-center justify-center gap-4 md:flex-row"
-          >
-            <input
-              type="email"
-              name="email"
-              placeholder="Your email address"
-              required
-              className="w-full rounded-full border-none px-6 py-4 text-ink-900 focus:ring-2 focus:ring-coral-300"
-            />
-            <button
-              type="submit"
-              className="inline-flex w-full items-center justify-center whitespace-nowrap rounded-full bg-coral-accent px-8 py-4 font-bold text-white transition-all hover:shadow-xl active:scale-95 md:w-auto"
-            >
-              Reserve My Spot
-            </button>
-          </form>
-          <p className="mt-6 text-xs font-semibold uppercase tracking-widest opacity-70">
-            12,000+ students supporting each other
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------------------- FOOTER --------------------- */
-
-function SiteFooter() {
-  return (
-    <footer className="border-t border-ink-200 bg-paper">
-      <div className="mx-auto grid max-w-[1280px] grid-cols-2 gap-6 px-6 py-16 md:grid-cols-4 md:px-8">
-        <div className="col-span-2 md:col-span-1">
-          <div className="mb-4 text-2xl font-bold text-ink-900">
-            Preplyfly
+              <span>A product of Alphabet Mobility</span>
+              <span
+                className="material-symbols-outlined"
+                style={{ fontSize: "14px" }}
+              >
+                arrow_outward
+              </span>
+            </a>
           </div>
-          <p className="max-w-xs text-sm text-ink-700">
-            Transforming the academic journey through empathy and personalized
-            technology.
+
+          {footerLinks.map((section) => (
+            <div key={section.title}>
+              <h4 className="mb-4 text-base font-semibold text-white">
+                {section.title}
+              </h4>
+              <ul className="space-y-2 text-sm text-paper/70">
+                {section.links.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="transition-colors hover:text-coral-accent"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+
+          <div>
+            <h4 className="mb-4 text-base font-semibold text-white">
+              Contact Us
+            </h4>
+            <ul className="space-y-2.5 text-sm text-paper/70">
+              {contactInfo.map((item) => (
+                <li
+                  key={item.text}
+                  className="flex items-center space-x-3"
+                >
+                  <span
+                    className="material-symbols-outlined text-coral-accent"
+                    style={{ fontSize: "18px" }}
+                  >
+                    {item.icon}
+                  </span>
+                  {item.href ? (
+                    <a
+                      href={item.href}
+                      target={
+                        item.href.startsWith("http") ? "_blank" : undefined
+                      }
+                      rel={
+                        item.href.startsWith("http")
+                          ? "noopener noreferrer"
+                          : undefined
+                      }
+                      className="transition-colors hover:text-coral-accent"
+                    >
+                      {item.text}
+                    </a>
+                  ) : (
+                    <span>{item.text}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <hr className="my-5 border-t border-paper/15" />
+
+        <div className="flex flex-col items-center justify-between space-y-4 text-sm text-paper/60 md:flex-row md:space-y-0">
+          <div className="flex space-x-5">
+            <Link
+              href="/login"
+              aria-label="Sign in"
+              className="transition-colors hover:text-coral-accent"
+            >
+              <span
+                className="material-symbols-outlined"
+                style={{ fontSize: "20px" }}
+              >
+                login
+              </span>
+            </Link>
+            <Link
+              href="/signup"
+              aria-label="Sign up"
+              className="transition-colors hover:text-coral-accent"
+            >
+              <span
+                className="material-symbols-outlined"
+                style={{ fontSize: "20px" }}
+              >
+                person_add
+              </span>
+            </Link>
+            <Link
+              href="#product"
+              aria-label="Product"
+              className="transition-colors hover:text-coral-accent"
+            >
+              <span
+                className="material-symbols-outlined"
+                style={{ fontSize: "20px" }}
+              >
+                widgets
+              </span>
+            </Link>
+          </div>
+
+          <p className="text-center md:text-left">
+            © {new Date().getFullYear()}{" "}
+            <a
+              href="https://alphabetmobility.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-coral-accent"
+            >
+              Alphabet Mobility
+            </a>
+            <span>. All rights reserved.</span>
           </p>
         </div>
-        <FooterCol
-          heading="Product"
-          links={[
-            ["What's Inside", "#product"],
-            ["Philosophy", "#philosophy"],
-            ["How it works", "#how-it-works"],
-          ]}
-        />
-        <FooterCol
-          heading="Learn"
-          links={[
-            ["FAQ", "#faq"],
-            ["Stories", "#stories"],
-            ["Join beta", "#join"],
-          ]}
-        />
-        <FooterCol
-          heading="Account"
-          links={[
-            ["Sign in", "/login"],
-            ["Sign up", "/signup"],
-          ]}
-        />
       </div>
-      <div className="mx-auto flex max-w-[1280px] flex-col items-center justify-between gap-4 border-t border-ink-200 px-6 py-8 text-xs font-semibold uppercase tracking-wider text-ink-700 md:flex-row md:px-8">
-        <span className="">
-          © 2026 Preplyfly · Rooted in Empathy · Made in India
-        </span>
-        <div className="flex gap-6">
-          <Link href="/login" className="hover:text-coral-accent">
-            Sign in
-          </Link>
-          <Link href="/signup" className="hover:text-coral-accent">
-            Sign up
-          </Link>
-          <Link href="#faq" className="hover:text-coral-accent">
-            FAQ
-          </Link>
-        </div>
+
+      <div className="-mb-24 -mt-32 hidden h-[20rem] lg:flex">
+        <TextHoverEffect text="Preplyfly" className="z-50" />
       </div>
     </footer>
-  );
-}
-
-function FooterCol({
-  heading,
-  links,
-}: Readonly<{ heading: string; links: [string, string][] }>) {
-  return (
-    <div>
-      <div className="mb-6 text-xs font-bold uppercase tracking-widest text-ink-900">
-        {heading}
-      </div>
-      <ul className="space-y-4">
-        {links.map(([label, href]) => (
-          <li key={label}>
-            <Link
-              href={href}
-              className="text-xs font-semibold uppercase tracking-wider text-ink-700 transition-colors hover:text-coral-accent"
-            >
-              {label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }
