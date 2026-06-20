@@ -63,6 +63,6 @@ export const config = {
      * - _next/static, _next/image, favicon.ico, public/
      * - api routes already protected at handler level
      */
-    "/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon|opengraph-image|twitter-image|robots.txt|sitemap.xml|public/).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon|opengraph-image|twitter-image|robots.txt|sitemap.xml|public/|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|woff2?|ttf|otf|mp4|webm|pdf)).*)",
   ],
 };
