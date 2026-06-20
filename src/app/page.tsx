@@ -30,12 +30,12 @@ export default function Home() {
 function Hero() {
   return (
     <section
-      className="relative flex h-screen min-h-[640px] w-full flex-col justify-center pt-20"
+      className="relative flex h-screen min-h-[640px] w-full flex-col justify-center pt-28 md:pt-24"
       style={{
         backgroundImage:
-          "linear-gradient(to right, rgba(248,246,241,0.92) 0%, rgba(248,246,241,0.65) 35%, rgba(248,246,241,0.15) 60%, rgba(248,246,241,0) 100%), url('/hero-bg.png')",
+          "linear-gradient(to bottom right, rgba(248,246,241,0.95) 0%, rgba(248,246,241,0.78) 30%, rgba(248,246,241,0.35) 60%, rgba(248,246,241,0.1) 100%), url('/hero-bg.png')",
         backgroundSize: "cover",
-        backgroundPosition: "center",
+        backgroundPosition: "center right",
         backgroundRepeat: "no-repeat",
       }}
     >
@@ -462,14 +462,14 @@ function ProductPreview() {
               </div>
 
               <div className="mt-6 rounded-2xl border border-primary-200 bg-primary-50 p-5">
-                <div className="flex items-start gap-3">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
                   <span
                     className="material-symbols-outlined text-primary-700"
                     style={{ fontSize: "24px" }}
                   >
                     auto_awesome
                   </span>
-                  <div>
+                  <div className="flex-1">
                     <div className="text-sm font-bold text-primary-900">
                       AI Recommendation
                     </div>
@@ -479,7 +479,7 @@ function ProductPreview() {
                   </div>
                   <button
                     type="button"
-                    className="ml-auto whitespace-nowrap rounded-full bg-primary-700 px-4 py-2 text-xs font-bold text-white"
+                    className="whitespace-nowrap self-start rounded-full bg-primary-700 px-4 py-2 text-xs font-bold text-white sm:self-center"
                   >
                     Start mock
                   </button>
