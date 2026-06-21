@@ -154,7 +154,7 @@ export function CodeRunner({
       </div>
 
       {/* Console / Results panel */}
-      <div className="max-h-[40%] min-h-[180px] overflow-hidden border-t border-[#262B35] bg-[#161A21]">
+      <div className="max-h-[35%] min-h-[140px] overflow-hidden border-t border-[#262B35] bg-[#161A21] md:max-h-[40%] md:min-h-[180px]">
         <div className="flex items-center gap-1 border-b border-[#262B35] px-2 py-1.5">
           <TabBtn
             active={activeTab === "tests"}
@@ -228,7 +228,7 @@ export function CodeRunner({
                     </span>
                     Case {i + 1}
                   </div>
-                  <div className="grid gap-2 sm:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
                     <Cell label="Input" value={s.stdin || "(empty)"} />
                     <Cell label="Expected" value={s.expected} />
                     <Cell label="Output" value={s.got || "(no output)"} bad={!s.ok} />

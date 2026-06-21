@@ -205,6 +205,9 @@ html, body {
   background-repeat: repeat;
   opacity: 0.12;
 }
+@media (max-width: 640px) {
+  .compass-rose-pattern { background-size: 20px 20px; }
+}
 
 .coral-accent-text { color: #EE6A47; }
 .bg-coral-accent { background-color: #EE6A47; }

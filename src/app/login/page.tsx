@@ -45,13 +45,10 @@ export default function LoginPage() {
             </span>
           </div>
           <h1
-            className="mb-6 text-white"
+            className="mb-6 text-3xl font-black leading-tight text-white md:text-5xl"
             style={{
               fontFamily: "Geist, sans-serif",
-              fontSize: "48px",
-              lineHeight: 1.1,
               letterSpacing: "-0.05em",
-              fontWeight: 900,
             }}
           >
             Pick up where you left.
@@ -122,7 +119,7 @@ export default function LoginPage() {
       </section>
 
       {/* Right Panel — form */}
-      <section className="flex w-full items-center justify-center bg-white p-6 pb-32 md:w-1/2 md:p-12 md:pb-32">
+      <section className="flex w-full items-center justify-center bg-white p-6 pb-12 md:w-1/2 md:p-12 md:pb-32">
         <div className="w-full max-w-md">
           {/* Top actions */}
           <div className="mb-10 flex items-center justify-between">

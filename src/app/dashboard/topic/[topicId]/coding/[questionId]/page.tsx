@@ -81,7 +81,7 @@ export default async function StudentCodingSolvePage({
             {prev && (
               <Link
                 href={`/dashboard/topic/${topicId}/coding/${prev.id}`}
-                className="inline-flex h-8 items-center gap-1 rounded-xl border border-slate-300 bg-white px-2.5 text-[11px] font-black text-solar-text-dark transition-colors hover:border-blue-800 hover:text-blue-800"
+                className="inline-flex h-10 items-center gap-1 rounded-xl border border-slate-300 bg-white px-3 text-[11px] font-black text-solar-text-dark transition-colors hover:border-blue-800 hover:text-blue-800 md:h-8 md:px-2.5"
                 title={prev.title}
               >
                 <span
@@ -99,7 +99,7 @@ export default async function StudentCodingSolvePage({
             {next && (
               <Link
                 href={`/dashboard/topic/${topicId}/coding/${next.id}`}
-                className="inline-flex h-8 items-center gap-1 rounded-xl border border-slate-300 bg-white px-2.5 text-[11px] font-black text-solar-text-dark transition-colors hover:border-blue-800 hover:text-blue-800"
+                className="inline-flex h-10 items-center gap-1 rounded-xl border border-slate-300 bg-white px-3 text-[11px] font-black text-solar-text-dark transition-colors hover:border-blue-800 hover:text-blue-800 md:h-8 md:px-2.5"
                 title={next.title}
               >
                 Next{" "}
@@ -207,7 +207,7 @@ export default async function StudentCodingSolvePage({
         </section>
 
         {/* RIGHT — Editor + console */}
-        <section className="flex min-h-[640px] flex-col">
+        <section className="flex min-h-[400px] flex-col md:min-h-[640px]">
           <CodeRunner
             questionId={questionId}
             languages={question.languages as string[]}

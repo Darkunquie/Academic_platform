@@ -122,7 +122,8 @@ export default async function StudentCodingListPage({
 
         {/* Problem table */}
         <div className="solar-card overflow-hidden rounded-xxl bg-white">
-          <header className="grid grid-cols-[60px_minmax(0,1fr)_120px_120px_60px] items-center gap-4 border-b border-solar-card bg-solar-text-dark px-5 py-3 text-[10px] font-black text-white">
+          <div className="overflow-x-auto">
+          <header className="grid min-w-[640px] grid-cols-[60px_minmax(0,1fr)_120px_120px_60px] items-center gap-4 border-b border-solar-card bg-solar-text-dark px-5 py-3 text-[10px] font-black text-white">
             <span>Status</span>
             <span>Title</span>
             <span>Difficulty</span>
@@ -148,7 +149,7 @@ export default async function StudentCodingListPage({
                   <li key={q.id}>
                     <Link
                       href={`/dashboard/topic/${topicId}/coding/${q.id}`}
-                      className="group grid grid-cols-[60px_minmax(0,1fr)_120px_120px_60px] items-center gap-4 px-5 py-4 transition-colors hover:bg-slate-50"
+                      className="group grid min-w-[640px] grid-cols-[60px_minmax(0,1fr)_120px_120px_60px] items-center gap-4 px-5 py-4 transition-colors hover:bg-slate-50"
                     >
                       <span
                         className={
@@ -189,6 +190,7 @@ export default async function StudentCodingListPage({
               })}
             </ul>
           )}
+          </div>
         </div>
       </main>
     </div>

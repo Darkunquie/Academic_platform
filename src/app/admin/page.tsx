@@ -61,13 +61,10 @@ export default async function AdminHome() {
           01 — Control room
         </p>
         <h1
-          className="text-primary-900"
+          className="text-3xl font-normal leading-tight text-primary-900 md:text-5xl lg:text-[60px] lg:leading-[64px]"
           style={{
             fontFamily: "var(--font-serif)",
-            fontSize: "60px",
-            lineHeight: "64px",
             letterSpacing: "-0.02em",
-            fontWeight: 400,
           }}
         >
           The platform, at a{" "}

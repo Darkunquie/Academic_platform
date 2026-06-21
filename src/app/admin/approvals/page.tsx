@@ -17,13 +17,10 @@ export default async function ApprovalsPage() {
           {pending.length === 1 ? "" : "s"}
         </p>
         <h1
-          className="text-primary-900"
+          className="text-3xl font-normal leading-tight text-primary-900 md:text-4xl lg:text-[52px] lg:leading-[56px]"
           style={{
             fontFamily: "var(--font-serif)",
-            fontSize: "52px",
-            lineHeight: "56px",
             letterSpacing: "-0.02em",
-            fontWeight: 400,
           }}
         >
           Approvals{" "}

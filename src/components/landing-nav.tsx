@@ -31,7 +31,7 @@ export function LandingNav() {
             href="/"
             className="shrink-0 text-xl font-bold tracking-tight"
           >
-            <Logo size={26} withWordmark={true} />
+            <Logo size={22} withWordmark={true} />
           </Link>
           <div className="hidden items-center gap-6 md:flex">
             <NavItem href="#philosophy" label="Mentorship" icon="diversity_3" />

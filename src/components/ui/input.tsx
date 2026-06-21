@@ -8,7 +8,7 @@ export const Input = React.forwardRef<
   <input
     ref={ref}
     className={cn(
-      "w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500",
+      "w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-base outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 sm:py-2 sm:text-sm",
       className
     )}
     {...props}
@@ -33,7 +33,7 @@ export const Select = React.forwardRef<
   <select
     ref={ref}
     className={cn(
-      "w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100",
+      "w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-base outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 sm:py-2 sm:text-sm",
       className
     )}
     {...props}

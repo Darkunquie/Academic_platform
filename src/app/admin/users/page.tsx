@@ -61,13 +61,10 @@ export default async function AdminUsersPage({
             01 — User management
           </p>
           <h1
-            className="text-primary-900"
+            className="text-2xl font-normal leading-tight text-primary-900 md:text-4xl lg:text-[42px] lg:leading-[46px]"
             style={{
               fontFamily: "var(--font-serif)",
-              fontSize: "42px",
-              lineHeight: "46px",
               letterSpacing: "-0.01em",
-              fontWeight: 400,
             }}
           >
             People
@@ -134,7 +131,8 @@ export default async function AdminUsersPage({
       </form>
 
       <div className="overflow-hidden rounded-[20px] border border-ink-200 bg-white soft-shadow">
-        <header className="grid grid-cols-[minmax(0,2fr)_1fr_1fr_1fr_120px] gap-3 border-b border-ink-200 bg-ink-900 px-5 py-3 text-[10px] text-white">
+        <div className="overflow-x-auto">
+        <header className="grid min-w-[720px] grid-cols-[minmax(0,2fr)_1fr_1fr_1fr_120px] gap-3 border-b border-ink-200 bg-ink-900 px-5 py-3 text-[10px] text-white">
           <span style={{ fontFamily: "var(--font-mono)", }}>
             User
           </span>
@@ -171,7 +169,7 @@ export default async function AdminUsersPage({
             </p>
           </div>
         ) : (
-          <ul>
+          <ul className="min-w-[720px]">
             {rows.map((u) => (
               <UserRow
                 key={u.id}
@@ -184,6 +182,7 @@ export default async function AdminUsersPage({
             ))}
           </ul>
         )}
+        </div>
       </div>
 
       {!isSuper && (

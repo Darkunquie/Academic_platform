@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { getGradeChain } from "@/modules/curriculum/admin";
 import { LogoutButton } from "./logout-button";
+import { StudentNavDrawer } from "./student-nav-drawer";
 
 export async function StudentHeader({
   active,
@@ -76,9 +77,9 @@ export async function StudentHeader({
           />
         </nav>
       </div>
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-3 lg:gap-6">
         {grade && (
-          <div className="hidden items-center gap-2 rounded-full border border-solar-ink/20 bg-solar-card px-4 py-2 md:flex">
+          <div className="hidden items-center gap-2 rounded-full border border-solar-ink/20 bg-solar-card px-4 py-2 lg:flex">
             <span
               className="material-symbols-outlined text-sm text-solar-amber"
               style={{ fontSize: "16px" }}
@@ -90,17 +91,23 @@ export async function StudentHeader({
             </span>
           </div>
         )}
-        <div className="flex items-center gap-3">
+        <div className="hidden items-center gap-3 lg:flex">
           <div className="h-10 w-10 rounded-full border-2 border-solar-amber p-0.5">
             <span className="flex h-full w-full items-center justify-center rounded-full bg-solar-text-dark text-[11px] font-black text-white">
               {initials || "?"}
             </span>
           </div>
-          <span className="hidden text-sm font-bold text-solar-text-dark md:inline">
+          <span className="text-sm font-bold text-solar-text-dark">
             {user?.name?.split(" ")[0] ?? "Account"}
           </span>
           <LogoutButton />
         </div>
+        <StudentNavDrawer
+          active={active}
+          gradeLabel={grade ? `${grade.name} · ${grade.providerName}` : undefined}
+          userName={user?.name ?? undefined}
+          initials={initials || "?"}
+        />
       </div>
     </header>
   );

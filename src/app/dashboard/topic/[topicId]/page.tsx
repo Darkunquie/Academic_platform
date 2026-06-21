@@ -144,13 +144,8 @@ export default async function StudentTopicPage({
               Topic · {topic.chapterName}
             </span>
             <h1
-              className="text-solar-text-dark"
-              style={{
-                fontSize: "80px",
-                fontWeight: 900,
-                lineHeight: 0.9,
-                letterSpacing: "-0.04em",
-              }}
+              className="text-4xl font-black leading-tight text-solar-text-dark md:text-6xl lg:text-[80px] lg:leading-[0.9]"
+              style={{ letterSpacing: "-0.04em" }}
             >
               {topic.name}
             </h1>
@@ -257,7 +252,7 @@ export default async function StudentTopicPage({
                     <iframe
                       src={`/api/assets/${a.id}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`}
                       title={a.filename}
-                      className="h-[820px] w-full bg-slate-100"
+                      className="h-[500px] w-full bg-slate-100 md:h-[820px]"
                       loading="lazy"
                     />
                   </article>
@@ -327,8 +322,8 @@ export default async function StudentTopicPage({
         </div>
 
         {/* RIGHT — sticky sidebar 320px (NEW design) */}
-        <aside className="hidden w-full lg:block lg:w-80">
-          <div className="sticky top-24 flex flex-col gap-6">
+        <aside className="w-full lg:w-80">
+          <div className="flex flex-col gap-6 lg:sticky lg:top-24">
             {/* Module Progress ring */}
             <div className="solar-card rounded-xxl bg-white p-6">
               <div className="mb-4 flex items-center justify-between">
@@ -343,7 +338,7 @@ export default async function StudentTopicPage({
                 </span>
               </div>
               <div className="mb-4 flex justify-center">
-                <div className="relative h-32 w-32">
+                <div className="relative h-24 w-24 md:h-32 md:w-32">
                   <svg className="h-full w-full" viewBox="0 0 100 100">
                     <circle
                       cx="50"

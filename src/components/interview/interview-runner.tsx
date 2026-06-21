@@ -406,7 +406,7 @@ export function InterviewRunner({
                 type="button"
                 onClick={startRec}
                 disabled={transcribing}
-                className="inline-flex items-center gap-2 rounded-full bg-primary-700 px-4 py-2 text-[13px] font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-primary-900 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-primary-700 px-5 py-2.5 text-[13px] font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-primary-900 disabled:cursor-not-allowed disabled:opacity-60 md:min-h-0 md:px-4 md:py-2"
               >
                 <span
                   className="material-symbols-outlined"
@@ -423,7 +423,7 @@ export function InterviewRunner({
               <button
                 type="button"
                 onClick={stopRec}
-                className="inline-flex items-center gap-2 rounded-full bg-coral-700 px-4 py-2 text-[13px] font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-coral-500"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-coral-700 px-5 py-2.5 text-[13px] font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-coral-500 md:min-h-0 md:px-4 md:py-2"
               >
                 <span
                   className="material-symbols-outlined"

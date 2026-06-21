@@ -315,7 +315,7 @@ export function SignupForm() {
           )}
 
           <div
-            className="flex max-h-60 flex-wrap gap-2 overflow-y-auto rounded-lg border p-2"
+            className="flex max-h-80 flex-wrap gap-2 overflow-y-auto rounded-lg border p-2 sm:max-h-60"
             style={{ borderColor: "#cbd5e1", backgroundColor: "#e1f7ff" }}
           >
             {filteredProviders.length === 0 ? (

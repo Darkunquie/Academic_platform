@@ -57,12 +57,9 @@ export default async function ChapterPage({
           Chapter · {items.length} {items.length === 1 ? "topic" : "topics"}
         </p>
         <h1
-          className="text-primary-900"
+          className="text-2xl font-normal leading-tight text-primary-900 md:text-3xl lg:text-[42px] lg:leading-[48px]"
           style={{
             fontFamily: "var(--font-serif)",
-            fontSize: "42px",
-            lineHeight: "48px",
-            fontWeight: 400,
             letterSpacing: "-0.01em",
           }}
         >
