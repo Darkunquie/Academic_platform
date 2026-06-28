@@ -28,7 +28,14 @@ function dailyKey(userId: string): string {
   return `self-upload:${userId}:${today}`;
 }
 
-function quota(userId: string): boolean {
+// TEMPORARY: accounts here bypass the 3/day self-upload cap (unlimited uploads).
+// Remove this set + the email check in quota() to restore the normal limit.
+const UNLIMITED_UPLOAD_EMAILS = new Set(["foryoutableau@gmail.com"]);
+
+function quota(userId: string, email?: string | null): boolean {
+  if (email && UNLIMITED_UPLOAD_EMAILS.has(email.trim().toLowerCase())) {
+    return true; // whitelisted: always allowed, never consumes the rate limit
+  }
   return rateLimit(dailyKey(userId), 3, 24 * 60 * 60 * 1000);
 }
 
@@ -39,7 +46,7 @@ export async function parsePdfAction(
   | { ok: false; error: string }
 > {
   const user = await requireStudent();
-  if (!quota(user.id)) {
+  if (!quota(user.id, user.email)) {
     return { ok: false, error: "Daily limit reached (3 self-uploads/day)." };
   }
   const file = fd.get("file");
