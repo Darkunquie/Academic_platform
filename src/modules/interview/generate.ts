@@ -129,7 +129,11 @@ The material below is authoritative. Base each question on a specific concept, d
 ${ctx}
 """
 
-Mix conceptual ("what is", "explain", "why"), applied ("how would you", "give an example", "compare"), and short-answer questions. Each idealAnswer must be a 2-4 sentence model response drawn from the material above. Return strict JSON:
+Mix conceptual ("what is", "explain", "why"), applied ("how would you", "give an example", "compare"), and short-answer questions. Each idealAnswer must be a 2-4 sentence model response drawn from the material above.
+
+Never ask about the app, this platform, "mock test", "mock interview", or any UI feature. Never ask meta questions like "a student who understands X should next be able to". Stay strictly on subject matter.
+
+Return strict JSON:
 {"questions":[{"question":"...","idealAnswer":"..."}]}`;
 
   const json = await groqJson<{ questions?: GenInterviewQ[] }>({

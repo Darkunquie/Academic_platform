@@ -64,7 +64,7 @@ export function SelfUploadFlow() {
         subject={subject}
         topic={topic}
         pdfHash={pdfHash}
-        onExit={reset}
+        onExit={() => setStage("choose")}
       />
     );
   }
@@ -77,7 +77,7 @@ export function SelfUploadFlow() {
         subject={subject}
         topic={topic}
         pdfHash={pdfHash}
-        onExit={reset}
+        onExit={() => setStage("choose")}
       />
     );
   }
@@ -99,12 +99,13 @@ export function SelfUploadFlow() {
             Step 1 of 2 · Upload
           </p>
           <h2 className="mb-3 text-3xl font-black tracking-tighter text-solar-text-dark md:text-4xl">
-            Drop a PDF of your study material.
+            Drop a PDF or image of your study material.
           </h2>
           <p className="mb-6 max-w-xl text-[14px] leading-[22px] text-solar-text">
-            Text-PDFs only (no scanned images). Max 20 MB. We extract the text,
-            generate a mock test or interview from it, and save your results to
-            your history so you can replay or review them later.
+            Text-PDFs or clear images (photo of notes, screenshot, diagram).
+            Max 20 MB. We extract the content, generate a mock test or
+            interview from it, and save your results to your history so you
+            can replay or review them later.
           </p>
 
           <div className="mb-5 grid gap-3 sm:grid-cols-2">
@@ -143,7 +144,7 @@ export function SelfUploadFlow() {
           <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-800 px-6 py-3.5 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-blue-900/20 transition-all hover:-translate-y-0.5 hover:bg-blue-700">
             <input
               type="file"
-              accept="application/pdf,.pdf"
+              accept="application/pdf,.pdf,image/*"
               className="hidden"
               onChange={onFile}
               disabled={busy}
@@ -154,7 +155,7 @@ export function SelfUploadFlow() {
             >
               upload_file
             </span>
-            {" "}{busy ? "Reading PDF…" : "Choose PDF"}
+            {" "}{busy ? "Reading file…" : "Choose PDF or image"}
           </label>
 
           <ul
@@ -162,7 +163,7 @@ export function SelfUploadFlow() {
             style={{ fontFamily: "Geist Mono, monospace" }}
           >
             <li className="rounded-xl border border-solar-ink/20 bg-slate-50 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.1em] text-solar-text">
-              <span className="text-emerald-600">✓</span> Text-based PDF
+              <span className="text-emerald-600">✓</span> PDF or image
             </li>
             <li className="rounded-xl border border-solar-ink/20 bg-slate-50 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.1em] text-solar-text">
               <span className="text-emerald-600">✓</span> Up to 20 MB
@@ -186,14 +187,13 @@ export function SelfUploadFlow() {
               </span>
               <div>
                 <p className="text-[13px] font-black uppercase tracking-[0.1em] text-solar-text-dark">
-                  PDF Parsed
+                  Content Extracted
                 </p>
                 <p
                   className="text-[11px] font-bold uppercase tracking-[0.1em] text-solar-text/70"
                   style={{ fontFamily: "Geist Mono, monospace" }}
                 >
-                  {meta?.pages} pages · {meta?.chars.toLocaleString()} chars
-                  extracted
+                  {meta?.chars.toLocaleString()} chars extracted
                 </p>
               </div>
             </div>

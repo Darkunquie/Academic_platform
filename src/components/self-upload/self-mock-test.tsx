@@ -59,6 +59,15 @@ export function SelfMockTest({
   }
 
   async function submit() {
+    const unanswered = questions.length - Object.keys(picks).length;
+    if (
+      unanswered > 0 &&
+      !globalThis.confirm(
+        `You have ${unanswered} unanswered question${unanswered === 1 ? "" : "s"}. Submit anyway?`
+      )
+    ) {
+      return;
+    }
     setSubmitted(true);
     if (!saved && subject && topic && !presetQuestions) {
       const res = await saveTestAttemptAction({

@@ -94,6 +94,86 @@ export async function groqJson<T = unknown>(args: GroqArgs): Promise<T> {
   return JSON.parse(raw) as T;
 }
 
+// Vision-capable model on Groq (Llama 4 Scout supports image inputs).
+export const GROQ_VISION_MODEL =
+  process.env.GROQ_VISION_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct";
+
+type GroqVisionArgs = {
+  system: string;
+  user: string;
+  imageBase64: string;
+  imageMime: string;
+  model?: string;
+  temperature?: number;
+};
+
+/** Groq multimodal chat with a single image. Returns raw text content. */
+export async function groqVision({
+  system,
+  user,
+  imageBase64,
+  imageMime,
+  model = GROQ_VISION_MODEL,
+  temperature = 0.2,
+}: GroqVisionArgs): Promise<string> {
+  const key = process.env.GROQ_API_KEY;
+  if (!key) throw new Error("GROQ_API_KEY is not set. Add it to .env");
+
+  if (await isOverCap()) {
+    throw new UpstreamError(
+      "groq",
+      429,
+      "AI service paused for the day. Try again tomorrow or contact support.",
+      "daily token cap reached"
+    );
+  }
+
+  return withRetry(async () => {
+    const res = await fetch(GROQ_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${key}`,
+      },
+      body: JSON.stringify({
+        model,
+        temperature,
+        messages: [
+          { role: "system", content: system },
+          {
+            role: "user",
+            content: [
+              { type: "text", text: user },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:${imageMime};base64,${imageBase64}`,
+                },
+              },
+            ],
+          },
+        ],
+      }),
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      void recordGroqError();
+      throw new UpstreamError(
+        "groq",
+        res.status,
+        "AI service unavailable. Please retry shortly.",
+        text.slice(0, 1000)
+      );
+    }
+
+    const data = await res.json();
+    const tokens = Number(data.usage?.total_tokens) || 0;
+    if (tokens > 0) void recordTokens(tokens);
+    return data.choices?.[0]?.message?.content ?? "";
+  });
+}
+
 const GROQ_STT_URL = "https://api.groq.com/openai/v1/audio/transcriptions";
 export const GROQ_STT_MODEL =
   process.env.GROQ_STT_MODEL || "whisper-large-v3-turbo";

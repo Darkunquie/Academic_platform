@@ -20,6 +20,7 @@ export default function LoginPage() {
             alt="Open books in a sunlit library"
             fill
             priority
+            sizes="(min-width: 768px) 50vw, 100vw"
             className="h-full w-full object-cover opacity-60 mix-blend-overlay"
           />
           <div

@@ -4,13 +4,15 @@ import { createHash } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { requireStudent } from "@/modules/auth/guard";
 import { rateLimit } from "@/lib/rate-limit";
-import { groqJson, groqTranscribe, GROQ_FAST_MODEL } from "@/lib/groq";
+import { groqJson, groqTranscribe, groqVision, GROQ_FAST_MODEL } from "@/lib/groq";
 import { scoreInterviewAnswer } from "@/modules/interview/generate";
 import * as svc from "./service";
 
 const MAX_BYTES = 20 * 1024 * 1024; // 20 MB
 const MIN_TEXT_LEN = 200;
 const MAX_CTX_CHARS = 4000;
+const IMAGE_MIME_PREFIX = "image/";
+const IMAGE_EXTS = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"];
 
 export type SelfMcq = {
   prompt: string;
@@ -55,11 +57,49 @@ export async function parsePdfAction(
     return { ok: false, error: "File too large (max 20 MB)" };
   }
   const name = file.name.toLowerCase();
-  if (!name.endsWith(".pdf") && !file.type.includes("pdf")) {
-    return { ok: false, error: "Only PDF files are supported" };
+  const isImage =
+    file.type.startsWith(IMAGE_MIME_PREFIX) ||
+    IMAGE_EXTS.some((ext) => name.endsWith(ext));
+  const isPdf = name.endsWith(".pdf") || file.type.includes("pdf");
+  if (!isPdf && !isImage) {
+    return { ok: false, error: "Only PDF or image files are supported" };
   }
   try {
     const buf = Buffer.from(await file.arrayBuffer());
+
+    if (isImage) {
+      const imageMime = file.type.startsWith(IMAGE_MIME_PREFIX)
+        ? file.type
+        : "image/png";
+      const imageBase64 = buf.toString("base64");
+      const system =
+        "You are an OCR + study-material extractor. Read the image and output ONLY the study content it contains — transcribe text verbatim, describe diagrams/equations/tables in plain prose, and preserve technical detail. No preamble, no commentary, no markdown headers.";
+      const userPrompt =
+        "Extract everything useful for generating study questions from this image. Include all visible text, formulas, labelled diagrams, tables, and any captions. Output plain text only.";
+      const raw = await groqVision({
+        system,
+        user: userPrompt,
+        imageBase64,
+        imageMime,
+      });
+      const text = (raw ?? "").trim();
+      if (text.length < MIN_TEXT_LEN) {
+        return {
+          ok: false,
+          error:
+            "Could not extract enough content from the image. Try a clearer/higher-resolution photo or a text-based PDF.",
+        };
+      }
+      const pdfHash = createHash("sha256").update(text).digest("hex");
+      return {
+        ok: true,
+        text: text.slice(0, MAX_CTX_CHARS),
+        pages: 1,
+        chars: text.length,
+        pdfHash,
+      };
+    }
+
     // pdf-parse v1.1.1 — direct lib path dodges the "test pdf at import"
     // bug present in the index.js entry, and avoids the v2 worker problem
     // (v2 pulls in pdfjs-dist worker which Next.js can't resolve at runtime).
@@ -120,7 +160,14 @@ export async function generateSelfTestAction(input: {
 """
 ${input.text.slice(0, MAX_CTX_CHARS)}
 """
-Rules: exactly 4 options per question, exactly one correct. Cover different parts of the material. Return JSON of the shape:
+Rules:
+- Exactly 4 options per question, exactly one correct.
+- Cover different parts of the material.
+- Every question must test knowledge of the SUBJECT MATTER in the material above.
+- NEVER ask about the app, this platform, "mock test", "mock interview", "PDF download", or any UI feature.
+- NEVER ask meta questions like "a student who understands X should next be able to" or "which best explains the role of X".
+- Prefer concrete facts, definitions, or worked examples from the material.
+Return JSON of the shape:
 {"questions":[{"prompt":"...","options":[{"text":"...","isCorrect":true},{"text":"...","isCorrect":false},{"text":"...","isCorrect":false},{"text":"...","isCorrect":false}],"explanation":"short reason"}]}`;
     const json = await groqJson<{ questions?: SelfMcq[] }>({
       system,
@@ -157,7 +204,8 @@ export async function generateSelfInterviewAction(input: {
 """
 ${input.text.slice(0, MAX_CTX_CHARS)}
 """
-Mix conceptual and applied questions. Return JSON:
+Mix conceptual and applied questions grounded in the material above. Never ask about the app, this platform, "mock test", "mock interview", or any UI feature. Never ask meta questions like "a student who understands X should next be able to". Stay strictly on subject matter.
+Return JSON:
 {"questions":[{"question":"...","idealAnswer":"a concise model answer"}]}`;
     const json = await groqJson<{ questions?: SelfInterviewQ[] }>({
       system,

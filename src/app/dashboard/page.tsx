@@ -538,8 +538,8 @@ export default async function DashboardPage() {
         </div>
       </footer>
 
-      {/* Sync status badge (fixed) */}
-      <div className="fixed bottom-8 left-8 z-50 flex items-center gap-3 rounded-full border border-white/10 bg-solar-text-dark px-5 py-2.5 text-[10px] font-black text-white shadow-2xl">
+      {/* Sync status badge (fixed). Hidden on mobile so it doesn't crowd content. */}
+      <div className="fixed bottom-8 left-8 z-50 hidden items-center gap-3 rounded-full border border-white/10 bg-solar-text-dark px-5 py-2.5 text-[10px] font-black text-white shadow-2xl md:flex">
         <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
         SYNC_CONNECTED
       </div>

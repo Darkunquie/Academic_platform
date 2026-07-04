@@ -50,9 +50,17 @@ export async function generateMcqs(
   const user = `Write ${count} multiple-choice questions (difficulty: ${difficulty}) for the topic "${topic.name}" in subject "${topic.subjectName}" for ${topic.gradeName}.
 Base them on this material when present:
 """
-${ctx || "(no material provided — use standard curriculum knowledge for this topic)"}
+${ctx || "(no material — use standard curriculum knowledge for this topic and grade level)"}
 """
-Rules: exactly 4 options per question, exactly one correct. Return JSON of the shape:
+Rules:
+- Exactly 4 options per question, exactly one correct.
+- Every question must test factual, conceptual, or applied knowledge of the SUBJECT MATTER of "${topic.name}".
+- NEVER ask about the app, the platform, this website, "mock test", "mock interview", "PDF download", or any UI feature.
+- NEVER ask meta questions like "a student who understands X should next be able to" or "which best explains the role of X".
+- Prefer concrete examples, definitions, or worked problems over abstract "role of" phrasing.
+- Keep language age-appropriate for ${topic.gradeName} and use vocabulary the student will recognise.
+- Cover different sub-concepts across the ${count} questions; do not ask the same thing twice.
+Return JSON of the shape:
 {"questions":[{"prompt":"...","options":[{"text":"...","isCorrect":true},{"text":"...","isCorrect":false},{"text":"...","isCorrect":false},{"text":"...","isCorrect":false}],"explanation":"short reason"}]}`;
 
   const json = await groqJson<{ questions?: GenMcq[] }>({

@@ -46,12 +46,12 @@ export default async function SelfUploadPage() {
             Self Upload · Practice Your Own Material
           </p>
           <h1 className="text-5xl font-black tracking-tighter text-solar-text-dark md:text-6xl">
-            Bring your own PDF.
+            Bring your own PDF or image.
           </h1>
           <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-solar-text">
-            Upload any text-based PDF. We generate a mock test or interview from
-            it, save the result to your history, and let you replay or review
-            anytime.
+            Upload a text-based PDF or a clear image of study material. We
+            generate a mock test or interview from it, save the result to your
+            history, and let you replay or review anytime.
           </p>
         </header>
 

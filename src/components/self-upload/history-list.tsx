@@ -1,6 +1,20 @@
 import Link from "next/link";
 import { DeleteAttemptButton } from "./delete-attempt-button";
 
+// en-IN with explicit day/month/year avoids the ambiguous US-style m/d/yyyy
+// (e.g. "4/7/2026" reads as April 7 to some users, July 4 to others).
+const attemptDateFormatter = new Intl.DateTimeFormat("en-IN", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+function formatAttemptDate(d: Date): string {
+  return attemptDateFormatter.format(new Date(d));
+}
+
 type Attempt = {
   id: string;
   subject: string;
@@ -38,8 +52,8 @@ export function HistoryList({ items }: Readonly<{ items: Attempt[] }>) {
           >
             {a.mode}
           </span>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-[14px] font-black text-solar-text-dark">
+          <div className="min-w-0 flex-1 basis-[60%]">
+            <p className="line-clamp-2 text-[14px] font-black text-solar-text-dark md:truncate">
               {a.subject} · {a.topic}
             </p>
             <p
@@ -47,7 +61,7 @@ export function HistoryList({ items }: Readonly<{ items: Attempt[] }>) {
               style={{ fontFamily: "Geist Mono, monospace" }}
             >
               {a.difficulty} · {a.totalQuestions} Qs ·{" "}
-              {new Date(a.createdAt).toLocaleString()}
+              {formatAttemptDate(a.createdAt)}
             </p>
           </div>
           <span

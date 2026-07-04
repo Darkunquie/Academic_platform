@@ -18,7 +18,19 @@ export function TestRunner({
   const [result, setResult] = useState<Result | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  const unansweredCount = questions.filter((q) => picks[q.id] == null).length;
+  const allEmpty = unansweredCount === questions.length;
+
   async function submit() {
+    if (allEmpty) return;
+    if (
+      unansweredCount > 0 &&
+      !globalThis.confirm(
+        `You have ${unansweredCount} unanswered question${unansweredCount === 1 ? "" : "s"}. Submit anyway?`
+      )
+    ) {
+      return;
+    }
     setSubmitting(true);
     const answers = questions.map((q) => ({
       questionId: q.id,
@@ -119,9 +131,19 @@ export function TestRunner({
         </div>
       ))}
 
-      <Button onClick={submit} disabled={submitting}>
-        {submitting ? "Submitting…" : "Submit test"}
-      </Button>
+      <div className="flex items-center gap-3">
+        <Button onClick={submit} disabled={submitting || allEmpty}>
+          {submitting ? "Submitting…" : "Submit test"}
+        </Button>
+        {unansweredCount > 0 && !allEmpty && (
+          <span className="text-xs text-gray-500">
+            {unansweredCount} unanswered
+          </span>
+        )}
+        {allEmpty && (
+          <span className="text-xs text-gray-500">Answer at least one question to submit</span>
+        )}
+      </div>
     </div>
   );
 }
