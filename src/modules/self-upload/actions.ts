@@ -4,15 +4,30 @@ import { createHash } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { requireStudent } from "@/modules/auth/guard";
 import { rateLimit } from "@/lib/rate-limit";
-import { groqJson, groqTranscribe, groqVision, GROQ_FAST_MODEL } from "@/lib/groq";
+import { groqJson, groqTranscribe, groqVisionMulti, GROQ_FAST_MODEL } from "@/lib/groq";
 import { scoreInterviewAnswer } from "@/modules/interview/generate";
 import * as svc from "./service";
 
-const MAX_BYTES = 20 * 1024 * 1024; // 20 MB
+const MAX_BYTES = 20 * 1024 * 1024; // 20 MB per file
+const MAX_TOTAL_BYTES = 20 * 1024 * 1024; // 20 MB total across a multi-image upload
+const MAX_IMAGES_PER_UPLOAD = 5;
 const MIN_TEXT_LEN = 200;
 const MAX_CTX_CHARS = 4000;
 const IMAGE_MIME_PREFIX = "image/";
 const IMAGE_EXTS = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"];
+
+function isImageFile(file: File): boolean {
+  const name = file.name.toLowerCase();
+  return (
+    file.type.startsWith(IMAGE_MIME_PREFIX) ||
+    IMAGE_EXTS.some((ext) => name.endsWith(ext))
+  );
+}
+
+function isPdfFile(file: File): boolean {
+  const name = file.name.toLowerCase();
+  return name.endsWith(".pdf") || file.type.includes("pdf");
+}
 
 export type SelfMcq = {
   prompt: string;
@@ -51,55 +66,74 @@ export async function parsePdfAction(
   if (!quota(user.id, user.email)) {
     return { ok: false, error: "Daily limit reached (3 self-uploads/day)." };
   }
-  const file = fd.get("file");
-  if (!(file instanceof File)) return { ok: false, error: "No file" };
-  if (file.size > MAX_BYTES) {
-    return { ok: false, error: "File too large (max 20 MB)" };
+
+  // Accept either a single "file" (PDF or one image) or multiple images via
+  // repeated "file" entries. FormData.getAll works for both shapes.
+  const raw = fd.getAll("file").filter((v): v is File => v instanceof File);
+  if (raw.length === 0) return { ok: false, error: "No file" };
+
+  const anyPdf = raw.some(isPdfFile);
+  const anyImage = raw.some(isImageFile);
+  if (anyPdf && raw.length > 1) {
+    return { ok: false, error: "Upload a single PDF, or multiple images — not both." };
   }
-  const name = file.name.toLowerCase();
-  const isImage =
-    file.type.startsWith(IMAGE_MIME_PREFIX) ||
-    IMAGE_EXTS.some((ext) => name.endsWith(ext));
-  const isPdf = name.endsWith(".pdf") || file.type.includes("pdf");
-  if (!isPdf && !isImage) {
+  if (!anyPdf && !anyImage) {
     return { ok: false, error: "Only PDF or image files are supported" };
   }
-  try {
-    const buf = Buffer.from(await file.arrayBuffer());
+  if (raw.some((f) => f.size > MAX_BYTES)) {
+    return { ok: false, error: "File too large (max 20 MB)" };
+  }
+  const totalBytes = raw.reduce((sum, f) => sum + f.size, 0);
+  if (totalBytes > MAX_TOTAL_BYTES) {
+    return { ok: false, error: "Combined file size too large (max 20 MB total)" };
+  }
+  if (!anyPdf && raw.length > MAX_IMAGES_PER_UPLOAD) {
+    return {
+      ok: false,
+      error: `Too many images (max ${MAX_IMAGES_PER_UPLOAD} per upload).`,
+    };
+  }
 
-    if (isImage) {
-      const imageMime = file.type.startsWith(IMAGE_MIME_PREFIX)
-        ? file.type
-        : "image/png";
-      const imageBase64 = buf.toString("base64");
+  try {
+    if (!anyPdf) {
+      // Multi-image path (also handles single image).
+      const images = await Promise.all(
+        raw.map(async (f) => {
+          const buf = Buffer.from(await f.arrayBuffer());
+          const mime = f.type.startsWith(IMAGE_MIME_PREFIX) ? f.type : "image/png";
+          return { base64: buf.toString("base64"), mime };
+        })
+      );
       const system =
-        "You are an OCR + study-material extractor. Read the image and output ONLY the study content it contains — transcribe text verbatim, describe diagrams/equations/tables in plain prose, and preserve technical detail. No preamble, no commentary, no markdown headers.";
+        "You are an OCR + study-material extractor. Read the image(s) and output ONLY the study content they contain — transcribe text verbatim, describe diagrams/equations/tables in plain prose, and preserve technical detail. No preamble, no commentary, no markdown headers.";
       const userPrompt =
-        "Extract everything useful for generating study questions from this image. Include all visible text, formulas, labelled diagrams, tables, and any captions. Output plain text only.";
-      const raw = await groqVision({
+        images.length > 1
+          ? `Extract everything useful for generating study questions from these ${images.length} images. Treat them as pages of a single document — merge the content into one coherent transcript in the order given. Include all visible text, formulas, labelled diagrams, tables, and captions. Output plain text only.`
+          : "Extract everything useful for generating study questions from this image. Include all visible text, formulas, labelled diagrams, tables, and any captions. Output plain text only.";
+      const rawText = await groqVisionMulti({
         system,
         user: userPrompt,
-        imageBase64,
-        imageMime,
+        images,
       });
-      const text = (raw ?? "").trim();
+      const text = (rawText ?? "").trim();
       if (text.length < MIN_TEXT_LEN) {
         return {
           ok: false,
           error:
-            "Could not extract enough content from the image. Try a clearer/higher-resolution photo or a text-based PDF.",
+            "Could not extract enough content from the image(s). Try clearer/higher-resolution photos or a text-based PDF.",
         };
       }
       const pdfHash = createHash("sha256").update(text).digest("hex");
       return {
         ok: true,
         text: text.slice(0, MAX_CTX_CHARS),
-        pages: 1,
+        pages: images.length,
         chars: text.length,
         pdfHash,
       };
     }
 
+    const buf = Buffer.from(await raw[0].arrayBuffer());
     // pdf-parse v1.1.1 — direct lib path dodges the "test pdf at import"
     // bug present in the index.js entry, and avoids the v2 worker problem
     // (v2 pulls in pdfjs-dist worker which Next.js can't resolve at runtime).

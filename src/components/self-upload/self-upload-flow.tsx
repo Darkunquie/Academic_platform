@@ -24,17 +24,31 @@ export function SelfUploadFlow() {
   const [interviewMode, setInterviewMode] = useState<"text" | "voice">("text");
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const picked = Array.from(e.target.files ?? []);
+    if (picked.length === 0) return;
     if (!subject.trim() || !topic.trim()) {
       setError("Enter subject and topic before uploading.");
+      e.target.value = "";
+      return;
+    }
+    // Client-side guard: if any PDF is in the set, only allow a single file.
+    const hasPdf = picked.some((f) =>
+      f.name.toLowerCase().endsWith(".pdf") || f.type.includes("pdf")
+    );
+    if (hasPdf && picked.length > 1) {
+      setError("Upload a single PDF, or multiple images — not both.");
+      e.target.value = "";
+      return;
+    }
+    if (!hasPdf && picked.length > 5) {
+      setError("Too many images (max 5 per upload).");
       e.target.value = "";
       return;
     }
     setBusy(true);
     setError(null);
     const fd = new FormData();
-    fd.append("file", file);
+    for (const f of picked) fd.append("file", f);
     const res = await parsePdfAction(fd);
     setBusy(false);
     e.target.value = "";
@@ -99,13 +113,13 @@ export function SelfUploadFlow() {
             Step 1 of 2 · Upload
           </p>
           <h2 className="mb-3 text-3xl font-black tracking-tighter text-solar-text-dark md:text-4xl">
-            Drop a PDF or image of your study material.
+            Drop a PDF or images of your study material.
           </h2>
           <p className="mb-6 max-w-xl text-[14px] leading-[22px] text-solar-text">
-            Text-PDFs or clear images (photo of notes, screenshot, diagram).
-            Max 20 MB. We extract the content, generate a mock test or
-            interview from it, and save your results to your history so you
-            can replay or review them later.
+            One text-PDF, or up to 5 clear images (photos of notes,
+            screenshots, diagrams). 20 MB total. We merge them into one
+            transcript, generate a mock test or interview, and save your
+            results to your history so you can replay or review them later.
           </p>
 
           <div className="mb-5 grid gap-3 sm:grid-cols-2">
@@ -145,6 +159,7 @@ export function SelfUploadFlow() {
             <input
               type="file"
               accept="application/pdf,.pdf,image/*"
+              multiple
               className="hidden"
               onChange={onFile}
               disabled={busy}
@@ -155,7 +170,7 @@ export function SelfUploadFlow() {
             >
               upload_file
             </span>
-            {" "}{busy ? "Reading file…" : "Choose PDF or image"}
+            {" "}{busy ? "Reading file…" : "Choose PDF or images"}
           </label>
 
           <ul
@@ -163,10 +178,10 @@ export function SelfUploadFlow() {
             style={{ fontFamily: "Geist Mono, monospace" }}
           >
             <li className="rounded-xl border border-solar-ink/20 bg-slate-50 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.1em] text-solar-text">
-              <span className="text-emerald-600">✓</span> PDF or image
+              <span className="text-emerald-600">✓</span> PDF or up to 5 images
             </li>
             <li className="rounded-xl border border-solar-ink/20 bg-slate-50 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.1em] text-solar-text">
-              <span className="text-emerald-600">✓</span> Up to 20 MB
+              <span className="text-emerald-600">✓</span> Up to 20 MB total
             </li>
             <li className="rounded-xl border border-solar-ink/20 bg-slate-50 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.1em] text-solar-text">
               <span className="text-emerald-600">✓</span> 3 uploads per day

@@ -108,16 +108,35 @@ type GroqVisionArgs = {
 };
 
 /** Groq multimodal chat with a single image. Returns raw text content. */
-export async function groqVision({
+export async function groqVision(args: GroqVisionArgs): Promise<string> {
+  return groqVisionMulti({
+    system: args.system,
+    user: args.user,
+    images: [{ base64: args.imageBase64, mime: args.imageMime }],
+    model: args.model,
+    temperature: args.temperature,
+  });
+}
+
+type GroqVisionMultiArgs = {
+  system: string;
+  user: string;
+  images: { base64: string; mime: string }[];
+  model?: string;
+  temperature?: number;
+};
+
+/** Groq multimodal chat with one or more images in a single request. */
+export async function groqVisionMulti({
   system,
   user,
-  imageBase64,
-  imageMime,
+  images,
   model = GROQ_VISION_MODEL,
   temperature = 0.2,
-}: GroqVisionArgs): Promise<string> {
+}: GroqVisionMultiArgs): Promise<string> {
   const key = process.env.GROQ_API_KEY;
   if (!key) throw new Error("GROQ_API_KEY is not set. Add it to .env");
+  if (images.length === 0) throw new Error("groqVisionMulti: no images");
 
   if (await isOverCap()) {
     throw new UpstreamError(
@@ -144,12 +163,12 @@ export async function groqVision({
             role: "user",
             content: [
               { type: "text", text: user },
-              {
-                type: "image_url",
+              ...images.map((img) => ({
+                type: "image_url" as const,
                 image_url: {
-                  url: `data:${imageMime};base64,${imageBase64}`,
+                  url: `data:${img.mime};base64,${img.base64}`,
                 },
-              },
+              })),
             ],
           },
         ],
